@@ -40,7 +40,7 @@ public class TConJEIPlugin implements IModPlugin {
     }
 
     private ArrayList<ToolStatsRecipe> recipes(IGuiHelper guiHelper) {
-        ArrayList<ToolStatsRecipe> list = new ArrayList<ToolStatsRecipe>();
+        ArrayList<ToolStatsRecipe> list = new ArrayList<>();
         for (IMaterial material : MaterialRegistry.getMaterials())
             // && material.hasItems() && !material.getAllStats().isEmpty()
             if (!material.isHidden()) {
