@@ -1,9 +1,11 @@
 package me.paypur.tconjei.jei;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.builder.IRecipeSlotBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
+import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.RecipeIngredientRole;
@@ -14,10 +16,13 @@ import net.minecraft.network.chat.TextComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 
+import java.util.List;
+
 import static me.paypur.tconjei.TConJEI.MOD_ID;
 import static net.minecraft.world.item.Items.STONE;
 
 public class ToolStatsCategory implements IRecipeCategory<ToolStatsRecipe> {
+
     public static ResourceLocation UID = new ResourceLocation(MOD_ID, "tool_stats");
     public static final int WIDTH  = 182, HEIGHT = 128;
     private final IDrawable BACKGROUND, ICON;
@@ -26,6 +31,18 @@ public class ToolStatsCategory implements IRecipeCategory<ToolStatsRecipe> {
         this.BACKGROUND = guiHelper.createBlankDrawable(WIDTH, HEIGHT);
         this.ICON = guiHelper.createDrawable(new ResourceLocation(MOD_ID,"textures/gui/icon.png"), 0 ,0,16,16);
     }
+    @Override
+    public void draw(ToolStatsRecipe recipe, IRecipeSlotsView recipeSlotsView, PoseStack stack, double mouseX, double mouseY) {
+        IRecipeCategory.super.draw(recipe, recipeSlotsView, stack, mouseX, mouseY);
+    }
+
+    @Override
+    public void setRecipe(IRecipeLayoutBuilder builder, ToolStatsRecipe recipe, IFocusGroup focuses) {
+        ItemStack representative = recipe.getRepresentativeItem();
+        builder.addSlot(RecipeIngredientRole.INPUT, 2, 2).addItemStack(representative);
+        builder.addSlot(RecipeIngredientRole.OUTPUT, 2, 2).addItemStack(representative);
+    }
+
     @Override
     public Component getTitle() {
         return new TextComponent("Tool Stats");
@@ -45,11 +62,6 @@ public class ToolStatsCategory implements IRecipeCategory<ToolStatsRecipe> {
     @Override
     public IDrawable getBackground() {
         return BACKGROUND;
-    }
-
-    @Override
-    public void setRecipe(IRecipeLayoutBuilder builder, ToolStatsRecipe recipe, IFocusGroup focuses) {
-        IRecipeSlotBuilder slot = builder.addSlot(RecipeIngredientRole.OUTPUT, 0, 0);
     }
 
     @SuppressWarnings("removal")

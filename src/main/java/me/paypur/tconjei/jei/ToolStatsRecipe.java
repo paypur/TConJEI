@@ -16,6 +16,8 @@ import slimeknights.mantle.recipe.helper.RecipeHelper;
 import slimeknights.mantle.util.RegistryHelper;
 import slimeknights.tconstruct.common.TinkerTags;
 import slimeknights.tconstruct.library.materials.definition.IMaterial;
+import slimeknights.tconstruct.library.materials.definition.Material;
+import slimeknights.tconstruct.library.materials.definition.MaterialId;
 import slimeknights.tconstruct.library.materials.definition.MaterialVariantId;
 import slimeknights.tconstruct.library.recipe.TinkerRecipeTypes;
 import slimeknights.tconstruct.library.recipe.casting.material.MaterialCastingLookup;
@@ -32,14 +34,15 @@ import java.util.stream.Collectors;
 public class ToolStatsRecipe implements IRecipeCategoryExtension {
 
 
-    public final IMaterial material;
+    public final Material material;
     private final IDrawable slot;
 
-    public ToolStatsRecipe(IMaterial material, IGuiHelper guiHelper) {
+    public ToolStatsRecipe(Material material, IGuiHelper guiHelper) {
         this.material = material;
         this.slot = guiHelper.getSlotDrawable();
     }
 
+    @SuppressWarnings("removal")
     @Override
     public void setIngredients(IIngredients ingredients) {
 
@@ -75,7 +78,7 @@ public class ToolStatsRecipe implements IRecipeCategoryExtension {
         ArrayList<ItemStack> list = new ArrayList<ItemStack>();
         for (IToolPart part : getToolParts()) {
             if (part.canUseMaterial(material)) {
-                ItemStack stack = part.withMaterial(material.getIdentifier());
+                list.add(part.withMaterial(material.getIdentifier()));
             }
         }
         return list;
@@ -102,14 +105,14 @@ public class ToolStatsRecipe implements IRecipeCategoryExtension {
 //    }
 
     // taken from AbstractMaterialContent
-    private ItemStack getRepresentativeItem() {
+    public ItemStack getRepresentativeItem() {
         List<ItemStack> repairStacks;
         Level world = Minecraft.getInstance().level;
         if (world == null) {
             return ItemStack.EMPTY;
         }
         // simply combine all items from all recipes
-        MaterialVariantId materialVariantId = MaterialVariantId.parse(material.toString());
+        MaterialVariantId materialVariantId = MaterialVariantId.parse(material.getIdentifier().getVariant());
         repairStacks = RecipeHelper.getUIRecipes(world.getRecipeManager(), TinkerRecipeTypes.MATERIAL.get(), MaterialRecipe.class, recipe -> materialVariantId.matchesVariant(recipe.getMaterial()))
                 .stream()
                 .flatMap(recipe -> Arrays.stream(recipe.getIngredient().getItems()))
