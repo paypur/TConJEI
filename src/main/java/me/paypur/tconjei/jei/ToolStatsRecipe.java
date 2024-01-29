@@ -37,18 +37,23 @@ public class ToolStatsRecipe implements IRecipeCategoryExtension {
         this.slot = guiHelper.getSlotDrawable();
     }
 
-    @SuppressWarnings("removal")
+//    @SuppressWarnings("removal")
+//    @Override
+//    public void setIngredients(IIngredients ingredients) {
+//
+//        ingredients.setInputs(VanillaTypes.ITEM, getRepresentatives());
+//        ingredients.setOutputs(VanillaTypes.ITEM, getRepresentatives());
+//
+//        if (!material.isCraftable()) {
+//            ingredients.setInputs(ForgeTypes.FLUID, Collections.singletonList(getFluidStack()));
+//            ingredients.setOutputs(ForgeTypes.FLUID, Collections.singletonList(getFluidStack()));
+//        }
+//
+//    }
+
     @Override
-    public void setIngredients(IIngredients ingredients) {
-
-        ingredients.setInputs(VanillaTypes.ITEM, getRepresentatives());
-        ingredients.setOutputs(VanillaTypes.ITEM, getRepresentatives());
-
-        if (!material.isCraftable()) {
-            ingredients.setInputs(ForgeTypes.FLUID, Collections.singletonList(getFluidStack()));
-            ingredients.setOutputs(ForgeTypes.FLUID, Collections.singletonList(getFluidStack()));
-        }
-
+    public void drawInfo(int recipeWidth, int recipeHeight, PoseStack stack, double mouseX, double mouseY) {
+        IRecipeCategoryExtension.super.drawInfo(recipeWidth, recipeHeight, stack, mouseX, mouseY);
     }
 
     private List<ItemStack> getRepresentatives() {
@@ -120,8 +125,4 @@ public class ToolStatsRecipe implements IRecipeCategoryExtension {
         return repairStacks;
     }
 
-    @Override
-    public void drawInfo(int recipeWidth, int recipeHeight, PoseStack stack, double mouseX, double mouseY) {
-        IRecipeCategoryExtension.super.drawInfo(recipeWidth, recipeHeight, stack, mouseX, mouseY);
-    }
 }

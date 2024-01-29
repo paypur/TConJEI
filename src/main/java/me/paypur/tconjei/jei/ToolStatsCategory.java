@@ -21,7 +21,7 @@ import static me.paypur.tconjei.TConJEI.MOD_ID;
 public class ToolStatsCategory implements IRecipeCategory<ToolStatsRecipe> {
 
     public static ResourceLocation UID = new ResourceLocation(MOD_ID, "tool_stats");
-    public static final int WIDTH  = 182, HEIGHT = 128;
+    public static final int WIDTH = 182, HEIGHT = 128;
     private final IDrawable BACKGROUND, ICON;
 
     public ToolStatsCategory(IGuiHelper guiHelper) {
@@ -37,7 +37,7 @@ public class ToolStatsCategory implements IRecipeCategory<ToolStatsRecipe> {
     public void setRecipe(IRecipeLayoutBuilder builder, ToolStatsRecipe recipe, IFocusGroup focuses) {
         List<ItemStack> representative = recipe.getRepresentativeItems();
         builder.addSlot(RecipeIngredientRole.INPUT, 0, 0).addItemStacks(representative);
-        builder.addSlot(RecipeIngredientRole.OUTPUT, 2, 2).addItemStacks(representative);
+        builder.addSlot(RecipeIngredientRole.OUTPUT, 182, 0).addItemStacks(representative);
     }
 
     @Override
