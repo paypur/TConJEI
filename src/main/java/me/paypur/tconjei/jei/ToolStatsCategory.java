@@ -14,6 +14,8 @@ import net.minecraft.network.chat.TextComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 
+import java.util.List;
+
 import static me.paypur.tconjei.TConJEI.MOD_ID;
 
 public class ToolStatsCategory implements IRecipeCategory<ToolStatsRecipe> {
@@ -33,9 +35,9 @@ public class ToolStatsCategory implements IRecipeCategory<ToolStatsRecipe> {
 
     @Override
     public void setRecipe(IRecipeLayoutBuilder builder, ToolStatsRecipe recipe, IFocusGroup focuses) {
-        ItemStack representative = recipe.getRepresentativeItems();
-        builder.addSlot(RecipeIngredientRole.INPUT, 2, 2).addItemStack(representative);
-        builder.addSlot(RecipeIngredientRole.OUTPUT, 2, 2).addItemStack(representative);
+        List<ItemStack> representative = recipe.getRepresentativeItems();
+        builder.addSlot(RecipeIngredientRole.INPUT, 0, 0).addItemStacks(representative);
+        builder.addSlot(RecipeIngredientRole.OUTPUT, 2, 2).addItemStacks(representative);
     }
 
     @Override
