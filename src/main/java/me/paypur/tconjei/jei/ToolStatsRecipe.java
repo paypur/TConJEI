@@ -15,9 +15,7 @@ import net.minecraftforge.fluids.FluidStack;
 import slimeknights.mantle.recipe.helper.RecipeHelper;
 import slimeknights.mantle.util.RegistryHelper;
 import slimeknights.tconstruct.common.TinkerTags;
-import slimeknights.tconstruct.library.materials.definition.IMaterial;
 import slimeknights.tconstruct.library.materials.definition.Material;
-import slimeknights.tconstruct.library.materials.definition.MaterialId;
 import slimeknights.tconstruct.library.materials.definition.MaterialVariantId;
 import slimeknights.tconstruct.library.recipe.TinkerRecipeTypes;
 import slimeknights.tconstruct.library.recipe.casting.material.MaterialCastingLookup;
@@ -25,10 +23,7 @@ import slimeknights.tconstruct.library.recipe.material.MaterialRecipe;
 import slimeknights.tconstruct.library.tools.part.IToolPart;
 import slimeknights.tconstruct.tools.TinkerToolParts;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class ToolStatsRecipe implements IRecipeCategoryExtension {
@@ -67,7 +62,7 @@ public class ToolStatsRecipe implements IRecipeCategoryExtension {
 //        }
 
 //        if (material.getRepresentativeItem() != null && !material.getRepresentativeItem().isEmpty())
-        list.add(getRepresentativeItem());
+        list.addAll(getRepresentativeItems());
         list.addAll(getParts());
 
         return list;
@@ -105,14 +100,14 @@ public class ToolStatsRecipe implements IRecipeCategoryExtension {
 //    }
 
     // taken from AbstractMaterialContent
-    public ItemStack getRepresentativeItem() {
+    public List<ItemStack> getRepresentativeItems() {
         List<ItemStack> repairStacks;
         Level world = Minecraft.getInstance().level;
         if (world == null) {
-            return ItemStack.EMPTY;
+            return Collections.emptyList();
         }
         // simply combine all items from all recipes
-        MaterialVariantId materialVariantId = MaterialVariantId.parse(material.getIdentifier().getVariant());
+        MaterialVariantId materialVariantId = MaterialVariantId.parse(material.getIdentifier().toString());
         repairStacks = RecipeHelper.getUIRecipes(world.getRecipeManager(), TinkerRecipeTypes.MATERIAL.get(), MaterialRecipe.class, recipe -> materialVariantId.matchesVariant(recipe.getMaterial()))
                 .stream()
                 .flatMap(recipe -> Arrays.stream(recipe.getIngredient().getItems()))
@@ -122,7 +117,7 @@ public class ToolStatsRecipe implements IRecipeCategoryExtension {
             // bypass the valid check, because we need to show something
             repairStacks = Collections.singletonList(TinkerToolParts.repairKit.get().withMaterialForDisplay(materialVariantId));
         }
-        return repairStacks.get(0);
+        return repairStacks;
     }
 
     @Override

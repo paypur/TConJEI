@@ -1,9 +1,7 @@
 package me.paypur.tconjei.jei;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
-import mezz.jei.api.gui.builder.IRecipeSlotBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.helpers.IGuiHelper;
@@ -16,10 +14,7 @@ import net.minecraft.network.chat.TextComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 
-import java.util.List;
-
 import static me.paypur.tconjei.TConJEI.MOD_ID;
-import static net.minecraft.world.item.Items.STONE;
 
 public class ToolStatsCategory implements IRecipeCategory<ToolStatsRecipe> {
 
@@ -38,7 +33,7 @@ public class ToolStatsCategory implements IRecipeCategory<ToolStatsRecipe> {
 
     @Override
     public void setRecipe(IRecipeLayoutBuilder builder, ToolStatsRecipe recipe, IFocusGroup focuses) {
-        ItemStack representative = recipe.getRepresentativeItem();
+        ItemStack representative = recipe.getRepresentativeItems();
         builder.addSlot(RecipeIngredientRole.INPUT, 2, 2).addItemStack(representative);
         builder.addSlot(RecipeIngredientRole.OUTPUT, 2, 2).addItemStack(representative);
     }

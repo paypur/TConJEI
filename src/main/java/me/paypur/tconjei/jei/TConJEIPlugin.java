@@ -56,7 +56,7 @@ public class TConJEIPlugin implements IModPlugin {
         for (IMaterial material : MaterialRegistry.getMaterials())
             // && material.hasItems() && !material.getAllStats().isEmpty()
             if (!material.isHidden()) {
-                list.add(new ToolStatsRecipe(material, guiHelper));
+                list.add(new ToolStatsRecipe((Material) material, guiHelper));
             }
         return list;
     }
