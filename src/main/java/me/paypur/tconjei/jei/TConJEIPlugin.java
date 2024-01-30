@@ -17,6 +17,7 @@ import slimeknights.tconstruct.library.materials.MaterialRegistry;
 import slimeknights.tconstruct.library.materials.definition.IMaterial;
 import slimeknights.tconstruct.library.materials.definition.Material;
 import slimeknights.tconstruct.library.materials.definition.MaterialManager;
+import slimeknights.tconstruct.tables.TinkerTables;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -48,7 +49,8 @@ public class TConJEIPlugin implements IModPlugin {
 
     @Override
     public void registerRecipeCatalysts(IRecipeCatalystRegistration registration) {
-        registration.addRecipeCatalyst(new ItemStack(Items.DIAMOND_BLOCK), RECIPE_TYPE);
+        registration.addRecipeCatalyst(new ItemStack(TinkerTables.tinkerStation.asItem()), RECIPE_TYPE);
+        registration.addRecipeCatalyst(new ItemStack(TinkerTables.tinkersAnvil.asItem()), RECIPE_TYPE);
     }
 
     private ArrayList<ToolStatsRecipe> recipes(IGuiHelper guiHelper) {
@@ -56,7 +58,7 @@ public class TConJEIPlugin implements IModPlugin {
         for (IMaterial material : MaterialRegistry.getMaterials())
             // && material.hasItems() && !material.getAllStats().isEmpty()
             if (!material.isHidden()) {
-                list.add(new ToolStatsRecipe((Material) material, guiHelper));
+                list.add(new ToolStatsRecipe((Material) material));
             }
         return list;
     }

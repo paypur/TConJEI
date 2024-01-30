@@ -8,6 +8,7 @@ import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.ingredients.IIngredients;
 import mezz.jei.api.recipe.category.extensions.IRecipeCategoryExtension;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
 import net.minecraft.core.Registry;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -26,83 +27,13 @@ import slimeknights.tconstruct.tools.TinkerToolParts;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class ToolStatsRecipe implements IRecipeCategoryExtension {
-
+public class ToolStatsRecipe {
 
     public final Material material;
-    private final IDrawable slot;
 
-    public ToolStatsRecipe(Material material, IGuiHelper guiHelper) {
+    public ToolStatsRecipe(Material material) {
         this.material = material;
-        this.slot = guiHelper.getSlotDrawable();
     }
-
-//    @SuppressWarnings("removal")
-//    @Override
-//    public void setIngredients(IIngredients ingredients) {
-//
-//        ingredients.setInputs(VanillaTypes.ITEM, getRepresentatives());
-//        ingredients.setOutputs(VanillaTypes.ITEM, getRepresentatives());
-//
-//        if (!material.isCraftable()) {
-//            ingredients.setInputs(ForgeTypes.FLUID, Collections.singletonList(getFluidStack()));
-//            ingredients.setOutputs(ForgeTypes.FLUID, Collections.singletonList(getFluidStack()));
-//        }
-//
-//    }
-
-    @Override
-    public void drawInfo(int recipeWidth, int recipeHeight, PoseStack stack, double mouseX, double mouseY) {
-        IRecipeCategoryExtension.super.drawInfo(recipeWidth, recipeHeight, stack, mouseX, mouseY);
-    }
-
-    private List<ItemStack> getRepresentatives() {
-
-        ArrayList<ItemStack> list = new ArrayList<ItemStack>();
-
-//        if (!material.isCraftable()) {
-//            for (MeltingRecipe recipe : MaterialRegistry.getMaterials().getAllMeltingRecipes())
-//                if (getFluid(material).equals(getFluid(recipe.output)))
-//                    list.addAll(recipe.input.getInputs());
-//        }
-
-//        if (material.getRepresentativeItem() != null && !material.getRepresentativeItem().isEmpty())
-        list.addAll(getRepresentativeItems());
-        list.addAll(getParts());
-
-        return list;
-
-    }
-
-    private List<ItemStack> getParts() {
-        ArrayList<ItemStack> list = new ArrayList<ItemStack>();
-        for (IToolPart part : getToolParts()) {
-            if (part.canUseMaterial(material)) {
-                list.add(part.withMaterial(material.getIdentifier()));
-            }
-        }
-        return list;
-    }
-
-    // taken from AbstractMaterialContent
-    private List<IToolPart> getToolParts() {
-        return RegistryHelper.getTagValueStream(Registry.ITEM, TinkerTags.Items.TOOL_PARTS)
-                .filter(item -> item instanceof IToolPart)
-                .map(item -> (IToolPart) item)
-                .collect(Collectors.toList());
-    }
-
-    // taken from AbstractMaterialContent
-    private FluidStack getFluidStack() {
-        return MaterialCastingLookup.getCastingFluids(material.getIdentifier())
-                .stream()
-                .flatMap(recipe -> recipe.getFluids().stream())
-                .findFirst().orElse(FluidStack.EMPTY);
-    }
-
-//    private void getAllMeltingRecipes(IMaterial material) {
-//        return RegistryHelper.getTagValueStream(Registry)
-//    }
 
     // taken from AbstractMaterialContent
     public List<ItemStack> getRepresentativeItems() {
@@ -123,6 +54,32 @@ public class ToolStatsRecipe implements IRecipeCategoryExtension {
             repairStacks = Collections.singletonList(TinkerToolParts.repairKit.get().withMaterialForDisplay(materialVariantId));
         }
         return repairStacks;
+    }
+
+    // taken from AbstractMaterialContent
+    public FluidStack getFluidStack() {
+        return MaterialCastingLookup.getCastingFluids(material.getIdentifier())
+                .stream()
+                .flatMap(recipe -> recipe.getFluids().stream())
+                .findFirst().orElse(FluidStack.EMPTY);
+    }
+
+    public List<ItemStack> getParts() {
+        ArrayList<ItemStack> list = new ArrayList<ItemStack>();
+        for (IToolPart part : getToolParts()) {
+            if (part.canUseMaterial(material)) {
+                list.add(part.withMaterial(material.getIdentifier()));
+            }
+        }
+        return list;
+    }
+
+    // taken from AbstractMaterialContent
+    private List<IToolPart> getToolParts() {
+        return RegistryHelper.getTagValueStream(Registry.ITEM, TinkerTags.Items.TOOL_PARTS)
+                .filter(item -> item instanceof IToolPart)
+                .map(item -> (IToolPart) item)
+                .collect(Collectors.toList());
     }
 
 }
