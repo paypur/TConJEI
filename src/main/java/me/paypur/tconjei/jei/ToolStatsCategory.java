@@ -40,14 +40,15 @@ public class ToolStatsCategory implements IRecipeCategory<ToolStatsRecipe> {
 
         int textColor = MaterialTooltipCache.getColor(recipe.material.getIdentifier()).getValue();
         float textWidth = font.getSplitter().stringWidth(materialName);
-        font.draw(poseStack, recipe.material.getIdentifier().getId().getPath(), ((WIDTH - textWidth) / 2), 3, 8);
+
+        font.drawShadow(poseStack, recipe.material.getIdentifier().getId().getPath(), ((WIDTH - textWidth) / 2), 3, textColor);
 
         Optional<HeadMaterialStats> headStats = MaterialRegistry.getInstance().getMaterialStats(recipe.material.getIdentifier(), HeadMaterialStats.ID);
         if (headStats.isPresent()) {
             font.draw(poseStack, String.format("Durability: %d", headStats.get().getDurability()), 0 , 20, 8);
             font.draw(poseStack, String.format("Harvest Level: %s", headStats.get().getTierId().getPath()), 0 , 30, 8);
             font.draw(poseStack, String.format("Mining Speed: %.2f", headStats.get().getMiningSpeed()), 0 , 40, 8);
-            font.draw(poseStack, String.format("Attack Damage %.2f", headStats.get().getAttack()), -0 , 50, 8);
+            font.draw(poseStack, String.format("Attack Damage: %.2f", headStats.get().getAttack()), 0 , 50, 8);
         }
     }
 
