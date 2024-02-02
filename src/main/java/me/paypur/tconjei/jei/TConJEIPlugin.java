@@ -4,25 +4,17 @@ import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.recipe.RecipeType;
-import mezz.jei.api.registration.IGuiHandlerRegistration;
 import mezz.jei.api.registration.IRecipeCatalystRegistration;
 import mezz.jei.api.registration.IRecipeCategoryRegistration;
 import mezz.jei.api.registration.IRecipeRegistration;
-import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
-import net.minecraft.world.item.crafting.RecipeManager;
 import slimeknights.tconstruct.library.materials.MaterialRegistry;
 import slimeknights.tconstruct.library.materials.definition.IMaterial;
 import slimeknights.tconstruct.library.materials.definition.Material;
-import slimeknights.tconstruct.library.materials.definition.MaterialManager;
 import slimeknights.tconstruct.tables.TinkerTables;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
 
 import static me.paypur.tconjei.TConJEI.MOD_ID;
 
@@ -30,7 +22,7 @@ import static me.paypur.tconjei.TConJEI.MOD_ID;
 @JeiPlugin
 public class TConJEIPlugin implements IModPlugin {
 
-    public static final RecipeType<ToolStatsRecipe> RECIPE_TYPE = RecipeType.create(MOD_ID, "tool_stats", ToolStatsRecipe.class);
+    public static final RecipeType<ToolStatsWrapper> RECIPE_TYPE = RecipeType.create(MOD_ID, "tool_stats", ToolStatsWrapper.class);
 
     @Override
     public ResourceLocation getPluginUid() {
@@ -53,12 +45,12 @@ public class TConJEIPlugin implements IModPlugin {
         registration.addRecipeCatalyst(new ItemStack(TinkerTables.tinkersAnvil.asItem()), RECIPE_TYPE);
     }
 
-    private ArrayList<ToolStatsRecipe> recipes(IGuiHelper guiHelper) {
-        ArrayList<ToolStatsRecipe> list = new ArrayList<>();
+    private ArrayList<ToolStatsWrapper> recipes(IGuiHelper guiHelper) {
+        ArrayList<ToolStatsWrapper> list = new ArrayList<>();
         for (IMaterial material : MaterialRegistry.getMaterials())
             // && material.hasItems() && !material.getAllStats().isEmpty()
             if (!material.isHidden()) {
-                list.add(new ToolStatsRecipe((Material) material));
+                list.add(new ToolStatsWrapper((Material) material));
             }
         return list;
     }

@@ -1,14 +1,6 @@
 package me.paypur.tconjei.jei;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-import mezz.jei.api.constants.VanillaTypes;
-import mezz.jei.api.forge.ForgeTypes;
-import mezz.jei.api.gui.drawable.IDrawable;
-import mezz.jei.api.helpers.IGuiHelper;
-import mezz.jei.api.ingredients.IIngredients;
-import mezz.jei.api.recipe.category.extensions.IRecipeCategoryExtension;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Font;
 import net.minecraft.core.Registry;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -17,6 +9,7 @@ import slimeknights.mantle.recipe.helper.RecipeHelper;
 import slimeknights.mantle.util.RegistryHelper;
 import slimeknights.tconstruct.common.TinkerTags;
 import slimeknights.tconstruct.library.materials.definition.Material;
+import slimeknights.tconstruct.library.materials.definition.MaterialId;
 import slimeknights.tconstruct.library.materials.definition.MaterialVariantId;
 import slimeknights.tconstruct.library.recipe.TinkerRecipeTypes;
 import slimeknights.tconstruct.library.recipe.casting.material.MaterialCastingLookup;
@@ -27,11 +20,11 @@ import slimeknights.tconstruct.tools.TinkerToolParts;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class ToolStatsRecipe {
+public class ToolStatsWrapper {
 
     public final Material material;
 
-    public ToolStatsRecipe(Material material) {
+    public ToolStatsWrapper(Material material) {
         this.material = material;
     }
 
@@ -80,6 +73,10 @@ public class ToolStatsRecipe {
                 .filter(item -> item instanceof IToolPart)
                 .map(item -> (IToolPart) item)
                 .collect(Collectors.toList());
+    }
+
+    public MaterialId getMaterialId() {
+        return  material.getIdentifier().getId();
     }
 
 }

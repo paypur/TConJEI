@@ -13,19 +13,21 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import slimeknights.tconstruct.library.client.materials.MaterialTooltipCache;
 import slimeknights.tconstruct.library.materials.MaterialRegistry;
 import slimeknights.tconstruct.library.modifiers.ModifierEntry;
 import slimeknights.tconstruct.tools.stats.*;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 import static me.paypur.tconjei.TConJEI.MOD_ID;
 import static net.minecraftforge.common.ForgeI18n.getPattern;
 
-public class ToolStatsCategory implements IRecipeCategory<ToolStatsRecipe> {
+public class ToolStatsCategory implements IRecipeCategory<ToolStatsWrapper> {
 
     public static final int WIDTH = 164, HEIGHT = 240;
     public static ResourceLocation UID = new ResourceLocation(MOD_ID, "tool_stats");
@@ -38,11 +40,11 @@ public class ToolStatsCategory implements IRecipeCategory<ToolStatsRecipe> {
     }
 
     @Override
-    public void draw(ToolStatsRecipe recipe, IRecipeSlotsView recipeSlotsView, PoseStack poseStack, double mouseX, double mouseY) {
-        final String materialName = recipe.material.getIdentifier().getId().getPath();
+    public void draw(ToolStatsWrapper recipe, IRecipeSlotsView recipeSlotsView, PoseStack poseStack, double mouseX, double mouseY) {
+        final String materialName = recipe.getMaterialId().getPath();
         final Font font = Minecraft.getInstance().font;
 
-        final int MATERIAL_COLOR = MaterialTooltipCache.getColor(recipe.material.getIdentifier()).getValue();
+        final int MATERIAL_COLOR = MaterialTooltipCache.getColor(recipe.getMaterialId()).getValue();
         final int BLACK = 8;
         final int GRAY = 4144959;
         final int LIGHT_GRAY = 5526612;
@@ -51,10 +53,10 @@ public class ToolStatsCategory implements IRecipeCategory<ToolStatsRecipe> {
         final int LINE_HEIGHT = 10;
         float lineNumber = 0;
 
-        font.drawShadow(poseStack, getPattern("material.tconstruct." + recipe.material.getIdentifier().getId().getPath()), (WIDTH - font.getSplitter().stringWidth(materialName)) / 2, 4, MATERIAL_COLOR);
+        font.drawShadow(poseStack, getPattern("material.tconstruct." + recipe.getMaterialId().getPath()), (WIDTH - font.getSplitter().stringWidth(materialName)) / 2, 4, MATERIAL_COLOR);
 
-        Optional<HeadMaterialStats> headStats = MaterialRegistry.getInstance().getMaterialStats(recipe.material.getIdentifier(), HeadMaterialStats.ID);
-        List<ModifierEntry> headTrait = MaterialRegistry.getInstance().getTraits(recipe.material.getIdentifier(), HeadMaterialStats.ID);
+        Optional<HeadMaterialStats> headStats = MaterialRegistry.getInstance().getMaterialStats(recipe.getMaterialId(), HeadMaterialStats.ID);
+        List<ModifierEntry> headTrait = MaterialRegistry.getInstance().getTraits(recipe.getMaterialId(), HeadMaterialStats.ID);
         if (headStats.isPresent()) {
             // 545454
             font.draw(poseStack, String.format("[%s]", getPattern("stat.tconstruct.head")), 0, lineNumber * LINE_HEIGHT + LINE_OFFSET, BLACK);
@@ -66,16 +68,16 @@ public class ToolStatsCategory implements IRecipeCategory<ToolStatsRecipe> {
             lineNumber += 0.5f;
         }
 
-        Optional<ExtraMaterialStats> extraStats = MaterialRegistry.getInstance().getMaterialStats(recipe.material.getIdentifier(), ExtraMaterialStats.ID);
-        List<ModifierEntry> extraTrait = MaterialRegistry.getInstance().getTraits(recipe.material.getIdentifier(), ExtraMaterialStats.ID);
+        Optional<ExtraMaterialStats> extraStats = MaterialRegistry.getInstance().getMaterialStats(recipe.getMaterialId(), ExtraMaterialStats.ID);
+        List<ModifierEntry> extraTrait = MaterialRegistry.getInstance().getTraits(recipe.getMaterialId(), ExtraMaterialStats.ID);
         if (extraStats.isPresent()) {
             font.draw(poseStack, String.format("[%s]", getPattern("stat.tconstruct.extra")), 0, lineNumber * LINE_HEIGHT + LINE_OFFSET, BLACK);
             font.draw(poseStack, String.format("%s", extraTrait.get(0).getId().getPath()), WIDTH - font.getSplitter().stringWidth(extraTrait.get(0).getId().getPath()), lineNumber++ * LINE_HEIGHT + LINE_OFFSET, LIGHT_GRAY);
             lineNumber += 0.5f;
         }
 
-        Optional<HandleMaterialStats> handleStats = MaterialRegistry.getInstance().getMaterialStats(recipe.material.getIdentifier(), HandleMaterialStats.ID);
-        List<ModifierEntry> handleTrait = MaterialRegistry.getInstance().getTraits(recipe.material.getIdentifier(), HandleMaterialStats.ID);
+        Optional<HandleMaterialStats> handleStats = MaterialRegistry.getInstance().getMaterialStats(recipe.getMaterialId(), HandleMaterialStats.ID);
+        List<ModifierEntry> handleTrait = MaterialRegistry.getInstance().getTraits(recipe.getMaterialId(), HandleMaterialStats.ID);
         if (handleStats.isPresent()) {
             font.draw(poseStack, String.format("[%s]", getPattern("stat.tconstruct.head")), 0, lineNumber * LINE_HEIGHT + LINE_OFFSET, BLACK);
             font.draw(poseStack, String.format("%s", handleTrait.get(0).getId().getPath()), WIDTH - font.getSplitter().stringWidth(handleTrait.get(0).getId().getPath()), lineNumber++ * LINE_HEIGHT + LINE_OFFSET, LIGHT_GRAY);
@@ -86,8 +88,8 @@ public class ToolStatsCategory implements IRecipeCategory<ToolStatsRecipe> {
             lineNumber += 0.5f;
         }
 
-        Optional<LimbMaterialStats> limbStats = MaterialRegistry.getInstance().getMaterialStats(recipe.material.getIdentifier(), LimbMaterialStats.ID);
-        List<ModifierEntry> limbTrait = MaterialRegistry.getInstance().getTraits(recipe.material.getIdentifier(), LimbMaterialStats.ID);
+        Optional<LimbMaterialStats> limbStats = MaterialRegistry.getInstance().getMaterialStats(recipe.getMaterialId(), LimbMaterialStats.ID);
+        List<ModifierEntry> limbTrait = MaterialRegistry.getInstance().getTraits(recipe.getMaterialId(), LimbMaterialStats.ID);
         if (limbStats.isPresent()) {
             font.draw(poseStack, String.format("[%s]", getPattern("stat.tconstruct.limb")), 0, lineNumber * LINE_HEIGHT + LINE_OFFSET, BLACK);
             font.draw(poseStack, String.format("%s", limbTrait.get(0).getId().getPath()), WIDTH - font.getSplitter().stringWidth(limbTrait.get(0).getId().getPath()), lineNumber++ * LINE_HEIGHT + LINE_OFFSET, LIGHT_GRAY);
@@ -98,8 +100,8 @@ public class ToolStatsCategory implements IRecipeCategory<ToolStatsRecipe> {
             lineNumber += 0.5f;
         }
 
-        Optional<GripMaterialStats> gripStats = MaterialRegistry.getInstance().getMaterialStats(recipe.material.getIdentifier(), GripMaterialStats.ID);
-        List<ModifierEntry> gripTrait = MaterialRegistry.getInstance().getTraits(recipe.material.getIdentifier(), GripMaterialStats.ID);
+        Optional<GripMaterialStats> gripStats = MaterialRegistry.getInstance().getMaterialStats(recipe.getMaterialId(), GripMaterialStats.ID);
+        List<ModifierEntry> gripTrait = MaterialRegistry.getInstance().getTraits(recipe.getMaterialId(), GripMaterialStats.ID);
         if (gripStats.isPresent()) {
             font.draw(poseStack, String.format("[%s]", getPattern("stat.tconstruct.grip")), 0, lineNumber * LINE_HEIGHT + LINE_OFFSET, BLACK);
             font.draw(poseStack, String.format("%s", gripTrait.get(0).getId().getPath()), WIDTH - font.getSplitter().stringWidth(gripTrait.get(0).getId().getPath()), lineNumber++ * LINE_HEIGHT + LINE_OFFSET, LIGHT_GRAY);
@@ -109,8 +111,8 @@ public class ToolStatsCategory implements IRecipeCategory<ToolStatsRecipe> {
             lineNumber += 0.5f;
         }
 
-        Optional<BowstringMaterialStats> stringStats = MaterialRegistry.getInstance().getMaterialStats(recipe.material.getIdentifier(), BowstringMaterialStats.ID);
-        List<ModifierEntry> stringTrait = MaterialRegistry.getInstance().getTraits(recipe.material.getIdentifier(), BowstringMaterialStats.ID);
+        Optional<BowstringMaterialStats> stringStats = MaterialRegistry.getInstance().getMaterialStats(recipe.getMaterialId(), BowstringMaterialStats.ID);
+        List<ModifierEntry> stringTrait = MaterialRegistry.getInstance().getTraits(recipe.getMaterialId(), BowstringMaterialStats.ID);
         if (stringStats.isPresent()) {
             font.draw(poseStack, String.format("[%s]", getPattern("stat.tconstruct.bowstring")), 0, lineNumber * LINE_HEIGHT + LINE_OFFSET, BLACK);
             font.draw(poseStack, String.format("%s", stringTrait.get(0).getId().getPath()), WIDTH - font.getSplitter().stringWidth(stringTrait.get(0).getId().getPath()), lineNumber++ * LINE_HEIGHT + LINE_OFFSET, LIGHT_GRAY);
@@ -122,7 +124,7 @@ public class ToolStatsCategory implements IRecipeCategory<ToolStatsRecipe> {
     }
 
     @Override
-    public void setRecipe(IRecipeLayoutBuilder builder, ToolStatsRecipe recipe, IFocusGroup focuses) {
+    public void setRecipe(IRecipeLayoutBuilder builder, ToolStatsWrapper recipe, IFocusGroup focuses) {
         if (!recipe.material.isCraftable()) {
             // float is in milli buckets
             builder.addSlot(RecipeIngredientRole.RENDER_ONLY, 18, 0).addFluidStack(recipe.getFluidStack().getFluid(), 1000);
@@ -137,8 +139,34 @@ public class ToolStatsCategory implements IRecipeCategory<ToolStatsRecipe> {
     }
 
     @Override
-    public List<Component> getTooltipStrings(ToolStatsRecipe recipe, IRecipeSlotsView recipeSlotsView, double mouseX, double mouseY) {
-        return IRecipeCategory.super.getTooltipStrings(recipe, recipeSlotsView, mouseX, mouseY);
+    public List<Component> getTooltipStrings(ToolStatsWrapper recipe, IRecipeSlotsView recipeSlotsView, double mouseX, double mouseY) {
+        final String materialName = recipe.getMaterialId().getPath();
+        final Font font = Minecraft.getInstance().font;
+        final int LINE_OFFSET = 20;
+        final int LINE_HEIGHT = 10;
+        float lineNumber = 0;
+
+        if (((WIDTH - font.getSplitter().stringWidth(materialName)) / 2) <= mouseX && (mouseX <= ((WIDTH / 2) + font.getSplitter().stringWidth(materialName))) && 0 <= mouseY && mouseY <= 20) {
+            return Collections.singletonList(new TranslatableComponent("material.tconstruct."+materialName+".flavor"));
+        }
+
+
+        Optional<HeadMaterialStats> headStats = MaterialRegistry.getInstance().getMaterialStats(recipe.getMaterialId(), HeadMaterialStats.ID);
+//        Optional<ExtraMaterialStats> extraStats = MaterialRegistry.getInstance().getMaterialStats(recipe.getMaterialId(), ExtraMaterialStats.ID);
+//        Optional<HandleMaterialStats> handleStats = MaterialRegistry.getInstance().getMaterialStats(recipe.getMaterialId(), HandleMaterialStats.ID);
+//        Optional<LimbMaterialStats> limbStats = MaterialRegistry.getInstance().getMaterialStats(recipe.getMaterialId(), LimbMaterialStats.ID);
+//        Optional<GripMaterialStats> gripStats = MaterialRegistry.getInstance().getMaterialStats(recipe.getMaterialId(), GripMaterialStats.ID);
+//        Optional<BowstringMaterialStats> stringStats = MaterialRegistry.getInstance().getMaterialStats(recipe.getMaterialId(), BowstringMaterialStats.ID);
+        List<ModifierEntry> headTrait = MaterialRegistry.getInstance().getTraits(recipe.getMaterialId(), HeadMaterialStats.ID);
+
+        if (headStats.isPresent()) {
+            int width = font.width(headTrait.get(0).getId().getPath());
+            if (WIDTH - width <= mouseX && mouseX <= WIDTH && 20 <= mouseY && mouseY <= 30) {
+                // TODO: add flavor text
+                return Collections.singletonList(new TranslatableComponent("modifier.tconstruct."+headTrait.get(0).getId().getPath()+".description"));
+            }
+        }
+        return Collections.emptyList();
     }
 
     @Override
@@ -164,12 +192,12 @@ public class ToolStatsCategory implements IRecipeCategory<ToolStatsRecipe> {
 
     @SuppressWarnings("removal")
     @Override
-    public Class<? extends ToolStatsRecipe> getRecipeClass() {
-        return ToolStatsRecipe.class;
+    public Class<? extends ToolStatsWrapper> getRecipeClass() {
+        return ToolStatsWrapper.class;
     }
 
     @Override
-    public RecipeType<ToolStatsRecipe> getRecipeType() {
+    public RecipeType<ToolStatsWrapper> getRecipeType() {
         return RecipeType.create(MOD_ID, "tool_stats", getRecipeClass());
     }
 
