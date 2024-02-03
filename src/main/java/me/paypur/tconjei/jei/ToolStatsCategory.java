@@ -18,6 +18,8 @@ import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import slimeknights.tconstruct.library.client.materials.MaterialTooltipCache;
 import slimeknights.tconstruct.library.materials.MaterialRegistry;
+import slimeknights.tconstruct.library.materials.definition.MaterialId;
+import slimeknights.tconstruct.library.materials.stats.MaterialStatsId;
 import slimeknights.tconstruct.library.modifiers.ModifierEntry;
 import slimeknights.tconstruct.tools.stats.*;
 
@@ -30,9 +32,17 @@ import static net.minecraftforge.common.ForgeI18n.getPattern;
 
 public class ToolStatsCategory implements IRecipeCategory<ToolStatsWrapper> {
 
-    public static final int WIDTH = 164, HEIGHT = 240;
-    public static ResourceLocation UID = new ResourceLocation(MOD_ID, "tool_stats");
-    private final IDrawable BACKGROUND, ICON;
+    final ResourceLocation UID = new ResourceLocation(MOD_ID, "tool_stats");
+    final Font font = Minecraft.getInstance().font;
+    final IDrawable BACKGROUND, ICON;
+    final int WIDTH = 164, HEIGHT = 240;
+    final int LINE_OFFSET = 20;
+    final int LINE_OFFSET_HOVER = LINE_OFFSET - 1;
+    final int LINE_HEIGHT = 10;
+    final int WHITE = 16777215;
+    final int LIGHT_GRAY = 5526612;
+    final int GRAY = 4144959;
+    final int BLACK = 8;
 
     public ToolStatsCategory(IGuiHelper guiHelper) {
         this.BACKGROUND = guiHelper.createBlankDrawable(WIDTH, HEIGHT);
@@ -42,16 +52,9 @@ public class ToolStatsCategory implements IRecipeCategory<ToolStatsWrapper> {
 
     @Override
     public void draw(ToolStatsWrapper recipe, IRecipeSlotsView recipeSlotsView, PoseStack poseStack, double mouseX, double mouseY) {
-        final Font font = Minecraft.getInstance().font;
+        final int MATERIAL_COLOR = MaterialTooltipCache.getColor(recipe.getMaterialId()).getValue();
         final String materialPath = recipe.getMaterialId().getPath();
 
-        final int MATERIAL_COLOR = MaterialTooltipCache.getColor(recipe.getMaterialId()).getValue();
-        final int BLACK = 8;
-        final int GRAY = 4144959;
-        final int LIGHT_GRAY = 5526612;
-
-        final int LINE_OFFSET = 20;
-        final int LINE_HEIGHT = 10;
         float lineNumber = 0;
 
         font.drawShadow(poseStack, getPattern("material.tconstruct." + materialPath), (WIDTH - font.getSplitter().stringWidth(materialPath)) / 2, 4, MATERIAL_COLOR);
@@ -65,29 +68,23 @@ public class ToolStatsCategory implements IRecipeCategory<ToolStatsWrapper> {
 
         if (headStats.isPresent()) {
             // 545454
-            List<ModifierEntry> headTrait = MaterialRegistry.getInstance().getTraits(recipe.getMaterialId(), HeadMaterialStats.ID);
-            String pattern = getPattern("modifier.tconstruct." + headTrait.get(0).getId().getPath());
-            font.draw(poseStack, String.format("%s", pattern), WIDTH - font.getSplitter().stringWidth(pattern), lineNumber * LINE_HEIGHT + LINE_OFFSET, LIGHT_GRAY);
+            drawTraits(poseStack, recipe.getMaterialId(), HeadMaterialStats.ID, lineNumber);
             font.draw(poseStack, String.format("[%s]", getPattern("stat.tconstruct.head")), 0, lineNumber++ * LINE_HEIGHT + LINE_OFFSET, BLACK);
             font.draw(poseStack, String.format("%s%d", getPattern("tool_stat.tconstruct.durability"), headStats.get().getDurability()), 0, lineNumber++ * LINE_HEIGHT + LINE_OFFSET, GRAY);
-            font.draw(poseStack, String.format("%s%s", getPattern("tool_stat.tconstruct.harvest_tier"), headStats.get().getTierId().getPath()), 0, lineNumber++ * LINE_HEIGHT + LINE_OFFSET, GRAY);
+            font.draw(poseStack, String.format("%s%s", getPattern("tool_stat.tconstruct.harvest_tier"), getPattern("stat.tconstruct.harvest_tier.minecraft." + headStats.get().getTierId().getPath())), 0, lineNumber++ * LINE_HEIGHT + LINE_OFFSET, GRAY);
             font.draw(poseStack, String.format("%s%.2f", getPattern("tool_stat.tconstruct.mining_speed"), headStats.get().getMiningSpeed()), 0, lineNumber++ * LINE_HEIGHT + LINE_OFFSET, GRAY);
             font.draw(poseStack, String.format("%s%.2f", getPattern("tool_stat.tconstruct.attack_damage"), headStats.get().getAttack()), 0, lineNumber++ * LINE_HEIGHT + LINE_OFFSET, GRAY);
             lineNumber += 0.5f;
         }
 
         if (extraStats.isPresent()) {
-            List<ModifierEntry> extraTrait = MaterialRegistry.getInstance().getTraits(recipe.getMaterialId(), ExtraMaterialStats.ID);
-            String pattern = getPattern("modifier.tconstruct." + extraTrait.get(0).getId().getPath());
-            font.draw(poseStack, String.format("%s", pattern), WIDTH - font.getSplitter().stringWidth(pattern), lineNumber * LINE_HEIGHT + LINE_OFFSET, LIGHT_GRAY);
+            drawTraits(poseStack, recipe.getMaterialId(), ExtraMaterialStats.ID, lineNumber);
             font.draw(poseStack, String.format("[%s]", getPattern("stat.tconstruct.extra")), 0, lineNumber++ * LINE_HEIGHT + LINE_OFFSET, BLACK);
             lineNumber += 0.5f;
         }
 
         if (handleStats.isPresent()) {
-            List<ModifierEntry> handleTrait = MaterialRegistry.getInstance().getTraits(recipe.getMaterialId(), HandleMaterialStats.ID);
-            String pattern = getPattern("modifier.tconstruct." + handleTrait.get(0).getId().getPath());
-            font.draw(poseStack, String.format("%s", pattern), WIDTH - font.getSplitter().stringWidth(pattern), lineNumber * LINE_HEIGHT + LINE_OFFSET, LIGHT_GRAY);
+            drawTraits(poseStack, recipe.getMaterialId(), HandleMaterialStats.ID, lineNumber);
             font.draw(poseStack, String.format("[%s]", getPattern("stat.tconstruct.handle")), 0, lineNumber++ * LINE_HEIGHT + LINE_OFFSET, BLACK);
             font.draw(poseStack, String.format("%s%.2fx", getPattern("tool_stat.tconstruct.durability"), handleStats.get().getDurability()), 0, lineNumber++ * LINE_HEIGHT + LINE_OFFSET, GRAY);
             font.draw(poseStack, String.format("%s%.2fx", getPattern("tool_stat.tconstruct.attack_damage"), handleStats.get().getAttackDamage()), 0, lineNumber++ * LINE_HEIGHT + LINE_OFFSET, GRAY);
@@ -97,41 +94,45 @@ public class ToolStatsCategory implements IRecipeCategory<ToolStatsWrapper> {
         }
 
         if (limbStats.isPresent()) {
-            List<ModifierEntry> limbTrait = MaterialRegistry.getInstance().getTraits(recipe.getMaterialId(), LimbMaterialStats.ID);
-            String pattern = getPattern("modifier.tconstruct." + limbTrait.get(0).getId().getPath());
-            font.draw(poseStack, String.format("%s", pattern), WIDTH - font.getSplitter().stringWidth(pattern), lineNumber * LINE_HEIGHT + LINE_OFFSET, LIGHT_GRAY);
+            drawTraits(poseStack, recipe.getMaterialId(), LimbMaterialStats.ID, lineNumber);
+
             font.draw(poseStack, String.format("[%s]", getPattern("stat.tconstruct.limb")), 0, lineNumber++ * LINE_HEIGHT + LINE_OFFSET, BLACK);
             font.draw(poseStack, String.format("%s%d", getPattern("tool_stat.tconstruct.durability"), limbStats.get().getDurability()), 0, lineNumber++ * LINE_HEIGHT + LINE_OFFSET, GRAY);
-            font.draw(poseStack, String.format("%s+%.2f", getPattern("tool_stat.tconstruct.draw_speed"), limbStats.get().getDrawSpeed()), 0, lineNumber++ * LINE_HEIGHT + LINE_OFFSET, GRAY);
-            font.draw(poseStack, String.format("%s+%.2f", getPattern("tool_stat.tconstruct.velocity"), limbStats.get().getVelocity()), 0, lineNumber++ * LINE_HEIGHT + LINE_OFFSET, GRAY);
-            font.draw(poseStack, String.format("%s+%.2f", getPattern("tool_stat.tconstruct.accuracy"), limbStats.get().getDrawSpeed()), 0, lineNumber++ * LINE_HEIGHT + LINE_OFFSET, GRAY);
+            font.draw(poseStack, String.format("%s%s%.2f", getPattern("tool_stat.tconstruct.draw_speed"), limbStats.get().getDrawSpeed() >= 0 ? "+" : "", limbStats.get().getDrawSpeed()), 0, lineNumber++ * LINE_HEIGHT + LINE_OFFSET, GRAY);
+            font.draw(poseStack, String.format("%s%s%.2f", getPattern("tool_stat.tconstruct.velocity"), limbStats.get().getVelocity() >= 0 ? "+" : "", limbStats.get().getVelocity()), 0, lineNumber++ * LINE_HEIGHT + LINE_OFFSET, GRAY);
+            font.draw(poseStack, String.format("%s%s%.2f", getPattern("tool_stat.tconstruct.accuracy"), limbStats.get().getDrawSpeed() >= 0 ? "+" : "", limbStats.get().getDrawSpeed()), 0, lineNumber++ * LINE_HEIGHT + LINE_OFFSET, GRAY);
             lineNumber += 0.5f;
         }
 
         if (gripStats.isPresent()) {
             List<ModifierEntry> gripTrait = MaterialRegistry.getInstance().getTraits(recipe.getMaterialId(), GripMaterialStats.ID);
-            String pattern = getPattern("modifier.tconstruct." + gripTrait.get(0).getId().getPath());
-            font.draw(poseStack, String.format("%s", pattern), WIDTH - font.getSplitter().stringWidth(pattern), lineNumber * LINE_HEIGHT + LINE_OFFSET, LIGHT_GRAY);
+            drawTraits(poseStack, recipe.getMaterialId(), GripMaterialStats.ID, lineNumber);
             font.draw(poseStack, String.format("[%s]", getPattern("stat.tconstruct.grip")), 0, lineNumber++ * LINE_HEIGHT + LINE_OFFSET, BLACK);
             font.draw(poseStack, String.format("%s%.2fx", getPattern("tool_stat.tconstruct.durability"), gripStats.get().getDurability()), 0, lineNumber++ * LINE_HEIGHT + LINE_OFFSET, GRAY);
-            font.draw(poseStack, String.format("%s+%.2f", getPattern("tool_stat.tconstruct.accuracy"), gripStats.get().getAccuracy()), 0, lineNumber++ * LINE_HEIGHT + LINE_OFFSET, GRAY);
+            font.draw(poseStack, String.format("%s%s%.2f", getPattern("tool_stat.tconstruct.accuracy"), gripStats.get().getAccuracy() >= 0 ? "+" : "", gripStats.get().getAccuracy()), 0, lineNumber++ * LINE_HEIGHT + LINE_OFFSET, GRAY);
             font.draw(poseStack, String.format("%s%.2f", getPattern("tool_stat.tconstruct.attack_damage"), gripStats.get().getMeleeAttack()), 0, lineNumber++ * LINE_HEIGHT + LINE_OFFSET, GRAY);
             lineNumber += 0.5f;
         }
 
         if (stringStats.isPresent()) {
-            List<ModifierEntry> stringTrait = MaterialRegistry.getInstance().getTraits(recipe.getMaterialId(), BowstringMaterialStats.ID);
-            String pattern = getPattern("modifier.tconstruct." + stringTrait.get(0).getId().getPath());
-            font.draw(poseStack, String.format("%s", pattern), WIDTH - font.getSplitter().stringWidth(pattern), lineNumber++ * LINE_HEIGHT + LINE_OFFSET, LIGHT_GRAY);
+            drawTraits(poseStack, recipe.getMaterialId(), BowstringMaterialStats.ID, lineNumber);
             font.draw(poseStack, String.format("[%s]", getPattern("stat.tconstruct.bowstring")), 0, lineNumber * LINE_HEIGHT + LINE_OFFSET, BLACK);
         }
 
     }
 
+    private void drawTraits(PoseStack poseStack, MaterialId materialId, MaterialStatsId materialStatsId, float lineNumber) {
+        List<ModifierEntry> traits = MaterialRegistry.getInstance().getTraits(materialId, materialStatsId);
+        for (ModifierEntry trait : traits) {
+            String pattern = getPattern("modifier.tconstruct." + trait.getId().getPath());
+            font.draw(poseStack, String.format("%s", pattern), WIDTH - font.getSplitter().stringWidth(pattern), lineNumber++ * LINE_HEIGHT + LINE_OFFSET, LIGHT_GRAY);
+        }
+    }
+
     @Override
     public void setRecipe(IRecipeLayoutBuilder builder, ToolStatsWrapper recipe, IFocusGroup focuses) {
         if (!recipe.material.isCraftable()) {
-            final int BUCKET = 1000;
+            final int BUCKET = 1000; // milli buckets
             builder.addSlot(RecipeIngredientRole.RENDER_ONLY, 18, 0).addFluidStack(recipe.getFluidStack().getFluid(), BUCKET);
             builder.addInvisibleIngredients(RecipeIngredientRole.INPUT).addFluidStack(recipe.getFluidStack().getFluid(), BUCKET);
             builder.addInvisibleIngredients(RecipeIngredientRole.OUTPUT).addFluidStack(recipe.getFluidStack().getFluid(), BUCKET);
@@ -145,18 +146,13 @@ public class ToolStatsCategory implements IRecipeCategory<ToolStatsWrapper> {
 
     @Override
     public List<Component> getTooltipStrings(ToolStatsWrapper recipe, IRecipeSlotsView recipeSlotsView, double mouseX, double mouseY) {
-        final Font font = Minecraft.getInstance().font;
-        final String materialName = recipe.getMaterialId().getPath();
+        final String materialPath = recipe.getMaterialId().getPath();
 
-        final int WHITE = 16777215;
-
-        final int LINE_OFFSET = 18;
-        final int LINE_HEIGHT = 10;
         float lineNumber = 0;
 
-        int matWidth = font.width(materialName);
+        int matWidth = font.width(materialPath);
         if (inBox(mouseX, mouseY, (WIDTH - matWidth) / 2, 3, matWidth, LINE_HEIGHT)) {
-            return Collections.singletonList(new TranslatableComponent("material.tconstruct." + materialName + ".flavor").setStyle(Style.EMPTY.withItalic(true).withColor(WHITE)));
+            return Collections.singletonList(new TranslatableComponent("material.tconstruct." + materialPath + ".flavor").setStyle(Style.EMPTY.withItalic(true).withColor(WHITE)));
         }
 
         Optional<HeadMaterialStats> headStats = MaterialRegistry.getInstance().getMaterialStats(recipe.getMaterialId(), HeadMaterialStats.ID);
@@ -166,77 +162,70 @@ public class ToolStatsCategory implements IRecipeCategory<ToolStatsWrapper> {
         Optional<GripMaterialStats> gripStats = MaterialRegistry.getInstance().getMaterialStats(recipe.getMaterialId(), GripMaterialStats.ID);
         Optional<BowstringMaterialStats> stringStats = MaterialRegistry.getInstance().getMaterialStats(recipe.getMaterialId(), BowstringMaterialStats.ID);
 
+        List<Component> components = Collections.emptyList();
+
         if (headStats.isPresent()) {
-            ModifierEntry headTrait = MaterialRegistry.getInstance().getTraits(recipe.getMaterialId(), HeadMaterialStats.ID).get(0);
-            String path = headTrait.getId().getPath();
-            String pattern = getPattern("modifier.tconstruct." + path);
-            int textWidth = font.width(pattern);
-            if (inBox(mouseX, mouseY, WIDTH - textWidth, (int) (lineNumber * LINE_HEIGHT + LINE_OFFSET), textWidth, LINE_HEIGHT)) {
-                return List.of(new TranslatableComponent("modifier.tconstruct." + path + ".flavor").setStyle(Style.EMPTY.withItalic(true).withColor(WHITE)),
-                        new TranslatableComponent("modifier.tconstruct." + path + ".description"));
+            components = getTooltips(recipe.getMaterialId(), BowstringMaterialStats.ID, mouseX, mouseY, lineNumber);
+            if (!components.isEmpty()) {
+                return components;
             }
             lineNumber += 5.5f;
         }
 
         if (extraStats.isPresent()) {
-            ModifierEntry extraTrait = MaterialRegistry.getInstance().getTraits(recipe.getMaterialId(), ExtraMaterialStats.ID).get(0);
-            String path = extraTrait.getId().getPath();
-            String pattern = getPattern("modifier.tconstruct." + path);
-            int textWidth = font.width(pattern);
-            if (inBox(mouseX, mouseY, WIDTH - textWidth, (int) (lineNumber * LINE_HEIGHT + LINE_OFFSET), textWidth, LINE_HEIGHT)) {
-                return List.of(new TranslatableComponent("modifier.tconstruct." + path + ".flavor").setStyle(Style.EMPTY.withItalic(true).withColor(WHITE)),
-                        new TranslatableComponent("modifier.tconstruct." + path + ".description"));
+            components = getTooltips(recipe.getMaterialId(), BowstringMaterialStats.ID, mouseX, mouseY, lineNumber);
+            if (!components.isEmpty()) {
+                return components;
             }
             lineNumber += 1.5f;
         }
 
         if (handleStats.isPresent()) {
-            ModifierEntry handleTrait = MaterialRegistry.getInstance().getTraits(recipe.getMaterialId(), HandleMaterialStats.ID).get(0);
-            String path = handleTrait.getId().getPath();
-            String pattern = getPattern("modifier.tconstruct." + path);
-            int textWidth = font.width(pattern);
-            if (inBox(mouseX, mouseY, WIDTH - textWidth, (int) (lineNumber * LINE_HEIGHT + LINE_OFFSET), textWidth, LINE_HEIGHT)) {
-                return List.of(new TranslatableComponent("modifier.tconstruct." + path + ".flavor").setStyle(Style.EMPTY.withItalic(true).withColor(WHITE)),
-                        new TranslatableComponent("modifier.tconstruct." + path + ".description"));
+            components = getTooltips(recipe.getMaterialId(), BowstringMaterialStats.ID, mouseX, mouseY, lineNumber);
+            if (!components.isEmpty()) {
+                return components;
             }
             lineNumber += 5.5f;
         }
 
         if (limbStats.isPresent()) {
-            ModifierEntry limbTrait = MaterialRegistry.getInstance().getTraits(recipe.getMaterialId(), LimbMaterialStats.ID).get(0);
-            String path = limbTrait.getId().getPath();
-            String pattern = getPattern("modifier.tconstruct." + path);
-            int textWidth = font.width(pattern);
-            if (inBox(mouseX, mouseY, WIDTH - textWidth, (int) (lineNumber * LINE_HEIGHT + LINE_OFFSET), textWidth, LINE_HEIGHT)) {
-                return List.of(new TranslatableComponent("modifier.tconstruct." + path + ".flavor").setStyle(Style.EMPTY.withItalic(true).withColor(WHITE)),
-                        new TranslatableComponent("modifier.tconstruct." + path + ".description"));
+            components = getTooltips(recipe.getMaterialId(), BowstringMaterialStats.ID, mouseX, mouseY, lineNumber);
+            if (!components.isEmpty()) {
+                return components;
             }
             lineNumber += 5.5f;
         }
 
         if (gripStats.isPresent()) {
-            ModifierEntry gripTrait = MaterialRegistry.getInstance().getTraits(recipe.getMaterialId(), GripMaterialStats.ID).get(0);
-            String path = gripTrait.getId().getPath();
-            String pattern = getPattern("modifier.tconstruct." + path);
-            int textWidth = font.width(pattern);
-            if (inBox(mouseX, mouseY, WIDTH - textWidth, (int) (lineNumber * LINE_HEIGHT + LINE_OFFSET), textWidth, LINE_HEIGHT)) {
-                return List.of(new TranslatableComponent("modifier.tconstruct." + path + ".flavor").setStyle(Style.EMPTY.withItalic(true).withColor(WHITE)),
-                        new TranslatableComponent("modifier.tconstruct." + path + ".description"));
+            components = getTooltips(recipe.getMaterialId(), BowstringMaterialStats.ID, mouseX, mouseY, lineNumber);
+            if (!components.isEmpty()) {
+                return components;
             }
             lineNumber += 4.5f;
         }
 
         if (stringStats.isPresent()) {
-            ModifierEntry stringTrait = MaterialRegistry.getInstance().getTraits(recipe.getMaterialId(), BowstringMaterialStats.ID).get(0);
-            String path = stringTrait.getId().getPath();
-            String pattern = getPattern("modifier.tconstruct." + path);
-            int textWidth = font.width(pattern);
-            if (inBox(mouseX, mouseY, WIDTH - textWidth, (int) (lineNumber * LINE_HEIGHT + LINE_OFFSET), textWidth, LINE_HEIGHT)) {
-                return List.of(new TranslatableComponent("modifier.tconstruct." + path + ".flavor").setStyle(Style.EMPTY.withItalic(true).withColor(WHITE)),
-                        new TranslatableComponent("modifier.tconstruct." + path + ".description"));
+            components = getTooltips(recipe.getMaterialId(), BowstringMaterialStats.ID, mouseX, mouseY, lineNumber);
+            if (!components.isEmpty()) {
+                return components;
             }
         }
 
+        return components;
+    }
+
+    private List<Component> getTooltips(MaterialId materialId, MaterialStatsId materialStatsId, double mouseX, double mouseY, float lineNumber) {
+        List<ModifierEntry> traits = MaterialRegistry.getInstance().getTraits(materialId, materialStatsId);
+        for (ModifierEntry trait : traits) {
+            String path = trait.getId().getPath();
+            String pattern = getPattern("modifier.tconstruct." + path);
+            int textWidth = font.width(pattern);
+            if (inBox(mouseX, mouseY, WIDTH - textWidth, (int) (lineNumber * LINE_HEIGHT + LINE_OFFSET_HOVER), textWidth, LINE_HEIGHT)) {
+                return List.of(new TranslatableComponent("modifier.tconstruct." + path + ".flavor").setStyle(Style.EMPTY.withItalic(true).withColor(WHITE)),
+                        new TranslatableComponent("modifier.tconstruct." + path + ".description"));
+            }
+            lineNumber += 1f;
+        }
         return Collections.emptyList();
     }
 
