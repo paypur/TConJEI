@@ -42,11 +42,11 @@ public class ToolStatsCategory implements IRecipeCategory<ToolStatsWrapper> {
     final int WHITE = 16777215;
     final int LIGHT_GRAY = 5526612;
     final int GRAY = 4144959;
-    final int BLACK = 8;
+    final int BLACK = 0;
 
     public ToolStatsCategory(IGuiHelper guiHelper) {
         this.BACKGROUND = guiHelper.createBlankDrawable(WIDTH, HEIGHT);
-        // TODO: only draws 1x1 for some reason
+//        this.BACKGROUND = guiHelper.createDrawable(new ResourceLocation(MOD_ID, "textures/gui/background.png"),0,0, WIDTH, HEIGHT);
         this.ICON = guiHelper.createDrawable(new ResourceLocation(MOD_ID, "textures/gui/icon.png"), 0, 0, 16, 16);
     }
 
@@ -67,7 +67,6 @@ public class ToolStatsCategory implements IRecipeCategory<ToolStatsWrapper> {
         Optional<BowstringMaterialStats> stringStats = MaterialRegistry.getInstance().getMaterialStats(recipe.getMaterialId(), BowstringMaterialStats.ID);
 
         if (headStats.isPresent()) {
-            // 545454
             drawTraits(poseStack, recipe.getMaterialId(), HeadMaterialStats.ID, lineNumber);
             font.draw(poseStack, String.format("[%s]", getPattern("stat.tconstruct.head")), 0, lineNumber++ * LINE_HEIGHT + LINE_OFFSET, BLACK);
             font.draw(poseStack, String.format("%s%d", getPattern("tool_stat.tconstruct.durability"), headStats.get().getDurability()), 0, lineNumber++ * LINE_HEIGHT + LINE_OFFSET, GRAY);
@@ -95,7 +94,6 @@ public class ToolStatsCategory implements IRecipeCategory<ToolStatsWrapper> {
 
         if (limbStats.isPresent()) {
             drawTraits(poseStack, recipe.getMaterialId(), LimbMaterialStats.ID, lineNumber);
-
             font.draw(poseStack, String.format("[%s]", getPattern("stat.tconstruct.limb")), 0, lineNumber++ * LINE_HEIGHT + LINE_OFFSET, BLACK);
             font.draw(poseStack, String.format("%s%d", getPattern("tool_stat.tconstruct.durability"), limbStats.get().getDurability()), 0, lineNumber++ * LINE_HEIGHT + LINE_OFFSET, GRAY);
             font.draw(poseStack, String.format("%s%s%.2f", getPattern("tool_stat.tconstruct.draw_speed"), limbStats.get().getDrawSpeed() >= 0 ? "+" : "", limbStats.get().getDrawSpeed()), 0, lineNumber++ * LINE_HEIGHT + LINE_OFFSET, GRAY);
@@ -105,7 +103,6 @@ public class ToolStatsCategory implements IRecipeCategory<ToolStatsWrapper> {
         }
 
         if (gripStats.isPresent()) {
-            List<ModifierEntry> gripTrait = MaterialRegistry.getInstance().getTraits(recipe.getMaterialId(), GripMaterialStats.ID);
             drawTraits(poseStack, recipe.getMaterialId(), GripMaterialStats.ID, lineNumber);
             font.draw(poseStack, String.format("[%s]", getPattern("stat.tconstruct.grip")), 0, lineNumber++ * LINE_HEIGHT + LINE_OFFSET, BLACK);
             font.draw(poseStack, String.format("%s%.2fx", getPattern("tool_stat.tconstruct.durability"), gripStats.get().getDurability()), 0, lineNumber++ * LINE_HEIGHT + LINE_OFFSET, GRAY);
