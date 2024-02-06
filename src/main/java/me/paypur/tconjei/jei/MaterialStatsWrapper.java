@@ -8,9 +8,12 @@ import net.minecraftforge.fluids.FluidStack;
 import slimeknights.mantle.recipe.helper.RecipeHelper;
 import slimeknights.mantle.util.RegistryHelper;
 import slimeknights.tconstruct.common.TinkerTags;
+import slimeknights.tconstruct.library.materials.MaterialRegistry;
 import slimeknights.tconstruct.library.materials.definition.Material;
 import slimeknights.tconstruct.library.materials.definition.MaterialId;
 import slimeknights.tconstruct.library.materials.definition.MaterialVariantId;
+import slimeknights.tconstruct.library.materials.stats.BaseMaterialStats;
+import slimeknights.tconstruct.library.materials.stats.MaterialStatsId;
 import slimeknights.tconstruct.library.recipe.TinkerRecipeTypes;
 import slimeknights.tconstruct.library.recipe.casting.material.MaterialCastingLookup;
 import slimeknights.tconstruct.library.recipe.material.MaterialRecipe;
@@ -20,21 +23,21 @@ import slimeknights.tconstruct.tools.TinkerToolParts;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class ToolStatsWrapper {
+public class MaterialStatsWrapper {
 
     public final Material material;
 
-    public ToolStatsWrapper(Material material) {
+    public MaterialStatsWrapper(Material material) {
         this.material = material;
     }
 
     // taken from AbstractMaterialContent
-    public List<ItemStack> getRepresentativeItems() {
-        List<ItemStack> repairStacks;
+    public List<ItemStack> getItemStacks() {
         Level world = Minecraft.getInstance().level;
         if (world == null) {
             return Collections.emptyList();
         }
+        List<ItemStack> repairStacks;
         // simply combine all items from all recipes
         MaterialVariantId materialVariantId = MaterialVariantId.parse(material.getIdentifier().toString());
         repairStacks = RecipeHelper.getUIRecipes(world.getRecipeManager(), TinkerRecipeTypes.MATERIAL.get(), MaterialRecipe.class, recipe -> materialVariantId.matchesVariant(recipe.getMaterial()))
@@ -76,7 +79,11 @@ public class ToolStatsWrapper {
     }
 
     public MaterialId getMaterialId() {
-        return  material.getIdentifier().getId();
+        return material.getIdentifier().getId();
+    }
+
+    public <T extends BaseMaterialStats> Optional<T> getMaterialStats(MaterialStatsId materialStatsId) {
+        return MaterialRegistry.getInstance().getMaterialStats(getMaterialId(), materialStatsId);
     }
 
 }

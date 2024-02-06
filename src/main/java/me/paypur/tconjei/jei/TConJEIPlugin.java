@@ -7,6 +7,7 @@ import mezz.jei.api.recipe.RecipeType;
 import mezz.jei.api.registration.IRecipeCatalystRegistration;
 import mezz.jei.api.registration.IRecipeCategoryRegistration;
 import mezz.jei.api.registration.IRecipeRegistration;
+import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import slimeknights.tconstruct.library.materials.MaterialRegistry;
@@ -14,6 +15,8 @@ import slimeknights.tconstruct.library.materials.definition.IMaterial;
 import slimeknights.tconstruct.library.materials.definition.Material;
 import slimeknights.tconstruct.tables.TinkerTables;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 
 import static me.paypur.tconjei.TConJEI.MOD_ID;
@@ -22,7 +25,7 @@ import static me.paypur.tconjei.TConJEI.MOD_ID;
 @JeiPlugin
 public class TConJEIPlugin implements IModPlugin {
 
-    public static final RecipeType<ToolStatsWrapper> RECIPE_TYPE = RecipeType.create(MOD_ID, "tool_stats", ToolStatsWrapper.class);
+    private static final RecipeType<MaterialStatsWrapper> RECIPE_TYPE = RecipeType.create(MOD_ID, "material_stats", MaterialStatsWrapper.class);
 
     @Override
     public ResourceLocation getPluginUid() {
@@ -36,7 +39,7 @@ public class TConJEIPlugin implements IModPlugin {
 
     @Override
     public void registerCategories(IRecipeCategoryRegistration registration) {
-        registration.addRecipeCategories(new ToolStatsCategory(registration.getJeiHelpers().getGuiHelper()));
+        registration.addRecipeCategories(new MaterialStatsCategory(registration.getJeiHelpers().getGuiHelper()));
     }
 
     @Override
@@ -45,12 +48,12 @@ public class TConJEIPlugin implements IModPlugin {
         registration.addRecipeCatalyst(new ItemStack(TinkerTables.tinkersAnvil.asItem()), RECIPE_TYPE);
     }
 
-    private ArrayList<ToolStatsWrapper> recipes(IGuiHelper guiHelper) {
-        ArrayList<ToolStatsWrapper> list = new ArrayList<>();
+    private ArrayList<MaterialStatsWrapper> recipes(IGuiHelper guiHelper) {
+        ArrayList<MaterialStatsWrapper> list = new ArrayList<>();
         for (IMaterial material : MaterialRegistry.getMaterials())
             // && material.hasItems() && !material.getAllStats().isEmpty()
             if (!material.isHidden()) {
-                list.add(new ToolStatsWrapper((Material) material));
+                list.add(new MaterialStatsWrapper((Material) material));
             }
         return list;
     }

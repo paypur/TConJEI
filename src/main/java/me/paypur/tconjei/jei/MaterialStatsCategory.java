@@ -1,6 +1,7 @@
 package me.paypur.tconjei.jei;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.logging.LogUtils;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
@@ -23,6 +24,10 @@ import slimeknights.tconstruct.library.materials.stats.MaterialStatsId;
 import slimeknights.tconstruct.library.modifiers.ModifierEntry;
 import slimeknights.tconstruct.tools.stats.*;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -30,9 +35,9 @@ import java.util.Optional;
 import static me.paypur.tconjei.TConJEI.MOD_ID;
 import static net.minecraftforge.common.ForgeI18n.getPattern;
 
-public class ToolStatsCategory implements IRecipeCategory<ToolStatsWrapper> {
+public class MaterialStatsCategory implements IRecipeCategory<MaterialStatsWrapper> {
 
-    final ResourceLocation UID = new ResourceLocation(MOD_ID, "tool_stats");
+    final ResourceLocation UID = new ResourceLocation(MOD_ID, "material_stats");
     final Font font = Minecraft.getInstance().font;
     final IDrawable BACKGROUND, ICON;
     final int WIDTH = 164, HEIGHT = 240;
@@ -40,18 +45,27 @@ public class ToolStatsCategory implements IRecipeCategory<ToolStatsWrapper> {
     final int LINE_OFFSET_HOVER = LINE_OFFSET - 1;
     final int LINE_HEIGHT = 10;
     final int WHITE = 16777215;
-    final int LIGHT_GRAY = 5526612;
-    final int GRAY = 4144959;
-    final int BLACK = 0;
+    int MAIN_COLOR = 0;
+    int STAT_COLOR = 5526612;
+    int TRAIT_COLOR = 8289918;
 
-    public ToolStatsCategory(IGuiHelper guiHelper) {
+    public MaterialStatsCategory(IGuiHelper guiHelper) {
         this.BACKGROUND = guiHelper.createBlankDrawable(WIDTH, HEIGHT);
-//        this.BACKGROUND = guiHelper.createDrawable(new ResourceLocation(MOD_ID, "textures/gui/background.png"),0,0, WIDTH, HEIGHT);
         this.ICON = guiHelper.createDrawable(new ResourceLocation(MOD_ID, "textures/gui/icon.png"), 0, 0, 16, 16);
+        ResourceLocation palette = new ResourceLocation(MOD_ID, "textures/gui/palette.png");
+        try {
+            InputStream stream = Minecraft.getInstance().getResourceManager().getResource(palette).getInputStream();
+            BufferedImage image = ImageIO.read(stream);
+            this.MAIN_COLOR = image.getRGB(0, 0);
+            this.STAT_COLOR = image.getRGB(1, 0);
+            this.TRAIT_COLOR = image.getRGB(0, 1);
+        } catch (IOException e) {
+            LogUtils.getLogger().error("Error loading palette", e);
+        }
     }
 
     @Override
-    public void draw(ToolStatsWrapper recipe, IRecipeSlotsView recipeSlotsView, PoseStack poseStack, double mouseX, double mouseY) {
+    public void draw(MaterialStatsWrapper recipe, IRecipeSlotsView recipeSlotsView, PoseStack poseStack, double mouseX, double mouseY) {
         final int MATERIAL_COLOR = MaterialTooltipCache.getColor(recipe.getMaterialId()).getValue();
         final String materialPath = recipe.getMaterialId().getPath();
 
@@ -59,61 +73,61 @@ public class ToolStatsCategory implements IRecipeCategory<ToolStatsWrapper> {
 
         font.drawShadow(poseStack, getPattern("material.tconstruct." + materialPath), (WIDTH - font.getSplitter().stringWidth(materialPath)) / 2, 4, MATERIAL_COLOR);
 
-        Optional<HeadMaterialStats> headStats = MaterialRegistry.getInstance().getMaterialStats(recipe.getMaterialId(), HeadMaterialStats.ID);
-        Optional<ExtraMaterialStats> extraStats = MaterialRegistry.getInstance().getMaterialStats(recipe.getMaterialId(), ExtraMaterialStats.ID);
-        Optional<HandleMaterialStats> handleStats = MaterialRegistry.getInstance().getMaterialStats(recipe.getMaterialId(), HandleMaterialStats.ID);
-        Optional<LimbMaterialStats> limbStats = MaterialRegistry.getInstance().getMaterialStats(recipe.getMaterialId(), LimbMaterialStats.ID);
-        Optional<GripMaterialStats> gripStats = MaterialRegistry.getInstance().getMaterialStats(recipe.getMaterialId(), GripMaterialStats.ID);
-        Optional<BowstringMaterialStats> stringStats = MaterialRegistry.getInstance().getMaterialStats(recipe.getMaterialId(), BowstringMaterialStats.ID);
+        Optional<HeadMaterialStats> headStats = recipe.getMaterialStats(HeadMaterialStats.ID);
+        Optional<ExtraMaterialStats> extraStats = recipe.getMaterialStats(ExtraMaterialStats.ID);
+        Optional<HandleMaterialStats> handleStats = recipe.getMaterialStats(HandleMaterialStats.ID);
+        Optional<LimbMaterialStats> limbStats = recipe.getMaterialStats(LimbMaterialStats.ID);
+        Optional<GripMaterialStats> gripStats = recipe.getMaterialStats(GripMaterialStats.ID);
+        Optional<BowstringMaterialStats> stringStats = recipe.getMaterialStats(BowstringMaterialStats.ID);
 
         if (headStats.isPresent()) {
             drawTraits(poseStack, recipe.getMaterialId(), HeadMaterialStats.ID, lineNumber);
-            font.draw(poseStack, String.format("[%s]", getPattern("stat.tconstruct.head")), 0, lineNumber++ * LINE_HEIGHT + LINE_OFFSET, BLACK);
-            font.draw(poseStack, String.format("%s%d", getPattern("tool_stat.tconstruct.durability"), headStats.get().getDurability()), 0, lineNumber++ * LINE_HEIGHT + LINE_OFFSET, GRAY);
-            font.draw(poseStack, String.format("%s%s", getPattern("tool_stat.tconstruct.harvest_tier"), getPattern("stat.tconstruct.harvest_tier.minecraft." + headStats.get().getTierId().getPath())), 0, lineNumber++ * LINE_HEIGHT + LINE_OFFSET, GRAY);
-            font.draw(poseStack, String.format("%s%.2f", getPattern("tool_stat.tconstruct.mining_speed"), headStats.get().getMiningSpeed()), 0, lineNumber++ * LINE_HEIGHT + LINE_OFFSET, GRAY);
-            font.draw(poseStack, String.format("%s%.2f", getPattern("tool_stat.tconstruct.attack_damage"), headStats.get().getAttack()), 0, lineNumber++ * LINE_HEIGHT + LINE_OFFSET, GRAY);
+            font.draw(poseStack, String.format("[%s]", getPattern("stat.tconstruct.head")), 0, lineNumber++ * LINE_HEIGHT + LINE_OFFSET, MAIN_COLOR);
+            font.draw(poseStack, String.format("%s%d", getPattern("tool_stat.tconstruct.durability"), headStats.get().getDurability()), 0, lineNumber++ * LINE_HEIGHT + LINE_OFFSET, STAT_COLOR);
+            font.draw(poseStack, String.format("%s%s", getPattern("tool_stat.tconstruct.harvest_tier"), getPattern("stat.tconstruct.harvest_tier.minecraft." + headStats.get().getTierId().getPath())), 0, lineNumber++ * LINE_HEIGHT + LINE_OFFSET, STAT_COLOR);
+            font.draw(poseStack, String.format("%s%.2f", getPattern("tool_stat.tconstruct.mining_speed"), headStats.get().getMiningSpeed()), 0, lineNumber++ * LINE_HEIGHT + LINE_OFFSET, STAT_COLOR);
+            font.draw(poseStack, String.format("%s%.2f", getPattern("tool_stat.tconstruct.attack_damage"), headStats.get().getAttack()), 0, lineNumber++ * LINE_HEIGHT + LINE_OFFSET, STAT_COLOR);
             lineNumber += 0.5f;
         }
 
         if (extraStats.isPresent()) {
             drawTraits(poseStack, recipe.getMaterialId(), ExtraMaterialStats.ID, lineNumber);
-            font.draw(poseStack, String.format("[%s]", getPattern("stat.tconstruct.extra")), 0, lineNumber++ * LINE_HEIGHT + LINE_OFFSET, BLACK);
+            font.draw(poseStack, String.format("[%s]", getPattern("stat.tconstruct.extra")), 0, lineNumber++ * LINE_HEIGHT + LINE_OFFSET, MAIN_COLOR);
             lineNumber += 0.5f;
         }
 
         if (handleStats.isPresent()) {
             drawTraits(poseStack, recipe.getMaterialId(), HandleMaterialStats.ID, lineNumber);
-            font.draw(poseStack, String.format("[%s]", getPattern("stat.tconstruct.handle")), 0, lineNumber++ * LINE_HEIGHT + LINE_OFFSET, BLACK);
-            font.draw(poseStack, String.format("%s%.2fx", getPattern("tool_stat.tconstruct.durability"), handleStats.get().getDurability()), 0, lineNumber++ * LINE_HEIGHT + LINE_OFFSET, GRAY);
-            font.draw(poseStack, String.format("%s%.2fx", getPattern("tool_stat.tconstruct.attack_damage"), handleStats.get().getAttackDamage()), 0, lineNumber++ * LINE_HEIGHT + LINE_OFFSET, GRAY);
-            font.draw(poseStack, String.format("%s%.2fx", getPattern("tool_stat.tconstruct.attack_speed"), handleStats.get().getAttackSpeed()), 0, lineNumber++ * LINE_HEIGHT + LINE_OFFSET, GRAY);
-            font.draw(poseStack, String.format("%s%.2fx", getPattern("tool_stat.tconstruct.mining_speed"), handleStats.get().getMiningSpeed()), 0, lineNumber++ * LINE_HEIGHT + LINE_OFFSET, GRAY);
+            font.draw(poseStack, String.format("[%s]", getPattern("stat.tconstruct.handle")), 0, lineNumber++ * LINE_HEIGHT + LINE_OFFSET, MAIN_COLOR);
+            font.draw(poseStack, String.format("%s%.2fx", getPattern("tool_stat.tconstruct.durability"), handleStats.get().getDurability()), 0, lineNumber++ * LINE_HEIGHT + LINE_OFFSET, STAT_COLOR);
+            font.draw(poseStack, String.format("%s%.2fx", getPattern("tool_stat.tconstruct.attack_damage"), handleStats.get().getAttackDamage()), 0, lineNumber++ * LINE_HEIGHT + LINE_OFFSET, STAT_COLOR);
+            font.draw(poseStack, String.format("%s%.2fx", getPattern("tool_stat.tconstruct.attack_speed"), handleStats.get().getAttackSpeed()), 0, lineNumber++ * LINE_HEIGHT + LINE_OFFSET, STAT_COLOR);
+            font.draw(poseStack, String.format("%s%.2fx", getPattern("tool_stat.tconstruct.mining_speed"), handleStats.get().getMiningSpeed()), 0, lineNumber++ * LINE_HEIGHT + LINE_OFFSET, STAT_COLOR);
             lineNumber += 0.5f;
         }
 
         if (limbStats.isPresent()) {
             drawTraits(poseStack, recipe.getMaterialId(), LimbMaterialStats.ID, lineNumber);
-            font.draw(poseStack, String.format("[%s]", getPattern("stat.tconstruct.limb")), 0, lineNumber++ * LINE_HEIGHT + LINE_OFFSET, BLACK);
-            font.draw(poseStack, String.format("%s%d", getPattern("tool_stat.tconstruct.durability"), limbStats.get().getDurability()), 0, lineNumber++ * LINE_HEIGHT + LINE_OFFSET, GRAY);
-            font.draw(poseStack, String.format("%s%s%.2f", getPattern("tool_stat.tconstruct.draw_speed"), limbStats.get().getDrawSpeed() >= 0 ? "+" : "", limbStats.get().getDrawSpeed()), 0, lineNumber++ * LINE_HEIGHT + LINE_OFFSET, GRAY);
-            font.draw(poseStack, String.format("%s%s%.2f", getPattern("tool_stat.tconstruct.velocity"), limbStats.get().getVelocity() >= 0 ? "+" : "", limbStats.get().getVelocity()), 0, lineNumber++ * LINE_HEIGHT + LINE_OFFSET, GRAY);
-            font.draw(poseStack, String.format("%s%s%.2f", getPattern("tool_stat.tconstruct.accuracy"), limbStats.get().getDrawSpeed() >= 0 ? "+" : "", limbStats.get().getDrawSpeed()), 0, lineNumber++ * LINE_HEIGHT + LINE_OFFSET, GRAY);
+            font.draw(poseStack, String.format("[%s]", getPattern("stat.tconstruct.limb")), 0, lineNumber++ * LINE_HEIGHT + LINE_OFFSET, MAIN_COLOR);
+            font.draw(poseStack, String.format("%s%d", getPattern("tool_stat.tconstruct.durability"), limbStats.get().getDurability()), 0, lineNumber++ * LINE_HEIGHT + LINE_OFFSET, STAT_COLOR);
+            font.draw(poseStack, String.format("%s%s%.2f", getPattern("tool_stat.tconstruct.draw_speed"), limbStats.get().getDrawSpeed() >= 0 ? "+" : "", limbStats.get().getDrawSpeed()), 0, lineNumber++ * LINE_HEIGHT + LINE_OFFSET, STAT_COLOR);
+            font.draw(poseStack, String.format("%s%s%.2f", getPattern("tool_stat.tconstruct.velocity"), limbStats.get().getVelocity() >= 0 ? "+" : "", limbStats.get().getVelocity()), 0, lineNumber++ * LINE_HEIGHT + LINE_OFFSET, STAT_COLOR);
+            font.draw(poseStack, String.format("%s%s%.2f", getPattern("tool_stat.tconstruct.accuracy"), limbStats.get().getDrawSpeed() >= 0 ? "+" : "", limbStats.get().getDrawSpeed()), 0, lineNumber++ * LINE_HEIGHT + LINE_OFFSET, STAT_COLOR);
             lineNumber += 0.5f;
         }
 
         if (gripStats.isPresent()) {
             drawTraits(poseStack, recipe.getMaterialId(), GripMaterialStats.ID, lineNumber);
-            font.draw(poseStack, String.format("[%s]", getPattern("stat.tconstruct.grip")), 0, lineNumber++ * LINE_HEIGHT + LINE_OFFSET, BLACK);
-            font.draw(poseStack, String.format("%s%.2fx", getPattern("tool_stat.tconstruct.durability"), gripStats.get().getDurability()), 0, lineNumber++ * LINE_HEIGHT + LINE_OFFSET, GRAY);
-            font.draw(poseStack, String.format("%s%s%.2f", getPattern("tool_stat.tconstruct.accuracy"), gripStats.get().getAccuracy() >= 0 ? "+" : "", gripStats.get().getAccuracy()), 0, lineNumber++ * LINE_HEIGHT + LINE_OFFSET, GRAY);
-            font.draw(poseStack, String.format("%s%.2f", getPattern("tool_stat.tconstruct.attack_damage"), gripStats.get().getMeleeAttack()), 0, lineNumber++ * LINE_HEIGHT + LINE_OFFSET, GRAY);
+            font.draw(poseStack, String.format("[%s]", getPattern("stat.tconstruct.grip")), 0, lineNumber++ * LINE_HEIGHT + LINE_OFFSET, MAIN_COLOR);
+            font.draw(poseStack, String.format("%s%.2fx", getPattern("tool_stat.tconstruct.durability"), gripStats.get().getDurability()), 0, lineNumber++ * LINE_HEIGHT + LINE_OFFSET, STAT_COLOR);
+            font.draw(poseStack, String.format("%s%s%.2f", getPattern("tool_stat.tconstruct.accuracy"), gripStats.get().getAccuracy() >= 0 ? "+" : "", gripStats.get().getAccuracy()), 0, lineNumber++ * LINE_HEIGHT + LINE_OFFSET, STAT_COLOR);
+            font.draw(poseStack, String.format("%s%.2f", getPattern("tool_stat.tconstruct.attack_damage"), gripStats.get().getMeleeAttack()), 0, lineNumber++ * LINE_HEIGHT + LINE_OFFSET, STAT_COLOR);
             lineNumber += 0.5f;
         }
 
         if (stringStats.isPresent()) {
             drawTraits(poseStack, recipe.getMaterialId(), BowstringMaterialStats.ID, lineNumber);
-            font.draw(poseStack, String.format("[%s]", getPattern("stat.tconstruct.bowstring")), 0, lineNumber * LINE_HEIGHT + LINE_OFFSET, BLACK);
+            font.draw(poseStack, String.format("[%s]", getPattern("stat.tconstruct.bowstring")), 0, lineNumber * LINE_HEIGHT + LINE_OFFSET, MAIN_COLOR);
         }
 
     }
@@ -122,27 +136,27 @@ public class ToolStatsCategory implements IRecipeCategory<ToolStatsWrapper> {
         List<ModifierEntry> traits = MaterialRegistry.getInstance().getTraits(materialId, materialStatsId);
         for (ModifierEntry trait : traits) {
             String pattern = getPattern("modifier.tconstruct." + trait.getId().getPath());
-            font.draw(poseStack, String.format("%s", pattern), WIDTH - font.getSplitter().stringWidth(pattern), lineNumber++ * LINE_HEIGHT + LINE_OFFSET, LIGHT_GRAY);
+            font.draw(poseStack, String.format("%s", pattern), WIDTH - font.getSplitter().stringWidth(pattern), lineNumber++ * LINE_HEIGHT + LINE_OFFSET, TRAIT_COLOR);
         }
     }
 
     @Override
-    public void setRecipe(IRecipeLayoutBuilder builder, ToolStatsWrapper recipe, IFocusGroup focuses) {
+    public void setRecipe(IRecipeLayoutBuilder builder, MaterialStatsWrapper recipe, IFocusGroup focuses) {
         if (!recipe.material.isCraftable()) {
             final int BUCKET = 1000; // milli buckets
             builder.addSlot(RecipeIngredientRole.RENDER_ONLY, 18, 0).addFluidStack(recipe.getFluidStack().getFluid(), BUCKET);
             builder.addInvisibleIngredients(RecipeIngredientRole.INPUT).addFluidStack(recipe.getFluidStack().getFluid(), BUCKET);
             builder.addInvisibleIngredients(RecipeIngredientRole.OUTPUT).addFluidStack(recipe.getFluidStack().getFluid(), BUCKET);
         }
-        builder.addSlot(RecipeIngredientRole.RENDER_ONLY, 0, 0).addItemStacks(recipe.getRepresentativeItems());
-        builder.addInvisibleIngredients(RecipeIngredientRole.INPUT).addItemStacks(recipe.getRepresentativeItems());
-        builder.addInvisibleIngredients(RecipeIngredientRole.OUTPUT).addItemStacks(recipe.getRepresentativeItems());
+        builder.addSlot(RecipeIngredientRole.RENDER_ONLY, 0, 0).addItemStacks(recipe.getItemStacks());
+        builder.addInvisibleIngredients(RecipeIngredientRole.INPUT).addItemStacks(recipe.getItemStacks());
+        builder.addInvisibleIngredients(RecipeIngredientRole.OUTPUT).addItemStacks(recipe.getItemStacks());
 
         builder.addSlot(RecipeIngredientRole.RENDER_ONLY, (WIDTH - 16), 0).addItemStacks(recipe.getParts());
     }
 
     @Override
-    public List<Component> getTooltipStrings(ToolStatsWrapper recipe, IRecipeSlotsView recipeSlotsView, double mouseX, double mouseY) {
+    public List<Component> getTooltipStrings(MaterialStatsWrapper recipe, IRecipeSlotsView recipeSlotsView, double mouseX, double mouseY) {
         final String materialPath = recipe.getMaterialId().getPath();
 
         float lineNumber = 0;
@@ -232,7 +246,7 @@ public class ToolStatsCategory implements IRecipeCategory<ToolStatsWrapper> {
 
     @Override
     public Component getTitle() {
-        return new TextComponent("Tool Stats");
+        return new TextComponent("Material Stats");
     }
 
     @SuppressWarnings("removal")
@@ -253,13 +267,13 @@ public class ToolStatsCategory implements IRecipeCategory<ToolStatsWrapper> {
 
     @SuppressWarnings("removal")
     @Override
-    public Class<? extends ToolStatsWrapper> getRecipeClass() {
-        return ToolStatsWrapper.class;
+    public Class<? extends MaterialStatsWrapper> getRecipeClass() {
+        return MaterialStatsWrapper.class;
     }
 
     @Override
-    public RecipeType<ToolStatsWrapper> getRecipeType() {
-        return RecipeType.create(MOD_ID, "tool_stats", getRecipeClass());
+    public RecipeType<MaterialStatsWrapper> getRecipeType() {
+        return RecipeType.create(MOD_ID, "material_stats", getRecipeClass());
     }
 
 }
