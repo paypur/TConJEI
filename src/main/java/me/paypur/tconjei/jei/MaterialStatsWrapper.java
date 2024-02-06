@@ -14,6 +14,7 @@ import slimeknights.tconstruct.library.materials.definition.MaterialId;
 import slimeknights.tconstruct.library.materials.definition.MaterialVariantId;
 import slimeknights.tconstruct.library.materials.stats.BaseMaterialStats;
 import slimeknights.tconstruct.library.materials.stats.MaterialStatsId;
+import slimeknights.tconstruct.library.modifiers.ModifierEntry;
 import slimeknights.tconstruct.library.recipe.TinkerRecipeTypes;
 import slimeknights.tconstruct.library.recipe.casting.material.MaterialCastingLookup;
 import slimeknights.tconstruct.library.recipe.material.MaterialRecipe;
@@ -23,13 +24,7 @@ import slimeknights.tconstruct.tools.TinkerToolParts;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class MaterialStatsWrapper {
-
-    public final Material material;
-
-    public MaterialStatsWrapper(Material material) {
-        this.material = material;
-    }
+public record MaterialStatsWrapper(Material material) {
 
     // taken from AbstractMaterialContent
     public List<ItemStack> getItemStacks() {
@@ -82,8 +77,16 @@ public class MaterialStatsWrapper {
         return material.getIdentifier().getId();
     }
 
-    public <T extends BaseMaterialStats> Optional<T> getMaterialStats(MaterialStatsId materialStatsId) {
+    public boolean isCraftable() {
+        return material.isCraftable();
+    }
+
+    public <T extends BaseMaterialStats> Optional<T> getStats(MaterialStatsId materialStatsId) {
         return MaterialRegistry.getInstance().getMaterialStats(getMaterialId(), materialStatsId);
+    }
+
+    public List<ModifierEntry> getTraits(MaterialStatsId materialStatsId) {
+        return MaterialRegistry.getInstance().getTraits(material.getIdentifier().getId(), materialStatsId);
     }
 
 }
