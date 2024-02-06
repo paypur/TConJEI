@@ -67,11 +67,11 @@ public class MaterialStatsCategory implements IRecipeCategory<MaterialStatsWrapp
     @Override
     public void draw(MaterialStatsWrapper recipe, IRecipeSlotsView recipeSlotsView, PoseStack poseStack, double mouseX, double mouseY) {
         final int MATERIAL_COLOR = MaterialTooltipCache.getColor(recipe.getMaterialId()).getValue();
+        final String materialNamespace = recipe.getMaterialId().getNamespace();
         final String materialPath = recipe.getMaterialId().getPath();
 
         float lineNumber = 0;
-
-        font.drawShadow(poseStack, getPattern("material.tconstruct." + materialPath), (WIDTH - font.getSplitter().stringWidth(materialPath)) / 2, 4, MATERIAL_COLOR);
+        font.drawShadow(poseStack, getPattern(String.format("material.%s.%s", materialNamespace, materialPath)), (WIDTH - font.getSplitter().stringWidth(materialPath)) / 2, 4, MATERIAL_COLOR);
 
         Optional<HeadMaterialStats> headStats = recipe.getMaterialStats(HeadMaterialStats.ID);
         Optional<ExtraMaterialStats> extraStats = recipe.getMaterialStats(ExtraMaterialStats.ID);
@@ -135,7 +135,7 @@ public class MaterialStatsCategory implements IRecipeCategory<MaterialStatsWrapp
     private void drawTraits(PoseStack poseStack, MaterialId materialId, MaterialStatsId materialStatsId, float lineNumber) {
         List<ModifierEntry> traits = MaterialRegistry.getInstance().getTraits(materialId, materialStatsId);
         for (ModifierEntry trait : traits) {
-            String pattern = getPattern("modifier.tconstruct." + trait.getId().getPath());
+            String pattern = getPattern(String.format("modifier.%s.%s", trait.getId().getNamespace(), trait.getId().getPath()));
             font.draw(poseStack, String.format("%s", pattern), WIDTH - font.getSplitter().stringWidth(pattern), lineNumber++ * LINE_HEIGHT + LINE_OFFSET, TRAIT_COLOR);
         }
     }
@@ -157,13 +157,14 @@ public class MaterialStatsCategory implements IRecipeCategory<MaterialStatsWrapp
 
     @Override
     public List<Component> getTooltipStrings(MaterialStatsWrapper recipe, IRecipeSlotsView recipeSlotsView, double mouseX, double mouseY) {
+        final String materialNamespace = recipe.getMaterialId().getNamespace();
         final String materialPath = recipe.getMaterialId().getPath();
 
         float lineNumber = 0;
 
         int matWidth = font.width(materialPath);
         if (inBox(mouseX, mouseY, (WIDTH - matWidth) / 2, 3, matWidth, LINE_HEIGHT)) {
-            return Collections.singletonList(new TranslatableComponent("material.tconstruct." + materialPath + ".flavor").setStyle(Style.EMPTY.withItalic(true).withColor(WHITE)));
+            return Collections.singletonList(new TranslatableComponent(String.format("material.%s.%s.flavor", materialNamespace, materialPath)).setStyle(Style.EMPTY.withItalic(true).withColor(WHITE)));
         }
 
         Optional<HeadMaterialStats> headStats = MaterialRegistry.getInstance().getMaterialStats(recipe.getMaterialId(), HeadMaterialStats.ID);
@@ -228,12 +229,13 @@ public class MaterialStatsCategory implements IRecipeCategory<MaterialStatsWrapp
     private List<Component> getTooltips(MaterialId materialId, MaterialStatsId materialStatsId, double mouseX, double mouseY, float lineNumber) {
         List<ModifierEntry> traits = MaterialRegistry.getInstance().getTraits(materialId, materialStatsId);
         for (ModifierEntry trait : traits) {
+            String namespace = trait.getId().getNamespace();
             String path = trait.getId().getPath();
-            String pattern = getPattern("modifier.tconstruct." + path);
+            String pattern = getPattern(String.format("modifier.%s.%s", namespace, path));
             int textWidth = font.width(pattern);
             if (inBox(mouseX, mouseY, WIDTH - textWidth, (int) (lineNumber * LINE_HEIGHT + LINE_OFFSET_HOVER), textWidth, LINE_HEIGHT)) {
-                return List.of(new TranslatableComponent("modifier.tconstruct." + path + ".flavor").setStyle(Style.EMPTY.withItalic(true).withColor(WHITE)),
-                        new TranslatableComponent("modifier.tconstruct." + path + ".description"));
+                return List.of(new TranslatableComponent(String.format("modifier.%s.%s.flavor", namespace, path)).setStyle(Style.EMPTY.withItalic(true).withColor(WHITE)),
+                        new TranslatableComponent(String.format("modifier.%s.%s.description", namespace, path)));
             }
             lineNumber += 1f;
         }
