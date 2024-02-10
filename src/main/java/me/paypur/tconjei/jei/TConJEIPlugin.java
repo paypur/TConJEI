@@ -7,17 +7,14 @@ import mezz.jei.api.recipe.RecipeType;
 import mezz.jei.api.registration.IRecipeCatalystRegistration;
 import mezz.jei.api.registration.IRecipeCategoryRegistration;
 import mezz.jei.api.registration.IRecipeRegistration;
-import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import slimeknights.tconstruct.library.materials.MaterialRegistry;
-import slimeknights.tconstruct.library.materials.definition.IMaterial;
 import slimeknights.tconstruct.library.materials.definition.Material;
 import slimeknights.tconstruct.tables.TinkerTables;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static me.paypur.tconjei.TConJEI.MOD_ID;
 
@@ -48,14 +45,13 @@ public class TConJEIPlugin implements IModPlugin {
         registration.addRecipeCatalyst(new ItemStack(TinkerTables.tinkersAnvil.asItem()), RECIPE_TYPE);
     }
 
-    private ArrayList<MaterialStatsWrapper> recipes(IGuiHelper guiHelper) {
-        ArrayList<MaterialStatsWrapper> list = new ArrayList<>();
-        for (IMaterial material : MaterialRegistry.getMaterials())
-            // && material.hasItems() && !material.getAllStats().isEmpty()
-            if (!material.isHidden()) {
-                list.add(new MaterialStatsWrapper((Material) material));
-            }
-        return list;
+    private List<MaterialStatsWrapper> recipes(IGuiHelper guiHelper) {
+        return MaterialRegistry.getMaterials()
+                .stream()
+                .filter(iMaterial -> !iMaterial.isHidden())
+                .map(stats -> new MaterialStatsWrapper((Material) stats))
+                .filter(MaterialStatsWrapper::hasTraits)
+                .collect(Collectors.toList());
     }
 
 }

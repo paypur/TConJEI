@@ -20,8 +20,12 @@ import slimeknights.tconstruct.library.recipe.casting.material.MaterialCastingLo
 import slimeknights.tconstruct.library.recipe.material.MaterialRecipe;
 import slimeknights.tconstruct.library.tools.part.IToolPart;
 import slimeknights.tconstruct.tools.TinkerToolParts;
+import slimeknights.tconstruct.tools.stats.*;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public record MaterialStatsWrapper(Material material) {
@@ -52,24 +56,17 @@ public record MaterialStatsWrapper(Material material) {
         return MaterialCastingLookup.getCastingFluids(material.getIdentifier())
                 .stream()
                 .flatMap(recipe -> recipe.getFluids().stream())
-                .findFirst().orElse(FluidStack.EMPTY);
-    }
-
-    public List<ItemStack> getParts() {
-        ArrayList<ItemStack> list = new ArrayList<ItemStack>();
-        for (IToolPart part : getToolParts()) {
-            if (part.canUseMaterial(material)) {
-                list.add(part.withMaterial(material.getIdentifier()));
-            }
-        }
-        return list;
+                .findFirst()
+                .orElse(FluidStack.EMPTY);
     }
 
     // taken from AbstractMaterialContent
-    private List<IToolPart> getToolParts() {
+    public List<ItemStack> getToolParts() {
         return RegistryHelper.getTagValueStream(Registry.ITEM, TinkerTags.Items.TOOL_PARTS)
-                .filter(item -> item instanceof IToolPart)
-                .map(item -> (IToolPart) item)
+                .filter(part -> part instanceof IToolPart)
+                .map(part -> (IToolPart) part)
+                .filter(part -> part.canUseMaterial(material))
+                .map(part -> part.withMaterial(material.getIdentifier()))
                 .collect(Collectors.toList());
     }
 
@@ -79,6 +76,11 @@ public record MaterialStatsWrapper(Material material) {
 
     public boolean isCraftable() {
         return material.isCraftable();
+    }
+
+    public boolean hasTraits() {
+        List<MaterialStatsId> stats = List.of(HeadMaterialStats.ID, ExtraMaterialStats.ID, HandleMaterialStats.ID, LimbMaterialStats.ID, GripMaterialStats.ID, BowstringMaterialStats.ID);
+        return stats.stream().anyMatch(stat -> !getTraits(stat).isEmpty());
     }
 
     public <T extends BaseMaterialStats> Optional<T> getStats(MaterialStatsId materialStatsId) {
