@@ -27,9 +27,11 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import static me.paypur.tconjei.TConJEI.MOD_ID;
 import static net.minecraftforge.common.ForgeI18n.getPattern;
@@ -71,7 +73,7 @@ public class MaterialStatsCategory implements IRecipeCategory<MaterialStatsWrapp
         final int MATERIAL_COLOR = MaterialTooltipCache.getColor(statsWrapper.getMaterialId()).getValue();
         float lineNumber = 0;
         // Name
-        font.drawShadow(poseStack, materialName, (WIDTH - font.getSplitter().stringWidth(materialName)) / 2, 4, MATERIAL_COLOR);
+        font.drawShadow(poseStack, materialName, (WIDTH - font.width(materialName)) / 2f, 4, MATERIAL_COLOR);
         Optional<HeadMaterialStats> headStats = statsWrapper.getStats(HeadMaterialStats.ID);
         Optional<ExtraMaterialStats> extraStats = statsWrapper.getStats(ExtraMaterialStats.ID);
         Optional<HandleMaterialStats> handleStats = statsWrapper.getStats(HandleMaterialStats.ID);
@@ -167,59 +169,84 @@ public class MaterialStatsCategory implements IRecipeCategory<MaterialStatsWrapp
         Optional<GripMaterialStats> gripStats = MaterialRegistry.getInstance().getMaterialStats(statsWrapper.getMaterialId(), GripMaterialStats.ID);
         Optional<BowstringMaterialStats> stringStats = MaterialRegistry.getInstance().getMaterialStats(statsWrapper.getMaterialId(), BowstringMaterialStats.ID);
 
-        List<Component> components = Collections.emptyList();
-
         if (headStats.isPresent()) {
-            components = getTraitTooltips(statsWrapper, BowstringMaterialStats.ID, mouseX, mouseY, lineNumber);
-            if (!components.isEmpty()) {
-                return components;
+            Optional<List<Component>> component = Stream.of(
+                    getTraitTooltips(statsWrapper, HeadMaterialStats.ID, mouseX, mouseY, lineNumber++),
+                    getStatTooltip("tool_stat.tconstruct.durability", mouseX, mouseY, lineNumber++),
+                    getStatTooltip("tool_stat.tconstruct.harvest_tier", mouseX, mouseY, lineNumber++),
+                    getStatTooltip("tool_stat.tconstruct.mining_speed", mouseX, mouseY, lineNumber++),
+                    getStatTooltip("tool_stat.tconstruct.attack_damage", mouseX, mouseY, lineNumber++))
+                    .filter(list -> !list.isEmpty())
+                    .findFirst();
+            if (component.isPresent()) {
+                return component.get();
             }
-            lineNumber += 5.5f;
+            lineNumber += 0.5f;
         }
 
         else if (extraStats.isPresent()) {
-            components = getTraitTooltips(statsWrapper, BowstringMaterialStats.ID, mouseX, mouseY, lineNumber);
-            if (!components.isEmpty()) {
-                return components;
+            List<Component> component = getTraitTooltips(statsWrapper, ExtraMaterialStats.ID, mouseX, mouseY, lineNumber++);
+            if (!component.isEmpty()) {
+                return component;
             }
-            lineNumber += 1.5f;
+            lineNumber += 0.5f;
         }
 
         if (handleStats.isPresent()) {
-            components = getTraitTooltips(statsWrapper, BowstringMaterialStats.ID, mouseX, mouseY, lineNumber);
-            if (!components.isEmpty()) {
-                return components;
+            Optional<List<Component>> component = Stream.of(
+                    getTraitTooltips(statsWrapper, HandleMaterialStats.ID, mouseX, mouseY, lineNumber++),
+                    getStatTooltip("tool_stat.tconstruct.durability", mouseX, mouseY, lineNumber++),
+                    getStatTooltip("tool_stat.tconstruct.attack_damage", mouseX, mouseY, lineNumber++),
+                    getStatTooltip("tool_stat.tconstruct.attack_speed", mouseX, mouseY, lineNumber++),
+                    getStatTooltip("tool_stat.tconstruct.mining_speed", mouseX, mouseY, lineNumber++))
+                    .filter(list -> !list.isEmpty())
+                    .findFirst();
+            if (component.isPresent()) {
+                return component.get();
             }
-            lineNumber += 5.5f;
+            lineNumber += 0.5f;
         }
 
         if (limbStats.isPresent()) {
-            components = getTraitTooltips(statsWrapper, BowstringMaterialStats.ID, mouseX, mouseY, lineNumber);
-            if (!components.isEmpty()) {
-                return components;
+            Optional<List<Component>> component = Stream.of(
+            getTraitTooltips(statsWrapper, LimbMaterialStats.ID, mouseX, mouseY, lineNumber++),
+                    getStatTooltip("tool_stat.tconstruct.durability", mouseX, mouseY, lineNumber++),
+                    getStatTooltip( "tool_stat.tconstruct.draw_speed", mouseX, mouseY, lineNumber++),
+                    getStatTooltip( "tool_stat.tconstruct.velocity", mouseX, mouseY, lineNumber++),
+                    getStatTooltip("tool_stat.tconstruct.accuracy", mouseX, mouseY, lineNumber++))
+                    .filter(list -> !list.isEmpty())
+                    .findFirst();
+            if (component.isPresent()) {
+                return component.get();
             }
-            lineNumber += 5.5f;
+            lineNumber += 0.5f;
         }
 
         if (gripStats.isPresent()) {
-            components = getTraitTooltips(statsWrapper, BowstringMaterialStats.ID, mouseX, mouseY, lineNumber);
-            if (!components.isEmpty()) {
-                return components;
+            Optional<List<Component>> component = Stream.of(
+                    getTraitTooltips(statsWrapper, GripMaterialStats.ID, mouseX, mouseY, lineNumber++),
+                    getStatTooltip("tool_stat.tconstruct.durability", mouseX, mouseY, lineNumber++),
+                    getStatTooltip("tool_stat.tconstruct.accuracy", mouseX, mouseY, lineNumber++),
+                    getStatTooltip( "tool_stat.tconstruct.attack_damage", mouseX, mouseY, lineNumber++))
+                    .filter(list -> !list.isEmpty())
+                    .findFirst();
+            if (component.isPresent()) {
+                return component.get();
             }
-            lineNumber += 4.5f;
+            lineNumber += 0.5f;
         }
 
         if (stringStats.isPresent()) {
-            components = getTraitTooltips(statsWrapper, BowstringMaterialStats.ID, mouseX, mouseY, lineNumber);
-            if (!components.isEmpty()) {
-                return components;
+            List<Component> component = getTraitTooltips(statsWrapper, BowstringMaterialStats.ID, mouseX, mouseY, lineNumber);
+            if (!component.isEmpty()) {
+                return component;
             }
         }
 
-        return components;
+        return Collections.emptyList();
     }
 
-    private <T> void drawStatsColor(PoseStack poseStack, String type, String stat, float lineNumber, int ACCENT_COLOR) {
+    private void drawStatsColor(PoseStack poseStack, String type, String stat, float lineNumber, int ACCENT_COLOR) {
         String pattern = getPattern(type);
         float width = font.getSplitter().stringWidth(pattern);
         font.draw(poseStack, pattern, 0, lineNumber * LINE_HEIGHT + LINE_OFFSET, TEXT_COLOR);
@@ -231,7 +258,7 @@ public class MaterialStatsCategory implements IRecipeCategory<MaterialStatsWrapp
             case "wood" -> 9200923;
             case "gold" -> 16558080;
             case "stone" -> 9934743;
-            case "iron" -> 13158600;
+            case "iron" -> 13158600; // TODO: not visible in light mode
             case "diamond" -> 5569788;
             case "netherite" -> 4997443;
             default -> TEXT_COLOR;
@@ -270,26 +297,33 @@ public class MaterialStatsCategory implements IRecipeCategory<MaterialStatsWrapp
         return String.format("%s%.2f", f >= 0 ? "+" : "", f);
     }
 
-    private void drawTraits(PoseStack poseStack, MaterialStatsWrapper statsWrapper, MaterialStatsId materialStatsId, float lineNumber) {
+    private void drawTraits(PoseStack poseStack, MaterialStatsWrapper statsWrapper, MaterialStatsId statsId, float lineNumber) {
         final int MATERIAL_COLOR = MaterialTooltipCache.getColor(statsWrapper.getMaterialId()).getValue();
-        for (ModifierEntry trait : statsWrapper.getTraits(materialStatsId)) {
+        for (ModifierEntry trait : statsWrapper.getTraits(statsId)) {
             String pattern = getPattern(String.format("modifier.%s.%s", trait.getId().getNamespace(), trait.getId().getPath()));
             font.drawShadow(poseStack, pattern, WIDTH - font.getSplitter().stringWidth(pattern), lineNumber++ * LINE_HEIGHT + LINE_OFFSET, MATERIAL_COLOR);
         }
     }
 
-    private List<Component> getTraitTooltips(MaterialStatsWrapper statsWrapper, MaterialStatsId materialStatsId, double mouseX, double mouseY, float lineNumber) {
-        List<ModifierEntry> traits = statsWrapper.getTraits(materialStatsId);
-        for (ModifierEntry trait : traits) {
+    private List<Component> getTraitTooltips(MaterialStatsWrapper statsWrapper, MaterialStatsId statsId, double mouseX, double mouseY, float lineNumber) {
+        for (ModifierEntry trait : statsWrapper.getTraits(statsId)) {
             String namespace = trait.getId().getNamespace();
             String path = trait.getId().getPath();
             String pattern = getPattern(String.format("modifier.%s.%s", namespace, path));
             int textWidth = font.width(pattern);
-            if (inBox(mouseX, mouseY, WIDTH - textWidth, (int) (lineNumber * LINE_HEIGHT + LINE_OFFSET_HOVER), textWidth, LINE_HEIGHT)) {
+            if (inBox(mouseX, mouseY, WIDTH - textWidth, (int) (lineNumber++ * LINE_HEIGHT + LINE_OFFSET_HOVER), textWidth, LINE_HEIGHT)) {
                 return List.of(new TranslatableComponent(String.format("modifier.%s.%s.flavor", namespace, path)).setStyle(Style.EMPTY.withItalic(true).withColor(WHITE)),
                         new TranslatableComponent(String.format("modifier.%s.%s.description", namespace, path)));
             }
-            lineNumber += 1f;
+        }
+        return Collections.emptyList();
+    }
+
+    private List<Component> getStatTooltip(String pattern, double mouseX, double mouseY, float lineNumber) {
+        String string = getPattern(pattern);
+        int textWidth = font.width(string);
+        if (inBox(mouseX, mouseY, 0, (int) (lineNumber * LINE_HEIGHT + LINE_OFFSET_HOVER), textWidth, LINE_HEIGHT)) {
+            return List.of(new TranslatableComponent(pattern + ".description"));
         }
         return Collections.emptyList();
     }
