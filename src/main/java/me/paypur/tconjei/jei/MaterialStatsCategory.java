@@ -52,8 +52,8 @@ public class MaterialStatsCategory implements IRecipeCategory<MaterialStatsWrapp
     public MaterialStatsCategory(IGuiHelper guiHelper) {
         this.BACKGROUND = guiHelper.createBlankDrawable(WIDTH, HEIGHT);
         this.ICON = guiHelper.createDrawable(new ResourceLocation(MOD_ID, "textures/gui/icon.png"), 0, 0, 16, 16);
-        ResourceLocation palette = new ResourceLocation(MOD_ID, "textures/gui/palette.png");
         try {
+            ResourceLocation palette = new ResourceLocation(MOD_ID, "textures/gui/palette.png");
             InputStream stream = Minecraft.getInstance().getResourceManager().getResource(palette).getInputStream();
             BufferedImage image = ImageIO.read(stream);
             this.TEXT_COLOR = image.getRGB(0, 0);
@@ -177,7 +177,7 @@ public class MaterialStatsCategory implements IRecipeCategory<MaterialStatsWrapp
             lineNumber += 5.5f;
         }
 
-        if (extraStats.isPresent()) {
+        else if (extraStats.isPresent()) {
             components = getTraitTooltips(statsWrapper, BowstringMaterialStats.ID, mouseX, mouseY, lineNumber);
             if (!components.isEmpty()) {
                 return components;
@@ -240,7 +240,10 @@ public class MaterialStatsCategory implements IRecipeCategory<MaterialStatsWrapp
 
     // @formatter:off
     private int getMultiplierColor(Float f) {
-        if (f < 0.70f) { return 12405504; } //bd4b00
+        if (f < 0.55f) { return 12386304; } //bd0000
+        if (f < 0.60f) { return 12396032; } //bd2600
+        if (f < 0.65f) { return 12405504; } //bd4b00
+        if (f < 0.70f) { return 12415232; } //bd7100
         if (f < 0.75f) { return 12424960; } //bd9700
         if (f < 0.80f) { return 12434688; } //bdbd00
         if (f < 0.85f) { return 9944320; } //97bd00
