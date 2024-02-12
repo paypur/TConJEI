@@ -17,6 +17,7 @@ import net.minecraft.network.chat.Style;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraftforge.fluids.FluidStack;
 import slimeknights.tconstruct.library.client.materials.MaterialTooltipCache;
 import slimeknights.tconstruct.library.materials.MaterialRegistry;
 import slimeknights.tconstruct.library.materials.stats.MaterialStatsId;
@@ -27,7 +28,6 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -68,6 +68,22 @@ public class MaterialStatsCategory implements IRecipeCategory<MaterialStatsWrapp
     }
 
     @Override
+    public void setRecipe(IRecipeLayoutBuilder builder, MaterialStatsWrapper recipe, IFocusGroup focuses) {
+        FluidStack fluidStack = recipe.getFluidStack();
+        if (!fluidStack.isEmpty()) {
+            final int BUCKET = 1000; // milli buckets
+            builder.addSlot(RecipeIngredientRole.RENDER_ONLY, 18, 0).addFluidStack(recipe.getFluidStack().getFluid(), BUCKET);
+            builder.addInvisibleIngredients(RecipeIngredientRole.INPUT).addFluidStack(recipe.getFluidStack().getFluid(), BUCKET);
+            builder.addInvisibleIngredients(RecipeIngredientRole.OUTPUT).addFluidStack(recipe.getFluidStack().getFluid(), BUCKET);
+        }
+        builder.addSlot(RecipeIngredientRole.RENDER_ONLY, 0, 0).addItemStacks(recipe.getItemStacks());
+        builder.addInvisibleIngredients(RecipeIngredientRole.INPUT).addItemStacks(recipe.getItemStacks());
+        builder.addInvisibleIngredients(RecipeIngredientRole.OUTPUT).addItemStacks(recipe.getItemStacks());
+
+        builder.addSlot(RecipeIngredientRole.RENDER_ONLY, WIDTH - 16, 0).addItemStacks(recipe.getToolParts());
+    }
+
+    @Override
     public void draw(MaterialStatsWrapper statsWrapper, IRecipeSlotsView recipeSlotsView, PoseStack poseStack, double mouseX, double mouseY) {
         final String materialName = getPattern(String.format("material.%s.%s", statsWrapper.getMaterialId().getNamespace(), statsWrapper.getMaterialId().getPath()));
         final int MATERIAL_COLOR = MaterialTooltipCache.getColor(statsWrapper.getMaterialId()).getValue();
@@ -92,7 +108,7 @@ public class MaterialStatsCategory implements IRecipeCategory<MaterialStatsWrapp
             lineNumber += 0.5f;
         }
         // EXTRA
-        // only draw extra if others dont exist
+        // only draw extra if others don't exist
         else if (extraStats.isPresent()) {
             drawTraits(poseStack, statsWrapper, ExtraMaterialStats.ID, lineNumber);
             font.drawShadow(poseStack, String.format("[%s]", getPattern("stat.tconstruct.extra")), 0, lineNumber++ * LINE_HEIGHT + LINE_OFFSET, MATERIAL_COLOR);
@@ -136,21 +152,6 @@ public class MaterialStatsCategory implements IRecipeCategory<MaterialStatsWrapp
     }
 
     @Override
-    public void setRecipe(IRecipeLayoutBuilder builder, MaterialStatsWrapper recipe, IFocusGroup focuses) {
-        if (!recipe.isCraftable()) {
-            final int BUCKET = 1000; // milli buckets
-            builder.addSlot(RecipeIngredientRole.RENDER_ONLY, 18, 0).addFluidStack(recipe.getFluidStack().getFluid(), BUCKET);
-            builder.addInvisibleIngredients(RecipeIngredientRole.INPUT).addFluidStack(recipe.getFluidStack().getFluid(), BUCKET);
-            builder.addInvisibleIngredients(RecipeIngredientRole.OUTPUT).addFluidStack(recipe.getFluidStack().getFluid(), BUCKET);
-        }
-        builder.addSlot(RecipeIngredientRole.RENDER_ONLY, 0, 0).addItemStacks(recipe.getItemStacks());
-        builder.addInvisibleIngredients(RecipeIngredientRole.INPUT).addItemStacks(recipe.getItemStacks());
-        builder.addInvisibleIngredients(RecipeIngredientRole.OUTPUT).addItemStacks(recipe.getItemStacks());
-
-        builder.addSlot(RecipeIngredientRole.RENDER_ONLY, WIDTH - 16, 0).addItemStacks(recipe.getToolParts());
-    }
-
-    @Override
     public List<Component> getTooltipStrings(MaterialStatsWrapper statsWrapper, IRecipeSlotsView recipeSlotsView, double mouseX, double mouseY) {
         final String materialNamespace = statsWrapper.getMaterialId().getNamespace();
         final String materialPath = statsWrapper.getMaterialId().getPath();
@@ -158,8 +159,8 @@ public class MaterialStatsCategory implements IRecipeCategory<MaterialStatsWrapp
         float lineNumber = 0;
 
         int matWidth = font.width(materialPath);
-        if (inBox(mouseX, mouseY, (WIDTH - matWidth) / 2, 3, matWidth, LINE_HEIGHT)) {
-            return Collections.singletonList(new TranslatableComponent(String.format("material.%s.%s.flavor", materialNamespace, materialPath)).setStyle(Style.EMPTY.withItalic(true).withColor(WHITE)));
+        if (inBox(mouseX, mouseY, (WIDTH - matWidth) / 2f, 3, matWidth, LINE_HEIGHT)) {
+            return List.of(new TranslatableComponent(String.format("material.%s.%s.flavor", materialNamespace, materialPath)).setStyle(Style.EMPTY.withItalic(true).withColor(WHITE)));
         }
 
         Optional<HeadMaterialStats> headStats = MaterialRegistry.getInstance().getMaterialStats(statsWrapper.getMaterialId(), HeadMaterialStats.ID);
@@ -258,7 +259,7 @@ public class MaterialStatsCategory implements IRecipeCategory<MaterialStatsWrapp
             case "wood" -> 9200923;
             case "gold" -> 16558080;
             case "stone" -> 9934743;
-            case "iron" -> 13158600; // TODO: not visible in light mode
+            case "iron" -> 14342874; // default color 13158600 is not visible in light mode
             case "diamond" -> 5569788;
             case "netherite" -> 4997443;
             default -> TEXT_COLOR;
@@ -311,7 +312,7 @@ public class MaterialStatsCategory implements IRecipeCategory<MaterialStatsWrapp
             String path = trait.getId().getPath();
             String pattern = getPattern(String.format("modifier.%s.%s", namespace, path));
             int textWidth = font.width(pattern);
-            if (inBox(mouseX, mouseY, WIDTH - textWidth, (int) (lineNumber++ * LINE_HEIGHT + LINE_OFFSET_HOVER), textWidth, LINE_HEIGHT)) {
+            if (inBox(mouseX, mouseY, WIDTH - textWidth, lineNumber++ * LINE_HEIGHT + LINE_OFFSET_HOVER, textWidth, LINE_HEIGHT)) {
                 return List.of(new TranslatableComponent(String.format("modifier.%s.%s.flavor", namespace, path)).setStyle(Style.EMPTY.withItalic(true).withColor(WHITE)),
                         new TranslatableComponent(String.format("modifier.%s.%s.description", namespace, path)));
             }
@@ -322,13 +323,13 @@ public class MaterialStatsCategory implements IRecipeCategory<MaterialStatsWrapp
     private List<Component> getStatTooltip(String pattern, double mouseX, double mouseY, float lineNumber) {
         String string = getPattern(pattern);
         int textWidth = font.width(string);
-        if (inBox(mouseX, mouseY, 0, (int) (lineNumber * LINE_HEIGHT + LINE_OFFSET_HOVER), textWidth, LINE_HEIGHT)) {
+        if (inBox(mouseX, mouseY, 0, lineNumber * LINE_HEIGHT + LINE_OFFSET_HOVER, textWidth, LINE_HEIGHT)) {
             return List.of(new TranslatableComponent(pattern + ".description"));
         }
         return Collections.emptyList();
     }
 
-    private boolean inBox(double mX, double mY, int x, int y, int w, int h) {
+    private boolean inBox(double mX, double mY, float x, float y, float w, float h) {
         return (x <= mX && mX <= x + w && y <= mY && mY <= y + h);
     }
 

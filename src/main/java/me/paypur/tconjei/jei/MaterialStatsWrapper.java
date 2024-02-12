@@ -1,5 +1,6 @@
 package me.paypur.tconjei.jei;
 
+import com.mojang.logging.LogUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.Registry;
 import net.minecraft.world.item.ItemStack;
@@ -38,15 +39,15 @@ public record MaterialStatsWrapper(Material material) {
         }
         List<ItemStack> repairStacks;
         // simply combine all items from all recipes
-        MaterialVariantId materialVariantId = MaterialVariantId.parse(material.getIdentifier().toString());
-        repairStacks = RecipeHelper.getUIRecipes(world.getRecipeManager(), TinkerRecipeTypes.MATERIAL.get(), MaterialRecipe.class, recipe -> materialVariantId.matchesVariant(recipe.getMaterial()))
+        MaterialVariantId variantId = MaterialVariantId.parse(material.getIdentifier().toString());
+        repairStacks = RecipeHelper.getUIRecipes(world.getRecipeManager(), TinkerRecipeTypes.MATERIAL.get(), MaterialRecipe.class, recipe -> variantId.matchesVariant(recipe.getMaterial()))
                 .stream()
                 .flatMap(recipe -> Arrays.stream(recipe.getIngredient().getItems()))
                 .collect(Collectors.toList());
         // no repair items? use the repair kit
         if (repairStacks.isEmpty()) {
             // bypass the valid check, because we need to show something
-            repairStacks = Collections.singletonList(TinkerToolParts.repairKit.get().withMaterialForDisplay(materialVariantId));
+            repairStacks = Collections.singletonList(TinkerToolParts.repairKit.get().withMaterialForDisplay(variantId));
         }
         return repairStacks;
     }
@@ -72,10 +73,6 @@ public record MaterialStatsWrapper(Material material) {
 
     public MaterialId getMaterialId() {
         return material.getIdentifier().getId();
-    }
-
-    public boolean isCraftable() {
-        return material.isCraftable();
     }
 
     public boolean hasTraits() {
