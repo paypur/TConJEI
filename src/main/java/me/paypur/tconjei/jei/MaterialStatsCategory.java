@@ -267,6 +267,7 @@ public class MaterialStatsCategory implements IRecipeCategory<MaterialStatsWrapp
     }
 
     // @formatter:off
+    // TODO: found colors in assets/tconstruct/mantle/colors.json
     private int getMultiplierColor(Float f) {
         if (f < 0.55f) { return 12386304; } //bd0000
         if (f < 0.60f) { return 12396032; } //bd2600
