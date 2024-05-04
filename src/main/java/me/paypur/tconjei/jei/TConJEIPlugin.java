@@ -31,7 +31,7 @@ public class TConJEIPlugin implements IModPlugin {
 
     @Override
     public void registerRecipes(IRecipeRegistration registration) {
-        registration.addRecipes(RECIPE_TYPE, recipes(registration.getJeiHelpers().getGuiHelper()));
+        registration.addRecipes(RECIPE_TYPE, recipes());
     }
 
     @Override
@@ -45,7 +45,7 @@ public class TConJEIPlugin implements IModPlugin {
         registration.addRecipeCatalyst(new ItemStack(TinkerTables.tinkersAnvil.asItem()), RECIPE_TYPE);
     }
 
-    private List<MaterialStatsWrapper> recipes(IGuiHelper guiHelper) {
+    private List<MaterialStatsWrapper> recipes() {
         return MaterialRegistry.getMaterials()
                 .stream()
                 .filter(iMaterial -> !iMaterial.isHidden())

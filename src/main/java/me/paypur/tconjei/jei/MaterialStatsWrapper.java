@@ -1,6 +1,5 @@
 package me.paypur.tconjei.jei;
 
-import com.mojang.logging.LogUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.Registry;
 import net.minecraft.world.item.ItemStack;
@@ -75,17 +74,17 @@ public record MaterialStatsWrapper(Material material) {
         return material.getIdentifier().getId();
     }
 
-    public boolean hasTraits() {
-        List<MaterialStatsId> stats = List.of(HeadMaterialStats.ID, ExtraMaterialStats.ID, HandleMaterialStats.ID, LimbMaterialStats.ID, GripMaterialStats.ID, BowstringMaterialStats.ID);
-        return stats.stream().anyMatch(stat -> !getTraits(stat).isEmpty());
-    }
-
     public <T extends BaseMaterialStats> Optional<T> getStats(MaterialStatsId materialStatsId) {
         return MaterialRegistry.getInstance().getMaterialStats(getMaterialId(), materialStatsId);
     }
 
     public List<ModifierEntry> getTraits(MaterialStatsId materialStatsId) {
         return MaterialRegistry.getInstance().getTraits(material.getIdentifier().getId(), materialStatsId);
+    }
+
+    public boolean hasTraits() {
+        List<MaterialStatsId> stats = List.of(HeadMaterialStats.ID, ExtraMaterialStats.ID, HandleMaterialStats.ID, LimbMaterialStats.ID, GripMaterialStats.ID, BowstringMaterialStats.ID);
+        return stats.stream().anyMatch(stat -> !getTraits(stat).isEmpty());
     }
 
 }
