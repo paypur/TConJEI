@@ -333,24 +333,24 @@ public class MaterialStatsCategory implements IRecipeCategory<MaterialStatsWrapp
     }
 
     @Override
+    public Component getTitle() {
+        return new TextComponent("Material Stats");
+    }
+
+    @Override
     public IDrawable getBackground() {
-        return BACKGROUND;
+        return this.BACKGROUND;
     }
 
     @Override
     public IDrawable getIcon() {
-        return ICON;
-    }
-
-    @Override
-    public Component getTitle() {
-        return new TextComponent("Material Stats");
+        return this.ICON;
     }
 
     @SuppressWarnings("removal")
     @Override
     public ResourceLocation getUid() {
-        return UID;
+        return this.UID;
     }
 
     @SuppressWarnings("removal")

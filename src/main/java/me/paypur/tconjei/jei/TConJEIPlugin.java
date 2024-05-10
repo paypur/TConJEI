@@ -7,13 +7,20 @@ import mezz.jei.api.recipe.RecipeType;
 import mezz.jei.api.registration.IRecipeCatalystRegistration;
 import mezz.jei.api.registration.IRecipeCategoryRegistration;
 import mezz.jei.api.registration.IRecipeRegistration;
+import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
+import slimeknights.mantle.util.RegistryHelper;
+import slimeknights.tconstruct.common.TinkerTags;
 import slimeknights.tconstruct.library.materials.MaterialRegistry;
+import slimeknights.tconstruct.library.materials.definition.IMaterial;
 import slimeknights.tconstruct.library.materials.definition.Material;
+import slimeknights.tconstruct.library.materials.definition.MaterialId;
+import slimeknights.tconstruct.library.tools.part.IToolPart;
 import slimeknights.tconstruct.tables.TinkerTables;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static me.paypur.tconjei.TConJEI.MOD_ID;
@@ -23,6 +30,7 @@ import static me.paypur.tconjei.TConJEI.MOD_ID;
 public class TConJEIPlugin implements IModPlugin {
 
     private static final RecipeType<MaterialStatsWrapper> RECIPE_TYPE = RecipeType.create(MOD_ID, "material_stats", MaterialStatsWrapper.class);
+    private static final RecipeType<ToolPartWrapper> TOOL_PARTS = RecipeType.create(MOD_ID, "tool_parts", ToolPartWrapper.class);
 
     @Override
     public ResourceLocation getPluginUid() {
@@ -32,11 +40,13 @@ public class TConJEIPlugin implements IModPlugin {
     @Override
     public void registerRecipes(IRecipeRegistration registration) {
         registration.addRecipes(RECIPE_TYPE, recipes());
+        registration.addRecipes(TOOL_PARTS, getToolParts());
     }
 
     @Override
     public void registerCategories(IRecipeCategoryRegistration registration) {
         registration.addRecipeCategories(new MaterialStatsCategory(registration.getJeiHelpers().getGuiHelper()));
+        registration.addRecipeCategories(new ToolPartCategory(registration.getJeiHelpers().getGuiHelper()));
     }
 
     @Override
@@ -53,5 +63,11 @@ public class TConJEIPlugin implements IModPlugin {
                 .filter(MaterialStatsWrapper::hasTraits)
                 .collect(Collectors.toList());
     }
+    private List<ToolPartWrapper> getToolParts() {
+        return RegistryHelper.getTagValueStream(Registry.ITEM, TinkerTags.Items.TOOL_PARTS)
+                .map(part -> new ToolPartWrapper((IToolPart) part))
+                .collect(Collectors.toList());
+    }
+
 
 }
