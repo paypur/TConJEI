@@ -63,8 +63,10 @@ public class TConJEIPlugin implements IModPlugin {
                 .filter(MaterialStatsWrapper::hasTraits)
                 .collect(Collectors.toList());
     }
+
     private List<ToolPartWrapper> getToolParts() {
         return RegistryHelper.getTagValueStream(Registry.ITEM, TinkerTags.Items.TOOL_PARTS)
+                .filter(part -> part instanceof IToolPart)
                 .map(part -> new ToolPartWrapper((IToolPart) part))
                 .collect(Collectors.toList());
     }

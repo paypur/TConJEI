@@ -13,7 +13,8 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
+
+import java.util.List;
 
 import static me.paypur.tconjei.TConJEI.MOD_ID;
 
@@ -23,19 +24,19 @@ public class ToolPartCategory implements IRecipeCategory<ToolPartWrapper> {
     final IDrawable BACKGROUND, ICON;
 
     public ToolPartCategory(IGuiHelper guiHelper) {
-        this.BACKGROUND = guiHelper.createBlankDrawable(1,1);
-        this.ICON = guiHelper.createBlankDrawable(1,1);
+        this.BACKGROUND = guiHelper.createBlankDrawable(40,20);
+        this.ICON = guiHelper.createBlankDrawable(16,16);
     }
 
     @Override
     public void setRecipe(IRecipeLayoutBuilder builder, ToolPartWrapper recipe, IFocusGroup focuses) {
-//        builder.addSlot(RecipeIngredientRole.INPUT, 0, 0).addItemStack(Items.DIAMOND.);
+        builder.addSlot(RecipeIngredientRole.INPUT, 0, 0).addItemStacks(recipe.getToolParts());
+        builder.addSlot(RecipeIngredientRole.OUTPUT, 20, 0).addItemStacks(recipe.getCraftableTools());
     }
 
     @Override
     public void draw(ToolPartWrapper recipe, IRecipeSlotsView recipeSlotsView, PoseStack stack, double mouseX, double mouseY) {
         IRecipeCategory.super.draw(recipe, recipeSlotsView, stack, mouseX, mouseY);
-        System.out.println(recipe.getCraftableTools());
     }
 
     @Override
