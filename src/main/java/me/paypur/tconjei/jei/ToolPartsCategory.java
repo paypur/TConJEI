@@ -26,7 +26,7 @@ import static me.paypur.tconjei.TConJEI.inBox;
 public class ToolPartsCategory implements IRecipeCategory<ToolPartsWrapper> {
 
     final ResourceLocation UID = new ResourceLocation(MOD_ID, "tool_parts");
-    final IDrawable BACKGROUND, ICON, ANVIL;
+    final IDrawable BACKGROUND, ICON, ANVIL, SLOT;
     final int WIDTH = 120;
     final int HEIGHT = 60;
     final int ITEM_SIZE = 16;
@@ -35,6 +35,7 @@ public class ToolPartsCategory implements IRecipeCategory<ToolPartsWrapper> {
         this.BACKGROUND = guiHelper.createDrawable(new ResourceLocation(MOD_ID, "textures/gui/toolparts/bg.png"), 0, 0, WIDTH, HEIGHT);
         this.ICON = guiHelper.createDrawableItemStack(TinkerTools.cleaver.get().getRenderTool());
         this.ANVIL = guiHelper.createDrawable(new ResourceLocation(MOD_ID, "textures/gui/toolparts/anvil.png"), 0, 0, 16, 16);
+        this.SLOT = guiHelper.createDrawable(new ResourceLocation(MOD_ID, "textures/gui/toolparts/slot.png"), 0, 0, 18, 18);
     }
 
     @Override
@@ -45,6 +46,37 @@ public class ToolPartsCategory implements IRecipeCategory<ToolPartsWrapper> {
         List<ItemStack> items = recipe.getToolRecipe();
 
         assert items.size() == slots.size();
+
+        xy offsets = getOffsets(recipe);
+        for (int i = 0; i < items.size(); i++) {
+            builder.addSlot(RecipeIngredientRole.INPUT, slots.get(i).getX() + offsets.x, slots.get(i).getY() + offsets.y).addItemStack(items.get(i));
+        }
+
+        builder.addSlot(RecipeIngredientRole.OUTPUT, WIDTH - 25, (HEIGHT - ITEM_SIZE) / 2).addItemStack(recipe.getTool());
+    }
+
+    @Override
+    public void draw(ToolPartsWrapper recipe, PoseStack stack, double mouseX, double mouseY) {
+        if (recipe.isBroadTool()) {
+            this.ANVIL.draw(stack, 65, 42);
+        }
+
+        xy offsets = getOffsets(recipe);
+        for (LayoutSlot slot : recipe.getSlots()) {
+            // need to offset by 1 because the inventory slot icons are 18x18
+            this.SLOT.draw(stack, slot.getX() + offsets.x - 1, slot.getY() + offsets.y - 1);
+        }
+    }
+
+    @Override
+    public List<Component> getTooltipStrings(ToolPartsWrapper recipe, IRecipeSlotsView recipeSlotsView, double mouseX, double mouseY) {
+        return recipe.isBroadTool() && inBox(mouseX, mouseY, 65, 42, ITEM_SIZE, ITEM_SIZE) ?
+                Collections.singletonList(new TextComponent("Broad tools require a Tinker's Anvil!")) :
+                    Collections.emptyList();
+    }
+
+    private xy getOffsets(ToolPartsWrapper recipe) {
+        List<LayoutSlot> slots = recipe.getSlots();
 
         int minX, maxX, minY, maxY;
         minX = slots.get(0).getX();
@@ -64,23 +96,10 @@ public class ToolPartsCategory implements IRecipeCategory<ToolPartsWrapper> {
         // centers slots horizontally within square
         int xOffset = (HEIGHT - (ITEM_SIZE + maxX - minX)) / 2 - minX;
 
-        for (int i = 0; i < items.size(); i++) {
-            builder.addSlot(RecipeIngredientRole.INPUT, slots.get(i).getX() + xOffset, slots.get(i).getY() + yOffset).addItemStack(items.get(i));
-        }
-
-        builder.addSlot(RecipeIngredientRole.OUTPUT, WIDTH - 25, (HEIGHT - ITEM_SIZE) / 2).addItemStack(recipe.getTool());
+        return new xy(xOffset, yOffset);
     }
 
-    @Override
-    public void draw(ToolPartsWrapper recipe, PoseStack stack, double mouseX, double mouseY) {
-        if (recipe.isBroadTool()) this.ANVIL.draw(stack, 67, 42);
-    }
-
-    @Override
-    public List<Component> getTooltipStrings(ToolPartsWrapper recipe, IRecipeSlotsView recipeSlotsView, double mouseX, double mouseY) {
-        return inBox(mouseX, mouseY, 67, 42, ITEM_SIZE, ITEM_SIZE) ?
-                Collections.singletonList(new TextComponent("Broad tools require a Tinker's Anvil!")) : Collections.emptyList();
-    }
+    private record xy(int x, int y) {}
 
     @Override
     public Component getTitle() {
