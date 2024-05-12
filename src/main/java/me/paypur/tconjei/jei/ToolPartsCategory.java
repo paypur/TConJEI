@@ -1,12 +1,15 @@
 package me.paypur.tconjei.jei;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
+import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.RecipeIngredientRole;
 import mezz.jei.api.recipe.RecipeType;
 import mezz.jei.api.recipe.category.IRecipeCategory;
+import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.resources.ResourceLocation;
@@ -14,25 +17,28 @@ import net.minecraft.world.item.ItemStack;
 import slimeknights.tconstruct.library.tools.layout.LayoutSlot;
 import slimeknights.tconstruct.tools.TinkerTools;
 
+import java.util.Collections;
 import java.util.List;
 
 import static me.paypur.tconjei.TConJEI.MOD_ID;
+import static me.paypur.tconjei.TConJEI.inBox;
 
-public class ToolPartCategory implements IRecipeCategory<ToolPartWrapper> {
+public class ToolPartsCategory implements IRecipeCategory<ToolPartsWrapper> {
 
     final ResourceLocation UID = new ResourceLocation(MOD_ID, "tool_parts");
-    final IDrawable BACKGROUND, ICON;
+    final IDrawable BACKGROUND, ICON, ANVIL;
     final int WIDTH = 120;
     final int HEIGHT = 60;
     final int ITEM_SIZE = 16;
 
-    public ToolPartCategory(IGuiHelper guiHelper) {
-        this.BACKGROUND = guiHelper.createDrawable(new ResourceLocation(MOD_ID, "textures/gui/tool_parts.png"), 0, 0, WIDTH, HEIGHT);
+    public ToolPartsCategory(IGuiHelper guiHelper) {
+        this.BACKGROUND = guiHelper.createDrawable(new ResourceLocation(MOD_ID, "textures/gui/toolparts/bg.png"), 0, 0, WIDTH, HEIGHT);
         this.ICON = guiHelper.createDrawableItemStack(TinkerTools.cleaver.get().getRenderTool());
+        this.ANVIL = guiHelper.createDrawable(new ResourceLocation(MOD_ID, "textures/gui/toolparts/anvil.png"), 0, 0, 16, 16);
     }
 
     @Override
-    public void setRecipe(IRecipeLayoutBuilder builder, ToolPartWrapper recipe, IFocusGroup focuses) {
+    public void setRecipe(IRecipeLayoutBuilder builder, ToolPartsWrapper recipe, IFocusGroup focuses) {
         recipe.getToolParts().forEach(parts -> builder.addInvisibleIngredients(RecipeIngredientRole.INPUT).addItemStacks(parts));
 
         List<LayoutSlot> slots = recipe.getSlots();
@@ -66,6 +72,17 @@ public class ToolPartCategory implements IRecipeCategory<ToolPartWrapper> {
     }
 
     @Override
+    public void draw(ToolPartsWrapper recipe, PoseStack stack, double mouseX, double mouseY) {
+        if (recipe.isBroadTool()) this.ANVIL.draw(stack, 67, 42);
+    }
+
+    @Override
+    public List<Component> getTooltipStrings(ToolPartsWrapper recipe, IRecipeSlotsView recipeSlotsView, double mouseX, double mouseY) {
+        return inBox(mouseX, mouseY, 67, 42, ITEM_SIZE, ITEM_SIZE) ?
+                Collections.singletonList(new TextComponent("Broad tools require a Tinker's Anvil!")) : Collections.emptyList();
+    }
+
+    @Override
     public Component getTitle() {
         return new TextComponent("Tool Recipe");
     }
@@ -86,12 +103,12 @@ public class ToolPartCategory implements IRecipeCategory<ToolPartWrapper> {
     }
 
     @Override
-    public Class<? extends ToolPartWrapper> getRecipeClass() {
-        return ToolPartWrapper.class;
+    public Class<? extends ToolPartsWrapper> getRecipeClass() {
+        return ToolPartsWrapper.class;
     }
 
     @Override
-    public RecipeType<ToolPartWrapper> getRecipeType() {
+    public RecipeType<ToolPartsWrapper> getRecipeType() {
         return RecipeType.create(MOD_ID, "tool_parts", getRecipeClass());
     }
 }

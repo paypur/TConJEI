@@ -8,6 +8,7 @@ import slimeknights.tconstruct.library.tools.definition.ToolDefinition;
 import slimeknights.tconstruct.library.tools.helper.ToolBuildHandler;
 import slimeknights.tconstruct.library.tools.helper.TooltipUtil;
 import slimeknights.tconstruct.library.tools.layout.LayoutSlot;
+import slimeknights.tconstruct.library.tools.layout.StationSlotLayout;
 import slimeknights.tconstruct.library.tools.layout.StationSlotLayoutLoader;
 import slimeknights.tconstruct.library.tools.part.IToolPart;
 
@@ -15,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public record ToolPartWrapper(ToolDefinition definition) {
+public record ToolPartsWrapper(ToolDefinition definition) {
 
     static List<Material> MATERIALS = MaterialRegistry.getMaterials()
             .stream()
@@ -23,12 +24,21 @@ public record ToolPartWrapper(ToolDefinition definition) {
             .filter(material -> !material.isHidden())
             .collect(Collectors.toList());
 
+    public StationSlotLayout getSlotLayout() {
+        return StationSlotLayoutLoader.getInstance().get(definition.getId());
+    }
+
     public ItemStack getTool() {
-        return StationSlotLayoutLoader.getInstance().get(definition.getId()).getIcon().getValue(ItemStack.class);
+        return getSlotLayout().getIcon().getValue(ItemStack.class);
     }
 
     public List<LayoutSlot> getSlots() {
-        return StationSlotLayoutLoader.getInstance().get(definition.getId()).getInputSlots();
+        return getSlotLayout().getInputSlots();
+    }
+
+    public boolean isBroadTool() {
+        // assumption might not always be true
+        return getSlotLayout().getSortIndex() > 8;
     }
 
     public List<List<ItemStack>> getToolParts() {

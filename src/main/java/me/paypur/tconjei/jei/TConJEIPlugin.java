@@ -11,8 +11,10 @@ import net.minecraft.world.item.ItemStack;
 import slimeknights.tconstruct.library.materials.MaterialRegistry;
 import slimeknights.tconstruct.library.materials.definition.Material;
 import slimeknights.tconstruct.library.tools.definition.ToolDefinitionLoader;
+import slimeknights.tconstruct.library.tools.layout.StationSlotLayoutLoader;
 import slimeknights.tconstruct.tables.TinkerTables;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,7 +25,7 @@ import static me.paypur.tconjei.TConJEI.MOD_ID;
 public class TConJEIPlugin implements IModPlugin {
 
     private static final RecipeType<MaterialStatsWrapper> MATERIAL_STATS = RecipeType.create(MOD_ID, "material_stats", MaterialStatsWrapper.class);
-    private static final RecipeType<ToolPartWrapper> TOOL_PARTS = RecipeType.create(MOD_ID, "tool_parts", ToolPartWrapper.class);
+    private static final RecipeType<ToolPartsWrapper> TOOL_PARTS = RecipeType.create(MOD_ID, "tool_parts", ToolPartsWrapper.class);
 
     @Override
     public ResourceLocation getPluginUid() {
@@ -39,7 +41,7 @@ public class TConJEIPlugin implements IModPlugin {
     @Override
     public void registerCategories(IRecipeCategoryRegistration registration) {
         registration.addRecipeCategories(new MaterialStatsCategory(registration.getJeiHelpers().getGuiHelper()));
-        registration.addRecipeCategories(new ToolPartCategory(registration.getJeiHelpers().getGuiHelper()));
+        registration.addRecipeCategories(new ToolPartsCategory(registration.getJeiHelpers().getGuiHelper()));
     }
 
     @Override
@@ -61,11 +63,12 @@ public class TConJEIPlugin implements IModPlugin {
                 .collect(Collectors.toList());
     }
 
-    private List<ToolPartWrapper> toolDefinitions() {
+    private List<ToolPartsWrapper> toolDefinitions() {
         return ToolDefinitionLoader.getInstance().getRegisteredToolDefinitions()
                 .stream()
                 .filter(definition -> definition.isMultipart() && !definition.getId().equals(new ResourceLocation("tconstruct", "slime_helmet")))
-                .map(tool -> new ToolPartWrapper(tool))
+                .sorted(Comparator.comparingInt(a -> StationSlotLayoutLoader.getInstance().get(a.getId()).getSortIndex()))
+                .map(ToolPartsWrapper::new)
                 .toList();
     }
 
