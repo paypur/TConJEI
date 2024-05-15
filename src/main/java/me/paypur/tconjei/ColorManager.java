@@ -20,28 +20,32 @@ public class ColorManager {
 
     //https://gamedev.stackexchange.com/questions/38536/given-a-rgb-color-x-how-to-find-the-most-contrasting-color-y
     public static int getShade(int color, float contrastRatio) {
+        float colorLuminance = luminance(color);
+        float factor = 0;
+
         int r = color >> 16 & 0xff;
         int g = color >> 8 & 0xff;
         int b = color & 0xff;
-
-        float colorLuminance = luminance(color);
-
-        // case when black doesn't meet the minimum contrast ratio
-        if ( contrast(colorLuminance, 0) < contrastRatio ) {
-//            return 16777215;
-            return 0;
-        }
-
-        float factor = (float) Math.pow(
-                (colorLuminance + 0.05f - contrastRatio * 0.05f) / (contrastRatio * colorLuminance),
-                1/2.2f
-        );
-
         float[] hsb = new float[3];
         Color.RGBtoHSB(r,g,b,hsb);
 
+        // use shade when it is possible to meet the minimum contrast ratio
+        if (contrast(colorLuminance, 0) > contrastRatio) {
+            factor = (float) Math.pow(
+                    (colorLuminance + 0.05f - contrastRatio * 0.05f) / (contrastRatio * colorLuminance),
+                    1/2.2f
+            );
+        }
+
+//        else if (contrast(colorLuminance, Color.HSBtoRGB(hsb[0], hsb[1],1)) > contrastRatio) {
+//            factor = (float) Math.pow(
+//                    (contrastRatio * (colorLuminance + 0.05f) - 0.05f) / colorLuminance,
+//                    1/2.2f
+//            );
+//        }
+
         // relationship between rgb is constant while changing brightness
-        return Color.HSBtoRGB(hsb[0], hsb[1], (hsb[2] * factor));
+        return Color.HSBtoRGB(hsb[0], hsb[1], hsb[2] * factor);
     }
 
 }
