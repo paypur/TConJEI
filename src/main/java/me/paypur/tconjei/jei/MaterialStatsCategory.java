@@ -48,11 +48,11 @@ public class MaterialStatsCategory implements IRecipeCategory<MaterialStatsWrapp
     final int LINE_OFFSET = 20;
     final int LINE_OFFSET_HOVER = LINE_OFFSET - 1;
     final int LINE_HEIGHT = 10;
-    final int WHITE = 16777215; //ffffff
-    int TEXT_COLOR = 8289918; //7e7e7e
-    int DURABILITY_COLOR = 4639302; //46ca46
-    int MINING_COLOR = 7839435; //779ecb
-    int ATTACK_COLOR = 13919075; //d46363
+    final int WHITE = 0xffffff;
+    int TEXT_COLOR = 0x7e7e7e;
+    int DURABILITY_COLOR = 0x46ca46;
+    int MINING_COLOR = 0x779ecb;
+    int ATTACK_COLOR = 0xd46363;
 
     public MaterialStatsCategory(IGuiHelper guiHelper) {
         this.BACKGROUND = guiHelper.createBlankDrawable(WIDTH, HEIGHT);
@@ -257,7 +257,7 @@ public class MaterialStatsCategory implements IRecipeCategory<MaterialStatsWrapp
     }
 
     private void drawShadow(PoseStack poseStack, String string, float x, float y, int color) {
-        font.draw(poseStack, string, x + 0.625f, y + 0.625f, getShade(color, 5));
+        font.draw(poseStack, string, x + 0.66f, y + 0.66f, getShade(color, 5));
         font.draw(poseStack, string, x, y, color);
     }
 
@@ -294,12 +294,12 @@ public class MaterialStatsCategory implements IRecipeCategory<MaterialStatsWrapp
 
     private int getMiningLevelColor(String miningLevel) {
         return switch (miningLevel) {
-            case "wood" -> 9200923;
-            case "gold" -> 16558080;
-            case "stone" -> 9934743;
-            case "iron" -> 14342874; // default color 13158600 is not visible in light mode
-            case "diamond" -> 5569788;
-            case "netherite" -> 4997443;
+            case "wood" -> 0x8C651B;
+            case "gold" -> 0xFCA800 ;
+            case "stone" -> 0x979797;
+            case "iron" -> 0xDFDFDF; // default color 13158600 is not visible in light mode
+            case "diamond" -> 0x54FCFC;
+            case "netherite" -> 0x4C4143;
             default -> TEXT_COLOR;
         };
     }
@@ -307,29 +307,29 @@ public class MaterialStatsCategory implements IRecipeCategory<MaterialStatsWrapp
     // @formatter:off
     // TODO: found colors in assets/tconstruct/mantle/colors.json
     private int getMultiplierColor(Float f) {
-        if (f < 0.55f) { return 12386304; } //bd0000
-        if (f < 0.60f) { return 12396032; } //bd2600
-        if (f < 0.65f) { return 12405504; } //bd4b00
-        if (f < 0.70f) { return 12415232; } //bd7100
-        if (f < 0.75f) { return 12424960; } //bd9700
-        if (f < 0.80f) { return 12434688; } //bdbd00
-        if (f < 0.85f) { return 9944320; } //97bd00
-        if (f < 0.90f) { return 7453952; } //71bd00
-        if (f < 0.95f) { return 4963584; } //4bbd00
-        if (f < 1.00f) { return 2538752; } //26bd00
-        if (f < 1.05f) { return 48384; } //00bd00
-        if (f < 1.10f) { return 48422; } //00bd26
-        if (f < 1.15f) { return 48459; } //00bd4b
-        if (f < 1.20f) { return 48497; } //00bd71
-        if (f < 1.25f) { return 48535; } //00bd97
-        if (f < 1.30f) { return 48573; } //00bdbd
-        if (f < 1.35f) { return 38845; } //0097bd
-        if (f < 1.4f) { return 29117; } //0071bd
-        return 19389; //004bbd
+        if (f < 0.55f) { return 0xbd0000; }
+        if (f < 0.60f) { return 0xbd2600; }
+        if (f < 0.65f) { return 0xbd4b00; }
+        if (f < 0.70f) { return 0xbd7100; }
+        if (f < 0.75f) { return 0xbd9700; }
+        if (f < 0.80f) { return 0xbdbd00; }
+        if (f < 0.85f) { return 0x97bd00; }
+        if (f < 0.90f) { return 0x71bd00; }
+        if (f < 0.95f) { return 0x4bbd00; }
+        if (f < 1.00f) { return 0x26bd00; }
+        if (f < 1.05f) { return 0x00bd00; }
+        if (f < 1.10f) { return 0x00bd26; }
+        if (f < 1.15f) { return 0x00bd4b; }
+        if (f < 1.20f) { return 0x00bd71; }
+        if (f < 1.25f) { return 0x00bd97; }
+        if (f < 1.30f) { return 0x00bdbd; }
+        if (f < 1.35f) { return 0x0097bd; }
+        if (f < 1.4f) { return 0x0071bd; }
+        return 0x004bbd;
     }
     // @formatter:on
 
-    private int getDifferenceColor(Float f) {
+    private int getDifferenceColor(float f) {
         return getMultiplierColor(f + 1f);
     }
 
