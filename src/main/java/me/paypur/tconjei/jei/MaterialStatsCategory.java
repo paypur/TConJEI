@@ -24,17 +24,12 @@ import slimeknights.tconstruct.library.materials.stats.MaterialStatsId;
 import slimeknights.tconstruct.library.modifiers.ModifierEntry;
 import slimeknights.tconstruct.tools.stats.*;
 
-import javax.imageio.ImageIO;
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import static me.paypur.tconjei.ColorManager.getShade;
+import static me.paypur.tconjei.ColorManager.*;
 import static me.paypur.tconjei.TConJEI.MOD_ID;
 import static me.paypur.tconjei.TConJEI.inBox;
 import static net.minecraftforge.common.ForgeI18n.getPattern;
@@ -48,26 +43,10 @@ public class MaterialStatsCategory implements IRecipeCategory<MaterialStatsWrapp
     final int LINE_OFFSET = 20;
     final int LINE_OFFSET_HOVER = LINE_OFFSET - 1;
     final int LINE_HEIGHT = 10;
-    final int WHITE = 0xffffff;
-    int TEXT_COLOR = 0x7e7e7e;
-    int DURABILITY_COLOR = 0x46ca46;
-    int MINING_COLOR = 0x779ecb;
-    int ATTACK_COLOR = 0xd46363;
 
     public MaterialStatsCategory(IGuiHelper guiHelper) {
         this.BACKGROUND = guiHelper.createBlankDrawable(WIDTH, HEIGHT);
         this.ICON = guiHelper.createDrawable(new ResourceLocation(MOD_ID, "textures/gui/materialstats/icon.png"), 0, 0, 16, 16);
-        try {
-            ResourceLocation palette = new ResourceLocation(MOD_ID, "textures/gui/palette.png");
-            InputStream stream = Minecraft.getInstance().getResourceManager().getResource(palette).getInputStream();
-            BufferedImage image = ImageIO.read(stream);
-            this.TEXT_COLOR = image.getRGB(0, 0);
-            this.DURABILITY_COLOR = image.getRGB(1, 0);
-            this.MINING_COLOR = image.getRGB(0, 1);
-            this.ATTACK_COLOR = image.getRGB(1, 1);
-        } catch (IOException e) {
-            LogUtils.getLogger().error("Error loading palette", e);
-        }
     }
 
     @Override
@@ -257,7 +236,7 @@ public class MaterialStatsCategory implements IRecipeCategory<MaterialStatsWrapp
     }
 
     private void drawShadow(PoseStack poseStack, String string, float x, float y, int color) {
-        font.draw(poseStack, string, x + 0.66f, y + 0.66f, getShade(color, 5));
+        font.draw(poseStack, string, x + 1f, y + 1f, getShade(color, 5));
         font.draw(poseStack, string, x, y, color);
     }
 
@@ -285,58 +264,18 @@ public class MaterialStatsCategory implements IRecipeCategory<MaterialStatsWrapp
             String pattern = getPattern(String.format("modifier.%s.%s", namespace, path));
             int textWidth = font.width(pattern);
             if (inBox(mouseX, mouseY, WIDTH - textWidth, lineNumber++ * LINE_HEIGHT + LINE_OFFSET_HOVER, textWidth, LINE_HEIGHT)) {
-                return List.of(new TranslatableComponent(String.format("modifier.%s.%s.flavor", namespace, path)).setStyle(Style.EMPTY.withItalic(true).withColor(WHITE)),
+                return List.of(new TranslatableComponent(String.format("modifier.%s.%s.flavor", namespace, path)).setStyle(Style.EMPTY.withItalic(true)),
                         new TranslatableComponent(String.format("modifier.%s.%s.description", namespace, path)));
             }
         }
         return Collections.emptyList();
     }
 
-    private int getMiningLevelColor(String miningLevel) {
-        return switch (miningLevel) {
-            case "wood" -> 0x8C651B;
-            case "gold" -> 0xFCA800 ;
-            case "stone" -> 0x979797;
-            case "iron" -> 0xDFDFDF; // default color 13158600 is not visible in light mode
-            case "diamond" -> 0x54FCFC;
-            case "netherite" -> 0x4C4143;
-            default -> TEXT_COLOR;
-        };
-    }
 
-    // @formatter:off
-    // TODO: found colors in assets/tconstruct/mantle/colors.json
-    private int getMultiplierColor(Float f) {
-        if (f < 0.55f) { return 0xbd0000; }
-        if (f < 0.60f) { return 0xbd2600; }
-        if (f < 0.65f) { return 0xbd4b00; }
-        if (f < 0.70f) { return 0xbd7100; }
-        if (f < 0.75f) { return 0xbd9700; }
-        if (f < 0.80f) { return 0xbdbd00; }
-        if (f < 0.85f) { return 0x97bd00; }
-        if (f < 0.90f) { return 0x71bd00; }
-        if (f < 0.95f) { return 0x4bbd00; }
-        if (f < 1.00f) { return 0x26bd00; }
-        if (f < 1.05f) { return 0x00bd00; }
-        if (f < 1.10f) { return 0x00bd26; }
-        if (f < 1.15f) { return 0x00bd4b; }
-        if (f < 1.20f) { return 0x00bd71; }
-        if (f < 1.25f) { return 0x00bd97; }
-        if (f < 1.30f) { return 0x00bdbd; }
-        if (f < 1.35f) { return 0x0097bd; }
-        if (f < 1.4f) { return 0x0071bd; }
-        return 0x004bbd;
-    }
-    // @formatter:on
-
-    private int getDifferenceColor(float f) {
-        return getMultiplierColor(f + 1f);
-    }
 
     private String signedString(float f) {
         return String.format("%s%.2f", f >= 0 ? "+" : "", f);
     }
-
 
     @Override
     public Component getTitle() {

@@ -1,8 +1,39 @@
 package me.paypur.tconjei;
 
+import com.mojang.logging.LogUtils;
+import net.minecraft.client.Minecraft;
+import net.minecraft.resources.ResourceLocation;
+
+import javax.imageio.ImageIO;
 import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.io.InputStream;
+
+import static me.paypur.tconjei.TConJEI.MOD_ID;
 
 public class ColorManager {
+
+    public static final int WHITE = 0xffffff;
+    public static final int BLACK = 0x000000;
+    public static int TEXT_COLOR = 0x3F3F3F;
+    public static int DURABILITY_COLOR = 0x46ca46;
+    public static int MINING_COLOR = 0x779ecb;
+    public static int ATTACK_COLOR = 0xd46363;
+
+    static  {
+        try {
+            ResourceLocation palette = new ResourceLocation(MOD_ID, "textures/gui/palette.png");
+            InputStream stream = Minecraft.getInstance().getResourceManager().getResource(palette).getInputStream();
+            BufferedImage image = ImageIO.read(stream);
+            TEXT_COLOR = image.getRGB(0, 0);
+            DURABILITY_COLOR = image.getRGB(1, 0);
+            MINING_COLOR = image.getRGB(0, 1);
+            ATTACK_COLOR = image.getRGB(1, 1);
+        } catch (IOException e) {
+            LogUtils.getLogger().error("Error loading palette", e);
+        }
+    }
 
     // https://www.w3.org/TR/WCAG20-TECHS/G17.html#G17-procedure
     public static float luminance(int color) {
@@ -46,6 +77,47 @@ public class ColorManager {
 
         // relationship between rgb is constant while changing brightness
         return Color.HSBtoRGB(hsb[0], hsb[1], hsb[2] * factor);
+    }
+
+    public static int getMiningLevelColor(String miningLevel) {
+        return switch (miningLevel) {
+            case "wood" -> 0x8C651B;
+            case "gold" -> 0xFCA800 ;
+            case "stone" -> 0x979797;
+            case "iron" -> 0xDFDFDF; // default color 13158600 is not visible in light mode
+            case "diamond" -> 0x54FCFC;
+            case "netherite" -> 0x4C4143;
+            default -> TEXT_COLOR;
+        };
+    }
+
+    // @formatter:off
+    // TODO: found colors in assets/tconstruct/mantle/colors.json
+    public static int getMultiplierColor(Float f) {
+        if (f < 0.55f) { return 0xbd0000; }
+        if (f < 0.60f) { return 0xbd2600; }
+        if (f < 0.65f) { return 0xbd4b00; }
+        if (f < 0.70f) { return 0xbd7100; }
+        if (f < 0.75f) { return 0xbd9700; }
+        if (f < 0.80f) { return 0xbdbd00; }
+        if (f < 0.85f) { return 0x97bd00; }
+        if (f < 0.90f) { return 0x71bd00; }
+        if (f < 0.95f) { return 0x4bbd00; }
+        if (f < 1.00f) { return 0x26bd00; }
+        if (f < 1.05f) { return 0x00bd00; }
+        if (f < 1.10f) { return 0x00bd26; }
+        if (f < 1.15f) { return 0x00bd4b; }
+        if (f < 1.20f) { return 0x00bd71; }
+        if (f < 1.25f) { return 0x00bd97; }
+        if (f < 1.30f) { return 0x00bdbd; }
+        if (f < 1.35f) { return 0x0097bd; }
+        if (f < 1.4f) { return 0x0071bd; }
+        return 0x004bbd;
+    }
+    // @formatter:on
+
+    public static int getDifferenceColor(float f) {
+        return getMultiplierColor(f + 1f);
     }
 
 }
