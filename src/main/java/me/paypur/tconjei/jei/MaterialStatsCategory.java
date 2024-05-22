@@ -1,7 +1,6 @@
 package me.paypur.tconjei.jei;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.logging.LogUtils;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
@@ -39,7 +38,7 @@ public class MaterialStatsCategory implements IRecipeCategory<MaterialStatsWrapp
     final ResourceLocation UID = new ResourceLocation(MOD_ID, "material_stats");
     final Font font = Minecraft.getInstance().font;
     final IDrawable BACKGROUND, ICON;
-    final int WIDTH = 164, HEIGHT = 222;
+    final int WIDTH = 172, HEIGHT = 222;
     final int LINE_OFFSET = 20;
     final int LINE_OFFSET_HOVER = LINE_OFFSET - 1;
     final int LINE_HEIGHT = 10;
@@ -140,7 +139,7 @@ public class MaterialStatsCategory implements IRecipeCategory<MaterialStatsWrapp
         // TRAIT
         int matWidth = font.width(materialPath);
         if (inBox(mouseX, mouseY, (WIDTH - matWidth) / 2f, 3, matWidth, LINE_HEIGHT)) {
-            return List.of(new TranslatableComponent(String.format("material.%s.%s.flavor", materialNamespace, materialPath)).setStyle(Style.EMPTY.withItalic(true).withColor(WHITE)));
+            return List.of(new TranslatableComponent(String.format("material.%s.%s.flavor", materialNamespace, materialPath)).setStyle(Style.EMPTY.withItalic(true)));
         }
 
         Optional<HeadMaterialStats> headStats = MaterialRegistry.getInstance().getMaterialStats(recipe.getMaterialId(), HeadMaterialStats.ID);
@@ -235,17 +234,17 @@ public class MaterialStatsCategory implements IRecipeCategory<MaterialStatsWrapp
         font.draw(poseStack, stat, width, lineNumber * LINE_HEIGHT + LINE_OFFSET, ACCENT_COLOR);
     }
 
-    private void drawShadow(PoseStack poseStack, String string, float x, float y, int color) {
-        font.draw(poseStack, string, x + 1f, y + 1f, getShade(color, 5));
-        font.draw(poseStack, string, x, y, color);
-    }
-
     private void drawTraits(PoseStack poseStack, MaterialStatsWrapper statsWrapper, MaterialStatsId statsId, float lineNumber) {
         final int MATERIAL_COLOR = MaterialTooltipCache.getColor(statsWrapper.getMaterialId()).getValue();
         for (ModifierEntry trait : statsWrapper.getTraits(statsId)) {
             String pattern = getPattern(String.format("modifier.%s.%s", trait.getId().getNamespace(), trait.getId().getPath()));
             drawShadow(poseStack, pattern, WIDTH - font.getSplitter().stringWidth(pattern), lineNumber++ * LINE_HEIGHT + LINE_OFFSET, MATERIAL_COLOR);
         }
+    }
+
+    private void drawShadow(PoseStack poseStack, String string, float x, float y, int color) {
+        font.draw(poseStack, string, x + 1f, y + 1f, getShade(color, 5));
+        font.draw(poseStack, string, x, y, color);
     }
 
     private List<Component> getStatTooltip(String pattern, double mouseX, double mouseY, float lineNumber) {
@@ -270,8 +269,6 @@ public class MaterialStatsCategory implements IRecipeCategory<MaterialStatsWrapp
         }
         return Collections.emptyList();
     }
-
-
 
     private String signedString(float f) {
         return String.format("%s%.2f", f >= 0 ? "+" : "", f);

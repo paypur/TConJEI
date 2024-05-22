@@ -3,6 +3,10 @@ package me.paypur.tconjei;
 import com.mojang.logging.LogUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.event.TextureStitchEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -20,18 +24,22 @@ public class ColorManager {
     public static int DURABILITY_COLOR = 0x46ca46;
     public static int MINING_COLOR = 0x779ecb;
     public static int ATTACK_COLOR = 0xd46363;
+    static ResourceLocation palette = new ResourceLocation(MOD_ID, "textures/gui/palette.png");
 
-    static  {
-        try {
-            ResourceLocation palette = new ResourceLocation(MOD_ID, "textures/gui/palette.png");
-            InputStream stream = Minecraft.getInstance().getResourceManager().getResource(palette).getInputStream();
-            BufferedImage image = ImageIO.read(stream);
-            TEXT_COLOR = image.getRGB(0, 0);
-            DURABILITY_COLOR = image.getRGB(1, 0);
-            MINING_COLOR = image.getRGB(0, 1);
-            ATTACK_COLOR = image.getRGB(1, 1);
-        } catch (IOException e) {
-            LogUtils.getLogger().error("Error loading palette", e);
+    @Mod.EventBusSubscriber(modid = MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
+    public final class ClientForgeHandler {
+        @SubscribeEvent
+        public static void onClientReload(TextureStitchEvent.Post event) {
+            try {
+                InputStream stream = Minecraft.getInstance().getResourceManager().getResource(palette).getInputStream();
+                BufferedImage image = ImageIO.read(stream);
+                ColorManager.TEXT_COLOR = image.getRGB(0, 0);
+                ColorManager.DURABILITY_COLOR = image.getRGB(1, 0);
+                ColorManager.MINING_COLOR = image.getRGB(0, 1);
+                ColorManager.ATTACK_COLOR = image.getRGB(1, 1);
+            } catch (IOException e) {
+                LogUtils.getLogger().error("Error loading palette", e);
+            }
         }
     }
 
