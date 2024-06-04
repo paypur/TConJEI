@@ -21,9 +21,9 @@ public class ColorManager {
     public static final int WHITE = 0xffffff;
     public static final int BLACK = 0x000000;
     public static int TEXT_COLOR = 0x3F3F3F;
-    public static int DURABILITY_COLOR = 0x46ca46;
-    public static int MINING_COLOR = 0x779ecb;
-    public static int ATTACK_COLOR = 0xd46363;
+    public static int DURABILITY_COLOR = 0x46ca46; //0x298E29
+    public static int MINING_COLOR = 0x779ecb; //0x4A7EBA
+    public static int ATTACK_COLOR = 0xd46363; //0xD05353
     static ResourceLocation palette = new ResourceLocation(MOD_ID, "textures/gui/palette.png");
 
     @Mod.EventBusSubscriber(modid = MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
@@ -37,6 +37,7 @@ public class ColorManager {
                 ColorManager.DURABILITY_COLOR = image.getRGB(1, 0);
                 ColorManager.MINING_COLOR = image.getRGB(0, 1);
                 ColorManager.ATTACK_COLOR = image.getRGB(1, 1);
+                stream.close();
             } catch (IOException e) {
                 LogUtils.getLogger().error("Error loading palette", e);
             }
