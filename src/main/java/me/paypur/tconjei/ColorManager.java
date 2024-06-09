@@ -7,6 +7,8 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import slimeknights.mantle.client.ResourceColorManager;
+import slimeknights.tconstruct.library.utils.Util;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -92,16 +94,7 @@ public class ColorManager {
         // TODO: found colors in assets/tconstruct/mantle/colors.json
         // for some reason the library specified colors are different
         // are also even harder to read
-//        return ResourceColorManager.getColor(Util.makeTranslationKey("harvest_tier", miningLevel));
-        return switch (miningLevel.getPath()) {
-            case "wood" -> 0x8C651B;
-            case "gold" -> 0xFCA800 ;
-            case "stone" -> 0x979797;
-            case "iron" -> 0xDFDFDF; // default color 0xC8C8C8 is not visible in light mode
-            case "diamond" -> 0x54FCFC;
-            case "netherite" -> 0x4C4143;
-            default -> TEXT_COLOR;
-        };
+        return ResourceColorManager.getColor(Util.makeTranslationKey("harvest_tier", miningLevel));
     }
 
     // @formatter:off
