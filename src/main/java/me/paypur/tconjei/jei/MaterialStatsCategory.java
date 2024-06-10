@@ -277,7 +277,7 @@ public class MaterialStatsCategory implements IRecipeCategory<MaterialStatsWrapp
         String string = getPattern(pattern);
         int textWidth = font.width(string);
         if (inBox(mouseX, mouseY, 0, lineNumber * LINE_HEIGHT + LINE_OFFSET_HOVER, textWidth, LINE_HEIGHT)) {
-            return List.of(MutableComponent.create(new LiteralContents(pattern + ".description")));
+            return List.of(MutableComponent.create(new LiteralContents(getPattern(pattern + ".description"))));
         }
         return Collections.emptyList();
     }
@@ -294,18 +294,6 @@ public class MaterialStatsCategory implements IRecipeCategory<MaterialStatsWrapp
             }
         }
         return Collections.emptyList();
-    }
-
-    private int getMiningLevelColor(String miningLevel) {
-        return switch (miningLevel) {
-            case "wood" -> 9200923;
-            case "gold" -> 16558080;
-            case "stone" -> 9934743;
-            case "iron" -> 14342874; // default color 13158600 is not visible in light mode
-            case "diamond" -> 5569788;
-            case "netherite" -> 4997443;
-            default -> TEXT_COLOR;
-        };
     }
 
     // @formatter:off
@@ -333,11 +321,6 @@ public class MaterialStatsCategory implements IRecipeCategory<MaterialStatsWrapp
         return 19389; //004bbd
     }
     // @formatter:on
-
-    private String signedString(float f) {
-        return String.format("%s%.2f", f >= 0 ? "+" : "", f);
-    }
-
 
     @Override
     public Component getTitle() {
