@@ -66,7 +66,7 @@ public class TConJEIPlugin implements IModPlugin {
     private List<ToolPartsWrapper> toolDefinitions() {
         return ToolDefinitionLoader.getInstance().getRegisteredToolDefinitions()
                 .stream()
-                .filter(definition -> definition.isMultipart() && !definition.getId().equals(new ResourceLocation("tconstruct", "slime_helmet")))
+                .filter(definition -> StationSlotLayoutLoader.getInstance().get(definition.getId()).getSortIndex() > 8 && !definition.getId().equals(new ResourceLocation("tconstruct", "slime_helmet")))
                 .sorted(Comparator.comparingInt(a -> StationSlotLayoutLoader.getInstance().get(a.getId()).getSortIndex()))
                 .map(ToolPartsWrapper::new)
                 .toList();

@@ -12,7 +12,7 @@ import slimeknights.tconstruct.library.materials.MaterialRegistry;
 import slimeknights.tconstruct.library.materials.definition.Material;
 import slimeknights.tconstruct.library.materials.definition.MaterialId;
 import slimeknights.tconstruct.library.materials.definition.MaterialVariantId;
-import slimeknights.tconstruct.library.materials.stats.BaseMaterialStats;
+import slimeknights.tconstruct.library.materials.stats.IMaterialStats;
 import slimeknights.tconstruct.library.materials.stats.MaterialStatsId;
 import slimeknights.tconstruct.library.modifiers.ModifierEntry;
 import slimeknights.tconstruct.library.recipe.TinkerRecipeTypes;
@@ -74,7 +74,7 @@ public record MaterialStatsWrapper(Material material) {
         return material.getIdentifier().getId();
     }
 
-    public <T extends BaseMaterialStats> Optional<T> getStats(MaterialStatsId materialStatsId) {
+    public <T extends IMaterialStats> Optional<T> getStats(MaterialStatsId materialStatsId) {
         return MaterialRegistry.getInstance().getMaterialStats(getMaterialId(), materialStatsId);
     }
 
@@ -83,7 +83,7 @@ public record MaterialStatsWrapper(Material material) {
     }
 
     public boolean hasTraits() {
-        List<MaterialStatsId> stats = List.of(HeadMaterialStats.ID, ExtraMaterialStats.ID, HandleMaterialStats.ID, LimbMaterialStats.ID, GripMaterialStats.ID, BowstringMaterialStats.ID);
+        List<MaterialStatsId> stats = List.of(HeadMaterialStats.ID, StatlessMaterialStats.BINDING.getIdentifier(), HandleMaterialStats.ID, LimbMaterialStats.ID, GripMaterialStats.ID, StatlessMaterialStats.BOWSTRING.getIdentifier());
         return stats.stream().anyMatch(stat -> !getTraits(stat).isEmpty());
     }
 

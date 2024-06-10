@@ -10,7 +10,8 @@ import mezz.jei.api.recipe.RecipeIngredientRole;
 import mezz.jei.api.recipe.RecipeType;
 import mezz.jei.api.recipe.category.IRecipeCategory;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.contents.LiteralContents;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import slimeknights.tconstruct.library.tools.layout.LayoutSlot;
@@ -55,7 +56,7 @@ public class ToolPartsCategory implements IRecipeCategory<ToolPartsWrapper> {
     }
 
     @Override
-    public void draw(ToolPartsWrapper recipe, PoseStack stack, double mouseX, double mouseY) {
+    public void draw(ToolPartsWrapper recipe, IRecipeSlotsView recipeSlotsView, PoseStack stack, double mouseX, double mouseY) {
         if (recipe.isBroadTool()) {
             this.ANVIL.draw(stack, 65, 42);
         }
@@ -70,7 +71,7 @@ public class ToolPartsCategory implements IRecipeCategory<ToolPartsWrapper> {
     @Override
     public List<Component> getTooltipStrings(ToolPartsWrapper recipe, IRecipeSlotsView recipeSlotsView, double mouseX, double mouseY) {
         return recipe.isBroadTool() && inBox(mouseX, mouseY, 65, 42, ITEM_SIZE, ITEM_SIZE) ?
-                Collections.singletonList(new TextComponent("Broad tools require a Tinker's Anvil!")) :
+                Collections.singletonList(MutableComponent.create(new LiteralContents("Broad tools require a Tinker's Anvil!"))) :
                     Collections.emptyList();
     }
 
@@ -102,7 +103,7 @@ public class ToolPartsCategory implements IRecipeCategory<ToolPartsWrapper> {
 
     @Override
     public Component getTitle() {
-        return new TextComponent("Tool Recipe");
+        return MutableComponent.create(new LiteralContents("Tool Recipe"));
     }
 
     @Override
@@ -116,17 +117,7 @@ public class ToolPartsCategory implements IRecipeCategory<ToolPartsWrapper> {
     }
 
     @Override
-    public ResourceLocation getUid() {
-        return this.UID;
-    }
-
-    @Override
-    public Class<? extends ToolPartsWrapper> getRecipeClass() {
-        return ToolPartsWrapper.class;
-    }
-
-    @Override
     public RecipeType<ToolPartsWrapper> getRecipeType() {
-        return RecipeType.create(MOD_ID, "tool_parts", getRecipeClass());
+        return RecipeType.create(MOD_ID, "tool_parts", ToolPartsWrapper.class);
     }
 }

@@ -3,7 +3,6 @@ package me.paypur.tconjei.jei;
 import net.minecraft.world.item.ItemStack;
 import slimeknights.tconstruct.library.materials.MaterialRegistry;
 import slimeknights.tconstruct.library.materials.definition.Material;
-import slimeknights.tconstruct.library.tools.definition.PartRequirement;
 import slimeknights.tconstruct.library.tools.definition.ToolDefinition;
 import slimeknights.tconstruct.library.tools.helper.ToolBuildHandler;
 import slimeknights.tconstruct.library.tools.helper.TooltipUtil;
@@ -53,7 +52,8 @@ public record ToolPartsWrapper(ToolDefinition definition) {
     }
 
     public List<ItemStack> getToolRecipe() {
-        List<IToolPart> parts = definition.getData().getParts()
+        List<IToolPart> parts = definition.getData()
+                .getParts()
                 .stream()
                 .map(PartRequirement::getPart)
                 .toList();
