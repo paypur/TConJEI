@@ -20,12 +20,12 @@ import static me.paypur.tconjei.TConJEI.MOD_ID;
 
 public class ColorManager {
 
-    public static final int WHITE = 0xffffff;
+    public static final int WHITE = 0xFFFFFF;
     public static final int BLACK = 0x000000;
     public static int TEXT_COLOR = 0x3F3F3F;
-    public static int DURABILITY_COLOR = 0x46ca46; //0x298E29
-    public static int MINING_COLOR = 0x779ecb; //0x4A7EBA
-    public static int ATTACK_COLOR = 0xd46363; //0xD05353
+    public static int DURABILITY_COLOR = 0x47CC47; //0x298E29 dark versions maybe
+    public static int MINING_COLOR = 0x78A0CD; //0x4A7EBA
+    public static int ATTACK_COLOR = 0xD76464; //0xD05353
     static ResourceLocation palette = new ResourceLocation(MOD_ID, "textures/gui/palette.png");
 
     @Mod.EventBusSubscriber(modid = MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)

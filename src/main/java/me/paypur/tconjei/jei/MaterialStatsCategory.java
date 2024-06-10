@@ -19,7 +19,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.fluids.FluidStack;
 import slimeknights.mantle.client.ResourceColorManager;
 import slimeknights.tconstruct.library.client.materials.MaterialTooltipCache;
-import slimeknights.tconstruct.library.materials.MaterialRegistry;
 import slimeknights.tconstruct.library.materials.stats.MaterialStatsId;
 import slimeknights.tconstruct.library.modifiers.ModifierEntry;
 import slimeknights.tconstruct.library.utils.Util;
@@ -127,7 +126,7 @@ public class MaterialStatsCategory implements IRecipeCategory<MaterialStatsWrapp
             lineNumber += 0.4f;
         }
         // STRING
-        if (stringOptional.isPresent()) {
+        else if (stringOptional.isPresent()) {
             drawTraits(stack, recipe.getTraits(BowstringMaterialStats.ID), lineNumber);
             drawShadow(stack, String.format("[%s]", getPattern("stat.tconstruct.bowstring")), 0, lineNumber, MATERIAL_COLOR);
         }
@@ -144,12 +143,12 @@ public class MaterialStatsCategory implements IRecipeCategory<MaterialStatsWrapp
             return List.of(new TranslatableComponent(String.format("material.%s.%s.flavor", materialNamespace, materialPath)).withStyle(ChatFormatting.ITALIC));
         }
         float lineNumber = 2f;
-        Optional<HeadMaterialStats> headOptional = MaterialRegistry.getInstance().getMaterialStats(recipe.getMaterialId(), HeadMaterialStats.ID);
-        Optional<ExtraMaterialStats> extraOptional = MaterialRegistry.getInstance().getMaterialStats(recipe.getMaterialId(), ExtraMaterialStats.ID);
-        Optional<HandleMaterialStats> handleOptional = MaterialRegistry.getInstance().getMaterialStats(recipe.getMaterialId(), HandleMaterialStats.ID);
-        Optional<LimbMaterialStats> limbOptional = MaterialRegistry.getInstance().getMaterialStats(recipe.getMaterialId(), LimbMaterialStats.ID);
-        Optional<GripMaterialStats> gripOptional = MaterialRegistry.getInstance().getMaterialStats(recipe.getMaterialId(), GripMaterialStats.ID);
-        Optional<BowstringMaterialStats> stringOptional = MaterialRegistry.getInstance().getMaterialStats(recipe.getMaterialId(), BowstringMaterialStats.ID);
+        Optional<HeadMaterialStats> headOptional = recipe.getStats(HeadMaterialStats.ID);
+        Optional<ExtraMaterialStats> extraOptional = recipe.getStats(ExtraMaterialStats.ID);
+        Optional<HandleMaterialStats> handleOptional =  recipe.getStats(HandleMaterialStats.ID);
+        Optional<LimbMaterialStats> limbOptional = recipe.getStats(LimbMaterialStats.ID);
+        Optional<GripMaterialStats> gripOptional = recipe.getStats(GripMaterialStats.ID);
+        Optional<BowstringMaterialStats> stringOptional = recipe.getStats(BowstringMaterialStats.ID);
         // HEAD
         if (headOptional.isPresent()) {
             Optional<List<Component>> component = Stream.of(
@@ -219,7 +218,7 @@ public class MaterialStatsCategory implements IRecipeCategory<MaterialStatsWrapp
             lineNumber += 0.4f;
         }
         // STRING
-        if (stringOptional.isPresent()) {
+        else if (stringOptional.isPresent()) {
             List<Component> component = getTraitTooltips(recipe, BowstringMaterialStats.ID, mouseX, mouseY, lineNumber);
             if (!component.isEmpty()) {
                 return component;
