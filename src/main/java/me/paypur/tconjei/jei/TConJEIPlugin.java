@@ -14,6 +14,7 @@ import slimeknights.tconstruct.library.tools.definition.ToolDefinitionLoader;
 import slimeknights.tconstruct.library.tools.layout.StationSlotLayoutLoader;
 import slimeknights.tconstruct.tables.TinkerTables;
 
+import javax.annotation.Nonnull;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -26,10 +27,12 @@ public class TConJEIPlugin implements IModPlugin {
 
     private static final RecipeType<MaterialStatsWrapper> MATERIAL_STATS = RecipeType.create(MOD_ID, "material_stats", MaterialStatsWrapper.class);
     private static final RecipeType<ToolPartsWrapper> TOOL_PARTS = RecipeType.create(MOD_ID, "tool_parts", ToolPartsWrapper.class);
+    private static final ResourceLocation PLUGIN_UID = new ResourceLocation(MOD_ID, "jei_plugin");
 
+    @Nonnull
     @Override
     public ResourceLocation getPluginUid() {
-        return new ResourceLocation(MOD_ID, "jei_plugin");
+        return PLUGIN_UID;
     }
 
     @Override
@@ -66,7 +69,7 @@ public class TConJEIPlugin implements IModPlugin {
     private List<ToolPartsWrapper> toolDefinitions() {
         return ToolDefinitionLoader.getInstance().getRegisteredToolDefinitions()
                 .stream()
-                .filter(definition -> StationSlotLayoutLoader.getInstance().get(definition.getId()).getSortIndex() > 8 && !definition.getId().equals(new ResourceLocation("tconstruct", "slime_helmet")))
+                .filter(definition -> definition.hasMaterials() && !definition.getId().equals(new ResourceLocation("tconstruct", "slime_helmet")))
                 .sorted(Comparator.comparingInt(a -> StationSlotLayoutLoader.getInstance().get(a.getId()).getSortIndex()))
                 .map(ToolPartsWrapper::new)
                 .toList();

@@ -15,6 +15,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static slimeknights.tconstruct.library.tools.definition.module.ToolHooks.TOOL_PARTS;
+
 public record ToolPartsWrapper(ToolDefinition definition) {
 
     static List<Material> MATERIALS = MaterialRegistry.getMaterials()
@@ -41,21 +43,22 @@ public record ToolPartsWrapper(ToolDefinition definition) {
     }
 
     public List<List<ItemStack>> getToolParts() {
-        return definition.getData().getParts().stream()
-            .map(PartRequirement::getPart)
-            .map(part ->
-                MATERIALS.stream()
-                    .filter(part::canUseMaterial)
-                    .map(material -> part.withMaterial(material.getIdentifier()))
-                    .toList()
-            ).toList();
+        return definition.getData()
+                .getHook(TOOL_PARTS)
+                .getParts(definition)
+                .stream()
+                .map(part -> MATERIALS.stream()
+                        .filter(part::canUseMaterial)
+                        .map(material -> part.withMaterial(material.getIdentifier()))
+                        .toList()
+                ).toList();
     }
 
     public List<ItemStack> getToolRecipe() {
         List<IToolPart> parts = definition.getData()
-                .getParts()
+                .getHook(TOOL_PARTS)
+                .getParts(definition)
                 .stream()
-                .map(PartRequirement::getPart)
                 .toList();
 
         // ContentTool
