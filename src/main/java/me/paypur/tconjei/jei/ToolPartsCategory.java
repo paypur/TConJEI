@@ -17,6 +17,7 @@ import net.minecraft.world.item.ItemStack;
 import slimeknights.tconstruct.library.tools.layout.LayoutSlot;
 import slimeknights.tconstruct.tools.TinkerTools;
 
+import javax.annotation.Nonnull;
 import java.util.Collections;
 import java.util.List;
 
@@ -25,7 +26,8 @@ import static me.paypur.tconjei.TConJEI.inBox;
 
 public class ToolPartsCategory implements IRecipeCategory<ToolPartsWrapper> {
 
-    final ResourceLocation UID = new ResourceLocation(MOD_ID, "tool_parts");
+    final MutableComponent TITLE = MutableComponent.create(new LiteralContents("Tool Recipe"));
+    final RecipeType<ToolPartsWrapper> RECIPE_TYPE = RecipeType.create(MOD_ID, "tool_parts", ToolPartsWrapper.class);
     final IDrawable BACKGROUND, ICON, ANVIL, SLOT;
     final int WIDTH = 120;
     final int HEIGHT = 60;
@@ -33,7 +35,7 @@ public class ToolPartsCategory implements IRecipeCategory<ToolPartsWrapper> {
 
     public ToolPartsCategory(IGuiHelper guiHelper) {
         this.BACKGROUND = guiHelper.createDrawable(new ResourceLocation(MOD_ID, "textures/gui/toolparts/bg.png"), 0, 0, WIDTH, HEIGHT);
-        this.ICON = guiHelper.createDrawableItemStack(TinkerTools.cleaver.get().getRenderTool());
+        this.ICON = guiHelper.createDrawableItemStack(TinkerTools.sledgeHammer.get().getRenderTool());
         this.ANVIL = guiHelper.createDrawable(new ResourceLocation(MOD_ID, "textures/gui/toolparts/anvil.png"), 0, 0, 16, 16);
         this.SLOT = guiHelper.createDrawable(new ResourceLocation(MOD_ID, "textures/gui/toolparts/slot.png"), 0, 0, 18, 18);
     }
@@ -101,23 +103,28 @@ public class ToolPartsCategory implements IRecipeCategory<ToolPartsWrapper> {
 
     private record xy(int x, int y) {}
 
+    @Nonnull
     @Override
     public Component getTitle() {
-        return MutableComponent.create(new LiteralContents("Tool Recipe"));
+        return TITLE;
     }
 
+    @Nonnull
+    @Override
+    public RecipeType<ToolPartsWrapper> getRecipeType() {
+        return RECIPE_TYPE;
+    }
+
+    @Nonnull
     @Override
     public IDrawable getBackground() {
         return this.BACKGROUND;
     }
 
+    @Nonnull
     @Override
     public IDrawable getIcon() {
         return this.ICON;
     }
 
-    @Override
-    public RecipeType<ToolPartsWrapper> getRecipeType() {
-        return RecipeType.create(MOD_ID, "tool_parts", ToolPartsWrapper.class);
-    }
 }
