@@ -288,6 +288,11 @@ public class MaterialStatsCategory implements IRecipeCategory<MaterialStatsWrapp
     }
 
     @Override
+    public RecipeType<MaterialStatsWrapper> getRecipeType() {
+        return RecipeType.create(MOD_ID, "material_stats", MaterialStatsWrapper.class);
+    }
+
+    @Override
     public IDrawable getBackground() {
         return this.BACKGROUND;
     }
@@ -309,9 +314,5 @@ public class MaterialStatsCategory implements IRecipeCategory<MaterialStatsWrapp
         return MaterialStatsWrapper.class;
     }
 
-    @Override
-    public RecipeType<MaterialStatsWrapper> getRecipeType() {
-        return RecipeType.create(MOD_ID, "material_stats", getRecipeClass());
-    }
 
 }

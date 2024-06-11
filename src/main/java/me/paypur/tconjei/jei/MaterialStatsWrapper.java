@@ -27,8 +27,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public record MaterialStatsWrapper(Material material) {
+
+    public MaterialId getMaterialId() {
+        return material.getIdentifier().getId();
+    }
 
     // taken from AbstractMaterialContent
     public List<ItemStack> getItemStacks() {
@@ -70,10 +75,6 @@ public record MaterialStatsWrapper(Material material) {
                 .collect(Collectors.toList());
     }
 
-    public MaterialId getMaterialId() {
-        return material.getIdentifier().getId();
-    }
-
     public <T extends BaseMaterialStats> Optional<T> getStats(MaterialStatsId materialStatsId) {
         return MaterialRegistry.getInstance().getMaterialStats(getMaterialId(), materialStatsId);
     }
@@ -83,8 +84,8 @@ public record MaterialStatsWrapper(Material material) {
     }
 
     public boolean hasTraits() {
-        List<MaterialStatsId> stats = List.of(HeadMaterialStats.ID, ExtraMaterialStats.ID, HandleMaterialStats.ID, LimbMaterialStats.ID, GripMaterialStats.ID, BowstringMaterialStats.ID);
-        return stats.stream().anyMatch(stat -> !getTraits(stat).isEmpty());
+        return Stream.of(HeadMaterialStats.ID, ExtraMaterialStats.ID, HandleMaterialStats.ID, LimbMaterialStats.ID, GripMaterialStats.ID, BowstringMaterialStats.ID)
+                .anyMatch(stat -> !getTraits(stat).isEmpty());
     }
 
 }
