@@ -13,9 +13,11 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.phys.Vec2;
 import slimeknights.tconstruct.library.tools.layout.LayoutSlot;
 import slimeknights.tconstruct.tools.TinkerTools;
 
+import javax.annotation.Nonnull;
 import java.util.Collections;
 import java.util.List;
 
@@ -24,6 +26,8 @@ import static me.paypur.tconjei.TConJEI.inBox;
 
 public class ToolPartsCategory implements IRecipeCategory<ToolPartsWrapper> {
 
+    final Component TITLE = new TextComponent("Tool Recipe");
+    final RecipeType<ToolPartsWrapper> RECIPE_TYPE = RecipeType.create(MOD_ID, "tool_parts", ToolPartsWrapper.class);
     final ResourceLocation UID = new ResourceLocation(MOD_ID, "tool_parts");
     final IDrawable BACKGROUND, ICON, ANVIL, SLOT;
     final int WIDTH = 120;
@@ -39,31 +43,31 @@ public class ToolPartsCategory implements IRecipeCategory<ToolPartsWrapper> {
 
     @Override
     public void setRecipe(IRecipeLayoutBuilder builder, ToolPartsWrapper recipe, IFocusGroup focuses) {
-        recipe.getToolParts().forEach(parts -> builder.addInvisibleIngredients(RecipeIngredientRole.INPUT).addItemStacks(parts));
+        recipe.getInputsParts().forEach(parts -> builder.addInvisibleIngredients(RecipeIngredientRole.INPUT).addItemStacks(parts));
 
         List<LayoutSlot> slots = recipe.getSlots();
-        List<ItemStack> items = recipe.getToolRecipe();
+        List<ItemStack> items = recipe.getDisplayParts();
 
         assert items.size() == slots.size();
 
-        xy offsets = getOffsets(recipe);
+        Vec2 offsets = getOffsets(recipe);
         for (int i = 0; i < items.size(); i++) {
-            builder.addSlot(RecipeIngredientRole.INPUT, slots.get(i).getX() + offsets.x, slots.get(i).getY() + offsets.y).addItemStack(items.get(i));
+            builder.addSlot(RecipeIngredientRole.INPUT, (int) (slots.get(i).getX() + offsets.x), (int) (slots.get(i).getY() + offsets.y)).addItemStack(items.get(i));
         }
 
-        builder.addSlot(RecipeIngredientRole.OUTPUT, WIDTH - 25, (HEIGHT - ITEM_SIZE) / 2).addItemStack(recipe.getTool());
+        builder.addSlot(RecipeIngredientRole.OUTPUT, WIDTH - 25, (HEIGHT - ITEM_SIZE) / 2).addItemStack(recipe.getOutputTool());
     }
 
     @Override
-    public void draw(ToolPartsWrapper recipe, PoseStack stack, double mouseX, double mouseY) {
+    public void draw(ToolPartsWrapper recipe, IRecipeSlotsView recipeSlotsView, PoseStack stack, double mouseX, double mouseY) {
         if (recipe.isBroadTool()) {
             this.ANVIL.draw(stack, 65, 42);
         }
 
-        xy offsets = getOffsets(recipe);
+        Vec2 offsets = getOffsets(recipe);
         for (LayoutSlot slot : recipe.getSlots()) {
             // need to offset by 1 because the inventory slot icons are 18x18
-            this.SLOT.draw(stack, slot.getX() + offsets.x - 1, slot.getY() + offsets.y - 1);
+            this.SLOT.draw(stack, (int) (slot.getX() + offsets.x - 1), (int) (slot.getY() + offsets.y - 1));
         }
     }
 
@@ -74,7 +78,7 @@ public class ToolPartsCategory implements IRecipeCategory<ToolPartsWrapper> {
                     Collections.emptyList();
     }
 
-    private xy getOffsets(ToolPartsWrapper recipe) {
+    private Vec2 getOffsets(ToolPartsWrapper recipe) {
         List<LayoutSlot> slots = recipe.getSlots();
 
         int minX, maxX, minY, maxY;
@@ -95,21 +99,28 @@ public class ToolPartsCategory implements IRecipeCategory<ToolPartsWrapper> {
         // centers slots horizontally within square
         int xOffset = (HEIGHT - (ITEM_SIZE + maxX - minX)) / 2 - minX;
 
-        return new xy(xOffset, yOffset);
+        return new Vec2(xOffset, yOffset);
     }
 
-    private record xy(int x, int y) {}
-
+    @Nonnull
     @Override
     public Component getTitle() {
-        return new TextComponent("Tool Recipe");
+        return TITLE;
     }
 
+    @Nonnull
+    @Override
+    public RecipeType<ToolPartsWrapper> getRecipeType() {
+        return RECIPE_TYPE;
+    }
+
+    @Nonnull
     @Override
     public IDrawable getBackground() {
         return this.BACKGROUND;
     }
 
+    @Nonnull
     @Override
     public IDrawable getIcon() {
         return this.ICON;
@@ -123,10 +134,5 @@ public class ToolPartsCategory implements IRecipeCategory<ToolPartsWrapper> {
     @Override
     public Class<? extends ToolPartsWrapper> getRecipeClass() {
         return ToolPartsWrapper.class;
-    }
-
-    @Override
-    public RecipeType<ToolPartsWrapper> getRecipeType() {
-        return RecipeType.create(MOD_ID, "tool_parts", getRecipeClass());
     }
 }

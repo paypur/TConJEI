@@ -2,6 +2,7 @@ package me.paypur.tconjei.jei;
 
 import net.minecraft.world.item.ItemStack;
 import slimeknights.tconstruct.library.materials.MaterialRegistry;
+import slimeknights.tconstruct.library.materials.definition.IMaterial;
 import slimeknights.tconstruct.library.materials.definition.Material;
 import slimeknights.tconstruct.library.tools.definition.PartRequirement;
 import slimeknights.tconstruct.library.tools.definition.ToolDefinition;
@@ -18,17 +19,16 @@ import java.util.stream.Collectors;
 
 public record ToolPartsWrapper(ToolDefinition definition) {
 
-    static List<Material> MATERIALS = MaterialRegistry.getMaterials()
+    static List<IMaterial> MATERIALS = MaterialRegistry.getMaterials()
             .stream()
-            .map(material -> (Material) material)
             .filter(material -> !material.isHidden())
-            .collect(Collectors.toList());
+            .toList();
 
     public StationSlotLayout getSlotLayout() {
         return StationSlotLayoutLoader.getInstance().get(definition.getId());
     }
 
-    public ItemStack getTool() {
+    public ItemStack getOutputTool() {
         return getSlotLayout().getIcon().getValue(ItemStack.class);
     }
 
@@ -37,11 +37,11 @@ public record ToolPartsWrapper(ToolDefinition definition) {
     }
 
     public boolean isBroadTool() {
-        // assumption might not always be true
-        return getSlotLayout().getSortIndex() > 8;
+        return getSlots().size() >= 4;
     }
 
-    public List<List<ItemStack>> getToolParts() {
+    // a 2d list of each part and then each variant of that part
+    public List<List<ItemStack>> getInputsParts() {
         return definition.getData().getParts().stream()
             .map(PartRequirement::getPart)
             .map(part -> MATERIALS.stream()
@@ -51,7 +51,8 @@ public record ToolPartsWrapper(ToolDefinition definition) {
             ).toList();
     }
 
-    public List<ItemStack> getToolRecipe() {
+    // use display parts to be more consistent
+    public List<ItemStack> getDisplayParts() {
         List<IToolPart> parts = definition.getData().getParts()
                 .stream()
                 .map(PartRequirement::getPart)
