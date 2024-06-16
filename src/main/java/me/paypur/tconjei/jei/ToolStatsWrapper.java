@@ -2,14 +2,16 @@ package me.paypur.tconjei.jei;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.Registry;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.fluids.FluidStack;
 import slimeknights.mantle.recipe.helper.RecipeHelper;
 import slimeknights.mantle.util.RegistryHelper;
-import slimeknights.tconstruct.common.TinkerTags;
+import slimeknights.tconstruct.library.materials.IMaterialRegistry;
 import slimeknights.tconstruct.library.materials.MaterialRegistry;
-import slimeknights.tconstruct.library.materials.definition.Material;
+import slimeknights.tconstruct.library.materials.definition.IMaterial;
 import slimeknights.tconstruct.library.materials.definition.MaterialId;
 import slimeknights.tconstruct.library.materials.definition.MaterialVariantId;
 import slimeknights.tconstruct.library.materials.stats.BaseMaterialStats;
@@ -18,25 +20,23 @@ import slimeknights.tconstruct.library.modifiers.ModifierEntry;
 import slimeknights.tconstruct.library.recipe.TinkerRecipeTypes;
 import slimeknights.tconstruct.library.recipe.casting.material.MaterialCastingLookup;
 import slimeknights.tconstruct.library.recipe.material.MaterialRecipe;
-import slimeknights.tconstruct.library.tools.part.IToolPart;
+import slimeknights.tconstruct.library.tools.item.IModifiableDisplay;
 import slimeknights.tconstruct.tools.TinkerToolParts;
-import slimeknights.tconstruct.tools.stats.*;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-public record MaterialStatsWrapper(Material material) {
+public record ToolStatsWrapper(IMaterial material) {
+    private static final IMaterialRegistry REGISTRY = MaterialRegistry.getInstance();
 
     public MaterialId getMaterialId() {
         return material.getIdentifier().getId();
     }
 
     // taken from AbstractMaterialContent
-    public List<ItemStack> getItemStacks() {
+    public List<ItemStack> getInputs() {
         Level world = Minecraft.getInstance().level;
         if (world == null) {
             return Collections.emptyList();
@@ -47,7 +47,7 @@ public record MaterialStatsWrapper(Material material) {
         repairStacks = RecipeHelper.getUIRecipes(world.getRecipeManager(), TinkerRecipeTypes.MATERIAL.get(), MaterialRecipe.class, recipe -> variantId.matchesVariant(recipe.getMaterial()))
                 .stream()
                 .flatMap(recipe -> Arrays.stream(recipe.getIngredient().getItems()))
-                .collect(Collectors.toList());
+                .toList();
         // no repair items? use the repair kit
         if (repairStacks.isEmpty()) {
             // bypass the valid check, because we need to show something
@@ -66,26 +66,27 @@ public record MaterialStatsWrapper(Material material) {
     }
 
     // taken from AbstractMaterialContent
-    public List<ItemStack> getToolParts() {
-        return RegistryHelper.getTagValueStream(Registry.ITEM, TinkerTags.Items.TOOL_PARTS)
-                .filter(part -> part instanceof IToolPart)
-                .map(part -> (IToolPart) part)
-                .filter(part -> part.canUseMaterial(material))
-                .map(part -> part.withMaterial(material.getIdentifier()))
-                .collect(Collectors.toList());
+    public List<ItemStack> getInputsParts(TagKey<Item> tag) {
+        return RegistryHelper.getTagValueStream(Registry.ITEM, tag)
+            .filter(item -> item instanceof IModifiableDisplay)
+            .flatMap(item -> ((IModifiableDisplay) item).getToolDefinition().getData().getParts().stream()
+                    .filter(part -> part.canUseMaterial(material.getIdentifier()))
+                    .map(part -> part.getPart().withMaterial(material.getIdentifier()))
+            )
+            .toList();
     }
 
-    public <T extends BaseMaterialStats> Optional<T> getStats(MaterialStatsId materialStatsId) {
-        return MaterialRegistry.getInstance().getMaterialStats(getMaterialId(), materialStatsId);
+    public <T extends BaseMaterialStats> Optional<T> getStats(MaterialStatsId statsId) {
+        return REGISTRY.getMaterialStats(getMaterialId(), statsId);
     }
 
-    public List<ModifierEntry> getTraits(MaterialStatsId materialStatsId) {
-        return MaterialRegistry.getInstance().getTraits(material.getIdentifier().getId(), materialStatsId);
+    public boolean hasStats(List<MaterialStatsId> statsIds) {
+        return statsIds.stream()
+                .anyMatch(stat -> getStats(stat).isPresent());
     }
 
-    public boolean hasTraits() {
-        return Stream.of(HeadMaterialStats.ID, ExtraMaterialStats.ID, HandleMaterialStats.ID, LimbMaterialStats.ID, GripMaterialStats.ID, BowstringMaterialStats.ID)
-                .anyMatch(stat -> !getTraits(stat).isEmpty());
+    public List<ModifierEntry> getTraits(MaterialStatsId statsId) {
+        return REGISTRY.getTraits(material.getIdentifier().getId(), statsId);
     }
 
 }

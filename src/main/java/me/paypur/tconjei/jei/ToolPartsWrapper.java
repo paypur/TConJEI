@@ -3,7 +3,6 @@ package me.paypur.tconjei.jei;
 import net.minecraft.world.item.ItemStack;
 import slimeknights.tconstruct.library.materials.MaterialRegistry;
 import slimeknights.tconstruct.library.materials.definition.IMaterial;
-import slimeknights.tconstruct.library.materials.definition.Material;
 import slimeknights.tconstruct.library.tools.definition.PartRequirement;
 import slimeknights.tconstruct.library.tools.definition.ToolDefinition;
 import slimeknights.tconstruct.library.tools.helper.ToolBuildHandler;
@@ -15,7 +14,6 @@ import slimeknights.tconstruct.library.tools.part.IToolPart;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public record ToolPartsWrapper(ToolDefinition definition) {
 

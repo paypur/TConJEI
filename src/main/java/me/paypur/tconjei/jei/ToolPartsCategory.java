@@ -26,13 +26,13 @@ import static me.paypur.tconjei.TConJEI.inBox;
 
 public class ToolPartsCategory implements IRecipeCategory<ToolPartsWrapper> {
 
-    final Component TITLE = new TextComponent("Tool Recipe");
-    final RecipeType<ToolPartsWrapper> RECIPE_TYPE = RecipeType.create(MOD_ID, "tool_parts", ToolPartsWrapper.class);
-    final ResourceLocation UID = new ResourceLocation(MOD_ID, "tool_parts");
+    static final Component TITLE = new TextComponent("Tool Recipe");
+    static final RecipeType<ToolPartsWrapper> RECIPE_TYPE = RecipeType.create(MOD_ID, "tool_parts", ToolPartsWrapper.class);
+    static final ResourceLocation UID = new ResourceLocation(MOD_ID, "tool_parts");
     final IDrawable BACKGROUND, ICON, ANVIL, SLOT;
-    final int WIDTH = 120;
-    final int HEIGHT = 60;
-    final int ITEM_SIZE = 16;
+    static final int WIDTH = 120;
+    static final int HEIGHT = 60;
+    static final int ITEM_SIZE = 16;
 
     public ToolPartsCategory(IGuiHelper guiHelper) {
         this.BACKGROUND = guiHelper.createDrawable(new ResourceLocation(MOD_ID, "textures/gui/toolparts/bg.png"), 0, 0, WIDTH, HEIGHT);

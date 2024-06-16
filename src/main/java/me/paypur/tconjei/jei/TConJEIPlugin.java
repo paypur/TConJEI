@@ -11,14 +11,12 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import slimeknights.tconstruct.library.materials.MaterialRegistry;
-import slimeknights.tconstruct.library.materials.definition.Material;
 import slimeknights.tconstruct.library.tools.definition.ToolDefinitionLoader;
 import slimeknights.tconstruct.library.tools.layout.StationSlotLayoutLoader;
-import slimeknights.tconstruct.tables.TinkerTables;
+import slimeknights.tconstruct.tools.stats.*;
 
 import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static me.paypur.tconjei.TConJEI.MOD_ID;
 import static slimeknights.tconstruct.tables.TinkerTables.*;
@@ -28,8 +26,8 @@ import static slimeknights.tconstruct.tables.TinkerTables.*;
 public class TConJEIPlugin implements IModPlugin {
 
     ResourceLocation UID = new ResourceLocation(MOD_ID, "jei_plugin");
-    private static final RecipeType<MaterialStatsWrapper> HARVEST_STATS = RecipeType.create(MOD_ID, "material_stats", MaterialStatsWrapper.class);
-    private static final RecipeType<MaterialStatsWrapper> RANGED_STATS = RecipeType.create(MOD_ID, "material_stats", MaterialStatsWrapper.class);
+    private static final RecipeType<ToolStatsWrapper> HARVEST_STATS = RecipeType.create(MOD_ID, "harvest_stats", ToolStatsWrapper.class);
+    private static final RecipeType<ToolStatsWrapper> RANGED_STATS = RecipeType.create(MOD_ID, "ranged_stats", ToolStatsWrapper.class);
     private static final RecipeType<ToolPartsWrapper> TOOL_PARTS = RecipeType.create(MOD_ID, "tool_parts", ToolPartsWrapper.class);
 
     @NotNull
@@ -40,8 +38,15 @@ public class TConJEIPlugin implements IModPlugin {
 
     @Override
     public void registerRecipes(IRecipeRegistration registration) {
-        registration.addRecipes(HARVEST_STATS, materials());
-        registration.addRecipes(RANGED_STATS, materials());
+        List<ToolStatsWrapper> statsWrappers = MaterialRegistry.getMaterials()
+                .stream()
+                .filter(iMaterial -> !iMaterial.isHidden())
+                .map(ToolStatsWrapper::new)
+//                .filter(ToolStatsWrapper::hasAnyTraits)
+                .toList();
+
+        registration.addRecipes(HARVEST_STATS, statsWrappers.stream().filter(w -> w.hasStats(List.of(HeadMaterialStats.ID, ExtraMaterialStats.ID, HandleMaterialStats.ID))).toList());
+        registration.addRecipes(RANGED_STATS, statsWrappers.stream().filter(w -> w.hasStats(List.of(LimbMaterialStats.ID, GripMaterialStats.ID, BowstringMaterialStats.ID))).toList());
         registration.addRecipes(TOOL_PARTS, toolDefinitions());
     }
 
@@ -64,15 +69,6 @@ public class TConJEIPlugin implements IModPlugin {
         registration.addRecipeCatalyst(new ItemStack(tinkerStation.asItem()), TOOL_PARTS);
         registration.addRecipeCatalyst(new ItemStack(tinkersAnvil.asItem()), TOOL_PARTS);
         registration.addRecipeCatalyst(new ItemStack(scorchedAnvil.asItem()), TOOL_PARTS);
-    }
-
-    private List<MaterialStatsWrapper> materials() {
-        return MaterialRegistry.getMaterials()
-                .stream()
-                .filter(iMaterial -> !iMaterial.isHidden())
-                .map(stats -> new MaterialStatsWrapper((Material) stats))
-                .filter(MaterialStatsWrapper::hasTraits)
-                .collect(Collectors.toList());
     }
 
     private List<ToolPartsWrapper> toolDefinitions() {

@@ -11,12 +11,13 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.fluids.FluidStack;
 import org.jetbrains.annotations.NotNull;
-import slimeknights.tconstruct.library.materials.stats.MaterialStatsId;
 import slimeknights.tconstruct.library.modifiers.ModifierEntry;
 
 import java.util.Collections;
@@ -24,7 +25,6 @@ import java.util.List;
 
 import static me.paypur.tconjei.ColorManager.TEXT_COLOR;
 import static me.paypur.tconjei.ColorManager.getShade;
-import static me.paypur.tconjei.TConJEI.MOD_ID;
 import static me.paypur.tconjei.TConJEI.inBox;
 import static mezz.jei.api.recipe.RecipeIngredientRole.INPUT;
 import static mezz.jei.api.recipe.RecipeIngredientRole.RENDER_ONLY;
@@ -32,32 +32,36 @@ import static net.minecraftforge.common.ForgeI18n.getPattern;
 import static slimeknights.mantle.client.ResourceColorManager.getColor;
 import static slimeknights.tconstruct.library.utils.Util.makeTranslationKey;
 
-public abstract class AbstractToolStatsCategory implements IRecipeCategory<MaterialStatsWrapper> {
+public abstract class AbstractToolStatsCategory implements IRecipeCategory<ToolStatsWrapper> {
 
-    protected ResourceLocation UID;
-    protected IDrawable BACKGROUND, ICON;
-    protected final Font FONT = Minecraft.getInstance().font;
-    protected int WIDTH = 172, HEIGHT = 220, LINE_HEIGHT = 10;
-    protected float LINE_SPACING = 0.4f;
-    protected Component TITLE = new TextComponent("Material Stats");
-    protected RecipeType<MaterialStatsWrapper> RECIPE_TYPE = RecipeType.create(MOD_ID, "material_stats", MaterialStatsWrapper.class);
+    protected Component title;
+    protected RecipeType<ToolStatsWrapper> recipeType;
+    protected ResourceLocation uid;
+    protected IDrawable background, icon;
+    static protected final Font FONT = Minecraft.getInstance().font;
+    protected final int WIDTH = 172, HEIGHT = 180, LINE_HEIGHT = 10;
+    protected float LINE_SPACING = 0.5f;
+    protected TagKey<Item> tag;
 
-    public AbstractToolStatsCategory(IGuiHelper guiHelper) {
-        this.BACKGROUND = guiHelper.createBlankDrawable(WIDTH, HEIGHT);
+    public AbstractToolStatsCategory(IGuiHelper guiHelper, TagKey<Item> tag) {
+        this.background = guiHelper.createBlankDrawable(WIDTH, HEIGHT);
+        this.tag = tag;
     }
 
     @Override
-    public void setRecipe(IRecipeLayoutBuilder builder, MaterialStatsWrapper recipe, IFocusGroup focuses) {
+    public void setRecipe(IRecipeLayoutBuilder builder, ToolStatsWrapper recipe, IFocusGroup focuses) {
         FluidStack fluidStack = recipe.getFluidStack();
         if (!fluidStack.isEmpty()) {
             final int BUCKET = 1000; // milli buckets
             builder.addSlot(RENDER_ONLY, 18, 0).addFluidStack(fluidStack.getFluid(), BUCKET);
             builder.addInvisibleIngredients(INPUT).addFluidStack(fluidStack.getFluid(), BUCKET);
         }
-        builder.addSlot(RENDER_ONLY, 0, 0).addItemStacks(recipe.getItemStacks());
-        builder.addSlot(RENDER_ONLY, WIDTH - 16, 0).addItemStacks(recipe.getToolParts());
-        builder.addInvisibleIngredients(INPUT).addItemStacks(recipe.getItemStacks());
-        builder.addInvisibleIngredients(INPUT).addItemStacks(recipe.getToolParts());
+        List<ItemStack> inputs = recipe.getInputs();
+        List<ItemStack> inputsParts = recipe.getInputsParts(tag);
+        builder.addSlot(RENDER_ONLY, 0, 0).addItemStacks(inputs);
+        builder.addSlot(RENDER_ONLY, WIDTH - 16, 0).addItemStacks(inputsParts);
+        builder.addInvisibleIngredients(INPUT).addItemStacks(inputs);
+        builder.addInvisibleIngredients(INPUT).addItemStacks(inputsParts);
     }
 
     protected void drawStats(PoseStack poseStack, String type, String stat, float lineNumber, int ACCENT_COLOR) {
@@ -96,8 +100,8 @@ public abstract class AbstractToolStatsCategory implements IRecipeCategory<Mater
         return Collections.emptyList();
     }
 
-    protected List<Component> getTraitTooltips(MaterialStatsWrapper statsWrapper, MaterialStatsId statsId, double mouseX, double mouseY, float lineNumber) {
-        for (ModifierEntry trait : statsWrapper.getTraits(statsId)) {
+    protected List<Component> getTraitTooltips(List<ModifierEntry> traits, double mouseX, double mouseY, float lineNumber) {
+        for (ModifierEntry trait : traits) {
             String string = getPattern(makeTranslationKey("modifier", trait.getId()));
             int textWidth = FONT.width(string);
             if (inBox(mouseX, mouseY, WIDTH - textWidth, lineNumber++ * LINE_HEIGHT - 1, textWidth, LINE_HEIGHT)) {
@@ -111,36 +115,36 @@ public abstract class AbstractToolStatsCategory implements IRecipeCategory<Mater
     @NotNull
     @Override
     public Component getTitle() {
-        return TITLE;
+        return title;
     }
     @NotNull
     @Override
-    public RecipeType<MaterialStatsWrapper> getRecipeType() {
-        return RECIPE_TYPE;
+    public RecipeType<ToolStatsWrapper> getRecipeType() {
+        return recipeType;
     }
 
     @NotNull
     @Override
     public IDrawable getBackground() {
-        return this.BACKGROUND;
+        return this.background;
     }
 
     @NotNull
     @Override
     public IDrawable getIcon() {
-        return this.ICON;
+        return this.icon;
     }
 
     @NotNull
     @Override
     public ResourceLocation getUid() {
-        return this.UID;
+        return this.uid;
     }
 
     @NotNull
     @Override
-    public Class<? extends MaterialStatsWrapper> getRecipeClass() {
-        return MaterialStatsWrapper.class;
+    public Class<? extends ToolStatsWrapper> getRecipeClass() {
+        return ToolStatsWrapper.class;
     }
 
 }
