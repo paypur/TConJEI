@@ -39,7 +39,7 @@ public abstract class AbstractToolStatsCategory implements IRecipeCategory<ToolS
     protected ResourceLocation uid;
     protected IDrawable background, icon;
     static protected final Font FONT = Minecraft.getInstance().font;
-    protected final int WIDTH = 172, HEIGHT = 180, LINE_HEIGHT = 10;
+    protected final int WIDTH = 172, HEIGHT = 140, LINE_HEIGHT = 10;
     protected float LINE_SPACING = 0.5f;
     protected TagKey<Item> tag;
 

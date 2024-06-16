@@ -29,16 +29,16 @@ public class ToolPartsCategory implements IRecipeCategory<ToolPartsWrapper> {
     static final Component TITLE = new TextComponent("Tool Recipe");
     static final RecipeType<ToolPartsWrapper> RECIPE_TYPE = RecipeType.create(MOD_ID, "tool_parts", ToolPartsWrapper.class);
     static final ResourceLocation UID = new ResourceLocation(MOD_ID, "tool_parts");
-    final IDrawable BACKGROUND, ICON, ANVIL, SLOT;
+    final IDrawable background, icon, anvil, slot;
     static final int WIDTH = 120;
     static final int HEIGHT = 60;
     static final int ITEM_SIZE = 16;
 
     public ToolPartsCategory(IGuiHelper guiHelper) {
-        this.BACKGROUND = guiHelper.createDrawable(new ResourceLocation(MOD_ID, "textures/gui/toolparts/bg.png"), 0, 0, WIDTH, HEIGHT);
-        this.ICON = guiHelper.createDrawableItemStack(TinkerTools.sledgeHammer.get().getRenderTool());
-        this.ANVIL = guiHelper.createDrawable(new ResourceLocation(MOD_ID, "textures/gui/toolparts/anvil.png"), 0, 0, 16, 16);
-        this.SLOT = guiHelper.createDrawable(new ResourceLocation(MOD_ID, "textures/gui/toolparts/slot.png"), 0, 0, 18, 18);
+        this.background = guiHelper.createDrawable(new ResourceLocation(MOD_ID, "textures/gui/jei.png"), 0, 16, WIDTH, HEIGHT);
+        this.icon = guiHelper.createDrawableItemStack(TinkerTools.sledgeHammer.get().getRenderTool());
+        this.anvil = guiHelper.createDrawable(new ResourceLocation(MOD_ID, "textures/gui/jei.png"), 222, 0, 16, 16);
+        this.slot = guiHelper.createDrawable(new ResourceLocation(MOD_ID, "textures/gui/jei.png"), 238, 0, 18, 18);
     }
 
     @Override
@@ -61,13 +61,13 @@ public class ToolPartsCategory implements IRecipeCategory<ToolPartsWrapper> {
     @Override
     public void draw(ToolPartsWrapper recipe, IRecipeSlotsView recipeSlotsView, PoseStack stack, double mouseX, double mouseY) {
         if (recipe.isBroadTool()) {
-            this.ANVIL.draw(stack, 65, 42);
+            this.anvil.draw(stack, 65, 42);
         }
 
         Vec2 offsets = getOffsets(recipe);
         for (LayoutSlot slot : recipe.getSlots()) {
             // need to offset by 1 because the inventory slot icons are 18x18
-            this.SLOT.draw(stack, (int) (slot.getX() + offsets.x - 1), (int) (slot.getY() + offsets.y - 1));
+            this.slot.draw(stack, (int) (slot.getX() + offsets.x - 1), (int) (slot.getY() + offsets.y - 1));
         }
     }
 
@@ -117,13 +117,13 @@ public class ToolPartsCategory implements IRecipeCategory<ToolPartsWrapper> {
     @Nonnull
     @Override
     public IDrawable getBackground() {
-        return this.BACKGROUND;
+        return this.background;
     }
 
     @Nonnull
     @Override
     public IDrawable getIcon() {
-        return this.ICON;
+        return this.icon;
     }
 
     @Override

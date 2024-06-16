@@ -31,7 +31,7 @@ public class HarvestStatsCategory extends AbstractToolStatsCategory {
 
     public HarvestStatsCategory(IGuiHelper guiHelper) {
         super(guiHelper, TinkerTags.Items.HARVEST);
-        this.icon = guiHelper.createDrawable(new ResourceLocation(MOD_ID, "textures/gui/materialstats/icon.png"), 0, 0, 16, 16);
+        this.icon = guiHelper.createDrawable(new ResourceLocation(MOD_ID, "textures/gui/jei.png"), 0, 0, 16, 16);
         this.title = new TextComponent("Harvest Stats");
         this.recipeType = RecipeType.create(MOD_ID, "harvest_stats", ToolStatsWrapper.class);
         this.uid = new ResourceLocation(MOD_ID, "harvest_stats");
