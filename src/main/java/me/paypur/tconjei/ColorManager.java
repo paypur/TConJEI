@@ -98,7 +98,8 @@ public class ColorManager {
     }
 
     // @formatter:off
-    public static int getMultiplierColor(Float f) {
+    public static int getMultiplierColor(float f) {
+        f += 1f;
         if (f < 0.55f) { return 0xbd0000; }
         if (f < 0.60f) { return 0xbd2600; }
         if (f < 0.65f) { return 0xbd4b00; }
@@ -120,9 +121,5 @@ public class ColorManager {
         return 0x004bbd;
     }
     // @formatter:on
-
-    public static int getDifferenceColor(float f) {
-        return getMultiplierColor(f + 1f);
-    }
 
 }

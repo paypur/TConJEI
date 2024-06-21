@@ -2,7 +2,7 @@ package me.paypur.tconjei.jei;
 
 import net.minecraft.world.item.ItemStack;
 import slimeknights.tconstruct.library.materials.MaterialRegistry;
-import slimeknights.tconstruct.library.materials.definition.Material;
+import slimeknights.tconstruct.library.materials.definition.IMaterial;
 import slimeknights.tconstruct.library.tools.definition.ToolDefinition;
 import slimeknights.tconstruct.library.tools.helper.ToolBuildHandler;
 import slimeknights.tconstruct.library.tools.helper.TooltipUtil;
@@ -12,24 +12,20 @@ import slimeknights.tconstruct.library.tools.layout.StationSlotLayoutLoader;
 import slimeknights.tconstruct.library.tools.part.IToolPart;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static slimeknights.tconstruct.library.tools.definition.module.ToolHooks.TOOL_PARTS;
 
 public record ToolPartsWrapper(ToolDefinition definition) {
 
-    static List<Material> MATERIALS = MaterialRegistry.getMaterials()
-            .stream()
-            .map(material -> (Material) material)
-            .filter(material -> !material.isHidden())
-            .collect(Collectors.toList());
+    static Collection<IMaterial> MATERIALS = MaterialRegistry.getInstance().getVisibleMaterials();
 
     public StationSlotLayout getSlotLayout() {
         return StationSlotLayoutLoader.getInstance().get(definition.getId());
     }
 
-    public ItemStack getTool() {
+    public ItemStack getOutputTool() {
         return getSlotLayout().getIcon().getValue(ItemStack.class);
     }
 
@@ -38,11 +34,11 @@ public record ToolPartsWrapper(ToolDefinition definition) {
     }
 
     public boolean isBroadTool() {
-        // assumption might not always be true
-        return getSlotLayout().getSortIndex() > 8;
+        return getSlots().size() >= 4;
     }
 
-    public List<List<ItemStack>> getToolParts() {
+    // a 2d list of each part and then each variant of that part
+    public List<List<ItemStack>> getInputParts() {
         return definition.getData()
                 .getHook(TOOL_PARTS)
                 .getParts(definition)
@@ -54,7 +50,8 @@ public record ToolPartsWrapper(ToolDefinition definition) {
                 ).toList();
     }
 
-    public List<ItemStack> getToolRecipe() {
+    // use display parts to be more consistent
+    public List<ItemStack> getDisplayParts() {
         List<IToolPart> parts = definition.getData()
                 .getHook(TOOL_PARTS)
                 .getParts(definition)

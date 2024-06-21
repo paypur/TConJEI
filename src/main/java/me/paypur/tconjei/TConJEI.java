@@ -34,7 +34,7 @@ public class TConJEI {
                     folder.mkdirs();
 
                     ResourceLocation texture = new ResourceLocation(MOD_ID, "tconjeidark.zip");
-                    InputStream in = Minecraft.getInstance().getResourceManager().getResource(texture).getInputStream();
+                    InputStream in = Minecraft.getInstance().getResourceManager().getResource(texture).get().open();;
                     FileOutputStream out = new FileOutputStream(copy);
 
                     byte[] buffer = new byte[4096];
