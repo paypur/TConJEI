@@ -64,13 +64,6 @@ public abstract class AbstractToolStatsCategory implements IRecipeCategory<ToolS
         builder.addInvisibleIngredients(INPUT).addItemStacks(inputsParts);
     }
 
-    protected void drawStats(PoseStack poseStack, String type, String stat, float lineNumber, int ACCENT_COLOR) {
-        String pattern = getPattern(type);
-        float width = FONT.width(pattern);
-        FONT.draw(poseStack, pattern, 0, lineNumber * LINE_HEIGHT, TEXT_COLOR);
-        FONT.draw(poseStack, stat, width, lineNumber * LINE_HEIGHT, ACCENT_COLOR);
-    }
-
     protected void drawStatsShadow(PoseStack poseStack, String type, String stat, float lineNumber, int ACCENT_COLOR) {
         String pattern = getPattern(type);
         float width = FONT.width(pattern);

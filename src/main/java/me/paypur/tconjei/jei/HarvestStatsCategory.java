@@ -63,10 +63,10 @@ public class HarvestStatsCategory extends AbstractToolStatsCategory {
             HeadMaterialStats head = headOptional.get();
             ResourceLocation miningLevel = head.getTierId();
             drawShadow(stack, String.format("[%s]", getPattern("stat.tconstruct.head")), 0, lineNumber++, MATERIAL_COLOR);
-            drawStats(stack, "tool_stat.tconstruct.durability", String.valueOf(head.getDurability()), lineNumber++, DURABILITY_COLOR);
+            drawStatsShadow(stack, "tool_stat.tconstruct.durability", String.valueOf(head.getDurability()), lineNumber++, DURABILITY_COLOR);
             drawStatsShadow(stack, "tool_stat.tconstruct.harvest_tier", getPattern(Util.makeTranslationKey("stat.tconstruct.harvest_tier", miningLevel)), lineNumber++, getMiningLevelColor(miningLevel));
-            drawStats(stack, "tool_stat.tconstruct.mining_speed", String.format("%.2f", head.getMiningSpeed()), lineNumber++, MINING_COLOR);
-            drawStats(stack, "tool_stat.tconstruct.attack_damage", String.format("%.2f", head.getAttack()), lineNumber++, ATTACK_COLOR);
+            drawStatsShadow(stack, "tool_stat.tconstruct.mining_speed", String.format("%.2f", head.getMiningSpeed()), lineNumber++, MINING_COLOR);
+            drawStatsShadow(stack, "tool_stat.tconstruct.attack_damage", String.format("%.2f", head.getAttack()), lineNumber++, ATTACK_COLOR);
             lineNumber += LINE_SPACING;
         }
 
@@ -80,10 +80,10 @@ public class HarvestStatsCategory extends AbstractToolStatsCategory {
         if (handleOptional.isPresent()) {
             HandleMaterialStats handle = handleOptional.get();
             drawShadow(stack, String.format("[%s]", getPattern("stat.tconstruct.handle")), 0, lineNumber++, MATERIAL_COLOR);
-            drawStats(stack, "tool_stat.tconstruct.durability", String.format("%.2fx", handle.getDurability()), lineNumber++, getMultiplierColor(handle.getDurability()));
-            drawStats(stack, "tool_stat.tconstruct.attack_damage", String.format("%.2fx", handle.getAttackDamage()), lineNumber++, getMultiplierColor(handle.getAttackDamage()));
-            drawStats(stack, "tool_stat.tconstruct.attack_speed", String.format("%.2fx", handle.getAttackSpeed()), lineNumber++, getMultiplierColor(handle.getAttackSpeed()));
-            drawStats(stack, "tool_stat.tconstruct.mining_speed", String.format("%.2fx", handle.getMiningSpeed()), lineNumber, getMultiplierColor(handle.getMiningSpeed()));
+            drawStatsShadow(stack, "tool_stat.tconstruct.durability", String.format("%.2fx", handle.getDurability()), lineNumber++, getMultiplierColor(handle.getDurability()));
+            drawStatsShadow(stack, "tool_stat.tconstruct.attack_damage", String.format("%.2fx", handle.getAttackDamage()), lineNumber++, getMultiplierColor(handle.getAttackDamage()));
+            drawStatsShadow(stack, "tool_stat.tconstruct.attack_speed", String.format("%.2fx", handle.getAttackSpeed()), lineNumber++, getMultiplierColor(handle.getAttackSpeed()));
+            drawStatsShadow(stack, "tool_stat.tconstruct.mining_speed", String.format("%.2fx", handle.getMiningSpeed()), lineNumber, getMultiplierColor(handle.getMiningSpeed()));
         }
     }
 

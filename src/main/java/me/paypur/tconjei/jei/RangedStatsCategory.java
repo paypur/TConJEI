@@ -62,10 +62,10 @@ public class RangedStatsCategory extends AbstractToolStatsCategory {
         if (limbOptional.isPresent()) {
             LimbMaterialStats limbStats = limbOptional.get();
             drawShadow(stack, String.format("[%s]", getPattern("stat.tconstruct.limb")), 0, lineNumber++, MATERIAL_COLOR);
-            drawStats(stack, "tool_stat.tconstruct.durability", String.valueOf(limbStats.getDurability()), lineNumber++, DURABILITY_COLOR);
-            drawStats(stack, "tool_stat.tconstruct.draw_speed", signedString(limbStats.getDrawSpeed()), lineNumber++, getDifferenceColor(limbStats.getDrawSpeed()));
-            drawStats(stack, "tool_stat.tconstruct.velocity", signedString(limbStats.getVelocity()), lineNumber++, getDifferenceColor(limbStats.getVelocity()));
-            drawStats(stack, "tool_stat.tconstruct.accuracy", signedString(limbStats.getAccuracy()), lineNumber++, getDifferenceColor(limbStats.getAccuracy()));
+            drawStatsShadow(stack, "tool_stat.tconstruct.durability", String.valueOf(limbStats.getDurability()), lineNumber++, DURABILITY_COLOR);
+            drawStatsShadow(stack, "tool_stat.tconstruct.draw_speed", signedString(limbStats.getDrawSpeed()), lineNumber++, getDifferenceColor(limbStats.getDrawSpeed()));
+            drawStatsShadow(stack, "tool_stat.tconstruct.velocity", signedString(limbStats.getVelocity()), lineNumber++, getDifferenceColor(limbStats.getVelocity()));
+            drawStatsShadow(stack, "tool_stat.tconstruct.accuracy", signedString(limbStats.getAccuracy()), lineNumber++, getDifferenceColor(limbStats.getAccuracy()));
             lineNumber += LINE_SPACING;
         }
 
@@ -73,9 +73,9 @@ public class RangedStatsCategory extends AbstractToolStatsCategory {
         if (gripOptional.isPresent()) {
             GripMaterialStats gripStats = gripOptional.get();
             drawShadow(stack, String.format("[%s]", getPattern("stat.tconstruct.grip")), 0, lineNumber++, MATERIAL_COLOR);
-            drawStats(stack, "tool_stat.tconstruct.durability", String.format("%.2fx", gripStats.getDurability()), lineNumber++, getMultiplierColor(gripStats.getDurability()));
-            drawStats(stack, "tool_stat.tconstruct.accuracy", signedString(gripStats.getAccuracy()), lineNumber++, getDifferenceColor(gripStats.getAccuracy()));
-            drawStats(stack, "tool_stat.tconstruct.attack_damage", String.format("%.2f", gripStats.getMeleeAttack()), lineNumber++, ATTACK_COLOR);
+            drawStatsShadow(stack, "tool_stat.tconstruct.durability", String.format("%.2fx", gripStats.getDurability()), lineNumber++, getMultiplierColor(gripStats.getDurability()));
+            drawStatsShadow(stack, "tool_stat.tconstruct.accuracy", signedString(gripStats.getAccuracy()), lineNumber++, getDifferenceColor(gripStats.getAccuracy()));
+            drawStatsShadow(stack, "tool_stat.tconstruct.attack_damage", String.format("%.2f", gripStats.getMeleeAttack()), lineNumber++, ATTACK_COLOR);
             lineNumber += LINE_SPACING;
         }
 
