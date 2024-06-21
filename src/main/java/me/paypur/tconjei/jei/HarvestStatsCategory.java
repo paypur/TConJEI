@@ -104,7 +104,7 @@ public class HarvestStatsCategory extends AbstractToolStatsCategory {
         }
 
         // TRAIT
-        List<ModifierEntry> traits = Stream.of(handleOptional, extraOptional, handleOptional)
+        List<ModifierEntry> traits = Stream.of(headOptional, extraOptional, handleOptional)
                 .filter(Optional::isPresent)
                 .findFirst()
                 .map(stat -> recipe.getTraits(stat.get().getIdentifier()))
