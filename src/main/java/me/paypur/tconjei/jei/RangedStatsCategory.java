@@ -52,9 +52,7 @@ public class RangedStatsCategory extends AbstractToolStatsCategory {
                 .filter(Optional::isPresent)
                 .findFirst()
                 .map(stat -> recipe.getTraits(stat.get().getIdentifier()));
-        if (traits.isPresent()) {
-            drawTraits(stack, traits.get(), lineNumber);
-        }
+        traits.ifPresent(modifierEntries -> drawTraits(stack, modifierEntries, lineNumber));
 
         // LIMB
         if (limbOptional.isPresent()) {

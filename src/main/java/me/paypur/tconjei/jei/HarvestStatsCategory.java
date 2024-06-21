@@ -48,13 +48,11 @@ public class HarvestStatsCategory extends AbstractToolStatsCategory {
         drawShadow(stack, MATERIAL_NAME, (WIDTH - FONT.width(MATERIAL_NAME)) / 2f, LINE_SPACING, MATERIAL_COLOR);
 
         // TRAITS
-        Optional<List<ModifierEntry>> traits = Stream.of(handleOptional, extraOptional, handleOptional)
+        Optional<List<ModifierEntry>> traits = Stream.of(headOptional, extraOptional, handleOptional)
                 .filter(Optional::isPresent)
                 .findFirst()
                 .map(stat -> recipe.getTraits(stat.get().getIdentifier()));
-        if (traits.isPresent()) {
-            drawTraits(stack, traits.get(), lineNumber);
-        }
+        traits.ifPresent(modifierEntries -> drawTraits(stack, modifierEntries, lineNumber));
 
         // HEAD
         if (headOptional.isPresent()) {

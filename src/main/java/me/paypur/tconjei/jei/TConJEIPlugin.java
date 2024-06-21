@@ -47,7 +47,13 @@ public class TConJEIPlugin implements IModPlugin {
         registration.addRecipes(RANGED_STATS, statsWrappers.stream()
                 .filter(w -> w.hasStats(List.of(LimbMaterialStats.ID, GripMaterialStats.ID, StatlessMaterialStats.BOWSTRING.getIdentifier())))
                 .toList());
-//        registration.addRecipes(ARMOR_STATS, materials());
+        registration.addRecipes(ARMOR_STATS, statsWrappers.stream()
+                .filter(w -> w.hasStats(List.of(
+                        PlatingMaterialStats.HELMET.getId(), PlatingMaterialStats.CHESTPLATE.getId(),
+                        PlatingMaterialStats.LEGGINGS.getId(), PlatingMaterialStats.BOOTS.getId(),
+                        PlatingMaterialStats.SHIELD.getId(), StatlessMaterialStats.MAILLE.getIdentifier(),
+                        StatlessMaterialStats.SHIELD_CORE.getIdentifier())))
+                .toList());
         registration.addRecipes(TOOL_PARTS, toolDefinitions());
     }
 
@@ -56,7 +62,7 @@ public class TConJEIPlugin implements IModPlugin {
         final IGuiHelper guiHelper = registration.getJeiHelpers().getGuiHelper();
         registration.addRecipeCategories(new HarvestStatsCategory(guiHelper));
         registration.addRecipeCategories(new RangedStatsCategory(guiHelper));
-//        registration.addRecipeCategories(new ArmorStatsCategory(guiHelper));
+        registration.addRecipeCategories(new ArmorStatsCategory(guiHelper));
         registration.addRecipeCategories(new ToolPartsCategory(guiHelper));
     }
 
