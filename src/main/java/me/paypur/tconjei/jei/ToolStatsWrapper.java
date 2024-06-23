@@ -24,10 +24,10 @@ import slimeknights.tconstruct.library.tools.definition.module.material.ToolPart
 import slimeknights.tconstruct.library.tools.item.IModifiable;
 import slimeknights.tconstruct.tools.TinkerToolParts;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 public record ToolStatsWrapper(IMaterial material) {
     private static final IMaterialRegistry REGISTRY = MaterialRegistry.getInstance();
@@ -68,12 +68,15 @@ public record ToolStatsWrapper(IMaterial material) {
 
     // taken from AbstractMaterialContent
     public List<ItemStack> getInputsParts(TagKey<Item> tag) {
+        Set<Item> seen = new HashSet<>();
         return RegistryHelper.getTagValueStream(Registry.ITEM, tag)
                 .filter(item -> item instanceof IModifiable)
                 .flatMap(item -> ToolPartsHook.parts(((IModifiable) item).getToolDefinition()).stream()
                         .filter(part -> part.canUseMaterial(material.getIdentifier()))
                         .map(part -> part.withMaterial(material.getIdentifier()))
                 )
+                .filter(part -> seen.add(part.getItem()))
+                .sorted(Comparator.comparing(a -> a.getItem().getDescriptionId()))
                 .toList();
     }
 

@@ -11,7 +11,6 @@ import net.minecraft.resources.ResourceLocation;
 import slimeknights.tconstruct.common.TinkerTags;
 import slimeknights.tconstruct.library.client.materials.MaterialTooltipCache;
 import slimeknights.tconstruct.library.materials.stats.IMaterialStats;
-import slimeknights.tconstruct.library.modifiers.ModifierEntry;
 import slimeknights.tconstruct.library.utils.Util;
 import slimeknights.tconstruct.tools.stats.*;
 
@@ -27,11 +26,13 @@ import static net.minecraftforge.common.ForgeI18n.getPattern;
 public class HarvestStatsCategory extends AbstractToolStatsCategory {
 
     public HarvestStatsCategory(IGuiHelper guiHelper) {
-        super(guiHelper, TinkerTags.Items.HARVEST);
-        this.icon = guiHelper.createDrawable(new ResourceLocation(MOD_ID, "textures/gui/jei.png"), 0, 0, 16, 16);
-        this.title =  MutableComponent.create(new LiteralContents("Harvest Stats"));
-        this.recipeType = RecipeType.create(MOD_ID, "harvest_stats", ToolStatsWrapper.class);
-        this.uid = new ResourceLocation(MOD_ID, "harvest_stats");
+        icon = guiHelper.createDrawable(new ResourceLocation(MOD_ID, "textures/gui/jei.png"), 0, 0, 16, 16);
+        title =  MutableComponent.create(new LiteralContents("Harvest Stats"));
+        recipeType = RecipeType.create(MOD_ID, "harvest_stats", ToolStatsWrapper.class);
+        tag = TinkerTags.Items.HARVEST;
+        WIDTH = 172;
+        HEIGHT = 200;
+        createBackground(guiHelper);
     }
 
     @Override
@@ -41,23 +42,26 @@ public class HarvestStatsCategory extends AbstractToolStatsCategory {
         float lineNumber = 2f;
 
         Optional<HeadMaterialStats> headOptional = recipe.getStats(HeadMaterialStats.ID);
-        Optional<IMaterialStats> extraOptional = recipe.getStats(StatlessMaterialStats.BINDING.getIdentifier());
+        Optional<StatlessMaterialStats> bindingOptional = recipe.getStats(StatlessMaterialStats.BINDING.getIdentifier());
         Optional<HandleMaterialStats> handleOptional = recipe.getStats(HandleMaterialStats.ID);
 
         // MATERIAL
         drawShadow(stack, MATERIAL_NAME, (WIDTH - FONT.width(MATERIAL_NAME)) / 2f, LINE_SPACING, MATERIAL_COLOR);
 
         // TRAITS
-        Optional<List<ModifierEntry>> traits = Stream.of(headOptional, extraOptional, handleOptional)
+        Optional<? extends IMaterialStats> statOptional = Stream.of(headOptional, bindingOptional, handleOptional)
                 .filter(Optional::isPresent)
-                .findFirst()
-                .map(stat -> recipe.getTraits(stat.get().getIdentifier()));
-        traits.ifPresent(modifierEntries -> drawTraits(stack, modifierEntries, lineNumber));
+                .map(Optional::get)
+                .findFirst();
+
+        if (statOptional.isPresent()) {
+            drawTraits(stack, recipe.getTraits(statOptional.get().getIdentifier()), lineNumber);
+        }
 
         // HEAD
         if (headOptional.isPresent()) {
             HeadMaterialStats head = headOptional.get();
-            drawShadow(stack, String.format("[%s]", getPattern("stat.tconstruct.head")), 0, lineNumber++, MATERIAL_COLOR);
+            drawShadow(stack, String.format("[%s]", head.getLocalizedName().getString()), 0, lineNumber++, MATERIAL_COLOR);
             drawStatsShadow(stack, head.getLocalizedInfo().get(0), lineNumber++, DURABILITY_COLOR);
             drawStatsShadow(stack, head.getLocalizedInfo().get(1), lineNumber++, head.getLocalizedInfo().get(1).getSiblings().get(0).getStyle().getColor().getValue());
             drawStatsShadow(stack, head.getLocalizedInfo().get(2), lineNumber++, MINING_COLOR);
@@ -65,16 +69,17 @@ public class HarvestStatsCategory extends AbstractToolStatsCategory {
             lineNumber += LINE_SPACING;
         }
 
-        // EXTRA
-        if (extraOptional.isPresent()) {
-            drawShadow(stack, String.format("[%s]", getPattern("stat.tconstruct.binding")), 0, lineNumber++, MATERIAL_COLOR);
+        // BINDING
+        if (bindingOptional.isPresent()) {
+            StatlessMaterialStats binding = bindingOptional.get();
+            drawShadow(stack, String.format("[%s]", binding.getLocalizedName().getString()), 0, lineNumber++, MATERIAL_COLOR);
             lineNumber += LINE_SPACING;
         }
 
         // HANDLE
         if (handleOptional.isPresent()) {
             HandleMaterialStats handle = handleOptional.get();
-            drawShadow(stack, String.format("[%s]", getPattern("stat.tconstruct.handle")), 0, lineNumber++, MATERIAL_COLOR);
+            drawShadow(stack, String.format("[%s]", handle.getLocalizedName().getString()), 0, lineNumber++, MATERIAL_COLOR);
             drawStatsShadow(stack, handle.getLocalizedInfo().get(0), lineNumber++, getMultiplierColor(handle.durability()));
             drawStatsShadow(stack, handle.getLocalizedInfo().get(1), lineNumber++, getMultiplierColor(handle.attackDamage()));
             drawStatsShadow(stack, handle.getLocalizedInfo().get(2), lineNumber++, getMultiplierColor(handle.durability()));
@@ -98,24 +103,27 @@ public class HarvestStatsCategory extends AbstractToolStatsCategory {
         }
 
         // TRAIT
-        List<ModifierEntry> traits = Stream.of(handleOptional, extraOptional, handleOptional)
+        Optional<? extends IMaterialStats> statOptional = Stream.of(handleOptional, extraOptional, handleOptional)
                 .filter(Optional::isPresent)
-                .findFirst()
-                .map(stat -> recipe.getTraits(stat.get().getIdentifier()))
-                .get();
-        List<Component> traitComponents = getTraitTooltips(traits, mouseX, mouseY, lineNumber);
-        if (!traitComponents.isEmpty()) {
-            return traitComponents;
+                .map(Optional::get)
+                .findFirst();
+
+        if (statOptional.isPresent()) {
+            List<Component> tooltips = getTraitTooltips(recipe.getTraits(statOptional.get().getIdentifier()), mouseX, mouseY, lineNumber);
+            if (!tooltips.isEmpty()) {
+                return tooltips;
+            }
         }
 
         // HEAD
         if (headOptional.isPresent()) {
             lineNumber++;
+            HeadMaterialStats head = headOptional.get();
             Optional<List<Component>> component = Stream.of(
-                    getStatTooltip("tool_stat.tconstruct.durability", mouseX, mouseY, lineNumber++),
-                    getStatTooltip("tool_stat.tconstruct.harvest_tier", mouseX, mouseY, lineNumber++),
-                    getStatTooltip("tool_stat.tconstruct.mining_speed", mouseX, mouseY, lineNumber++),
-                    getStatTooltip("tool_stat.tconstruct.attack_damage", mouseX, mouseY, lineNumber++))
+                    getStatTooltip(head, 0, mouseX, mouseY, lineNumber++),
+                    getStatTooltip(head, 1, mouseX, mouseY, lineNumber++),
+                    getStatTooltip(head, 2, mouseX, mouseY, lineNumber++),
+                    getStatTooltip(head, 3, mouseX, mouseY, lineNumber++))
                     .filter(list -> !list.isEmpty())
                     .findFirst();
             if (component.isPresent()) {
@@ -132,11 +140,12 @@ public class HarvestStatsCategory extends AbstractToolStatsCategory {
         // HANDLE
         if (handleOptional.isPresent()) {
             lineNumber++;
+            HandleMaterialStats handle = handleOptional.get();
             Optional<List<Component>> component = Stream.of(
-                    getStatTooltip("tool_stat.tconstruct.durability", mouseX, mouseY, lineNumber++),
-                    getStatTooltip("tool_stat.tconstruct.attack_damage", mouseX, mouseY, lineNumber++),
-                    getStatTooltip("tool_stat.tconstruct.attack_speed", mouseX, mouseY, lineNumber++),
-                    getStatTooltip("tool_stat.tconstruct.mining_speed", mouseX, mouseY, lineNumber))
+                    getStatTooltip(handle, 0,  mouseX, mouseY, lineNumber++),
+                    getStatTooltip(handle, 1,  mouseX, mouseY, lineNumber++),
+                    getStatTooltip(handle, 2,  mouseX, mouseY, lineNumber++),
+                    getStatTooltip(handle, 3,  mouseX, mouseY, lineNumber))
                     .filter(list -> !list.isEmpty())
                     .findFirst();
             if (component.isPresent()) {

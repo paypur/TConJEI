@@ -11,7 +11,6 @@ import net.minecraft.resources.ResourceLocation;
 import slimeknights.tconstruct.common.TinkerTags;
 import slimeknights.tconstruct.library.client.materials.MaterialTooltipCache;
 import slimeknights.tconstruct.library.materials.stats.IMaterialStats;
-import slimeknights.tconstruct.library.modifiers.ModifierEntry;
 import slimeknights.tconstruct.library.utils.Util;
 import slimeknights.tconstruct.tools.stats.*;
 
@@ -27,11 +26,13 @@ import static net.minecraftforge.common.ForgeI18n.getPattern;
 public class RangedStatsCategory extends AbstractToolStatsCategory {
 
     public RangedStatsCategory(IGuiHelper guiHelper) {
-        super(guiHelper, TinkerTags.Items.RANGED);
-        this.icon = guiHelper.createDrawable(new ResourceLocation(MOD_ID, "textures/gui/jei.png"), 16, 0, 16, 16);
-        this.title = MutableComponent.create(new LiteralContents("Ranged Stats"));
-        this.recipeType = RecipeType.create(MOD_ID, "ranged_stats", ToolStatsWrapper.class);
-        this.uid = new ResourceLocation(MOD_ID, "ranged_stats");
+        icon = guiHelper.createDrawable(new ResourceLocation(MOD_ID, "textures/gui/jei.png"), 16, 0, 16, 16);
+        title = MutableComponent.create(new LiteralContents("Ranged Stats"));
+        recipeType = RecipeType.create(MOD_ID, "ranged_stats", ToolStatsWrapper.class);
+        tag = TinkerTags.Items.RANGED;
+        WIDTH = 172;
+        HEIGHT = 200;
+        createBackground(guiHelper);
     }
 
     @Override
@@ -42,22 +43,25 @@ public class RangedStatsCategory extends AbstractToolStatsCategory {
 
         Optional<LimbMaterialStats> limbOptional = recipe.getStats(LimbMaterialStats.ID);
         Optional<GripMaterialStats> gripOptional = recipe.getStats(GripMaterialStats.ID);
-        Optional<IMaterialStats> stringOptional = recipe.getStats(StatlessMaterialStats.BOWSTRING.getIdentifier());
+        Optional<StatlessMaterialStats> stringOptional = recipe.getStats(StatlessMaterialStats.BOWSTRING.getIdentifier());
 
         // MATERIAL
         drawShadow(stack, MATERIAL_NAME, (WIDTH - FONT.width(MATERIAL_NAME)) / 2f, LINE_SPACING, MATERIAL_COLOR);
 
         // TRAITS
-        Optional<List<ModifierEntry>> traits = Stream.of(limbOptional, gripOptional, stringOptional)
+        Optional<? extends IMaterialStats> statOptional = Stream.of(limbOptional, gripOptional, stringOptional)
                 .filter(Optional::isPresent)
-                .findFirst()
-                .map(stat -> recipe.getTraits(stat.get().getIdentifier()));
-        traits.ifPresent(modifierEntries -> drawTraits(stack, modifierEntries, lineNumber));
+                .map(Optional::get)
+                .findFirst();
+
+        if (statOptional.isPresent()) {
+            drawTraits(stack, recipe.getTraits(statOptional.get().getIdentifier()), lineNumber);
+        }
 
         // LIMB
         if (limbOptional.isPresent()) {
             LimbMaterialStats limb = limbOptional.get();
-            drawShadow(stack, String.format("[%s]", getPattern("stat.tconstruct.limb")), 0, lineNumber++, MATERIAL_COLOR);
+            drawShadow(stack, String.format("[%s]", limb.getLocalizedName().getString()), 0, lineNumber++, MATERIAL_COLOR);
             drawStatsShadow(stack, limb.getLocalizedInfo().get(0), lineNumber++, DURABILITY_COLOR);
             drawStatsShadow(stack, limb.getLocalizedInfo().get(1), lineNumber++, getMultiplierColor(limb.drawSpeed()));
             drawStatsShadow(stack, limb.getLocalizedInfo().get(2), lineNumber++, getMultiplierColor(limb.velocity()));
@@ -68,7 +72,7 @@ public class RangedStatsCategory extends AbstractToolStatsCategory {
         // GRIP
         if (gripOptional.isPresent()) {
             GripMaterialStats grip = gripOptional.get();
-            drawShadow(stack, String.format("[%s]", getPattern("stat.tconstruct.grip")), 0, lineNumber++, MATERIAL_COLOR);
+            drawShadow(stack, String.format("[%s]", grip.getLocalizedName().getString()), 0, lineNumber++, MATERIAL_COLOR);
             drawStatsShadow(stack, grip.getLocalizedInfo().get(0), lineNumber++, getMultiplierColor(grip.durability()));
             drawStatsShadow(stack, grip.getLocalizedInfo().get(1), lineNumber++, getMultiplierColor(grip.accuracy()));
             drawStatsShadow(stack, grip.getLocalizedInfo().get(2), lineNumber++, ATTACK_COLOR);
@@ -77,7 +81,8 @@ public class RangedStatsCategory extends AbstractToolStatsCategory {
 
         // STRING
         if (stringOptional.isPresent()) {
-            drawShadow(stack, String.format("[%s]", getPattern("stat.tconstruct.bowstring")), 0, lineNumber, MATERIAL_COLOR);
+            StatlessMaterialStats string = stringOptional.get();
+            drawShadow(stack, String.format("[%s]", string.getLocalizedName().getString()), 0, lineNumber, MATERIAL_COLOR);
         }
     }
 
@@ -97,24 +102,27 @@ public class RangedStatsCategory extends AbstractToolStatsCategory {
         }
 
         // TRAIT
-        List<ModifierEntry> traits = Stream.of(limbOptional, gripOptional, stringOptional)
+        Optional<? extends IMaterialStats> statOptional = Stream.of(limbOptional, gripOptional, stringOptional)
                 .filter(Optional::isPresent)
-                .findFirst()
-                .map(stat -> recipe.getTraits(stat.get().getIdentifier()))
-                .get();
-        List<Component> traitComponents = getTraitTooltips(traits, mouseX, mouseY, lineNumber);
-        if (!traitComponents.isEmpty()) {
-            return traitComponents;
+                .map(Optional::get)
+                .findFirst();
+
+        if (statOptional.isPresent()) {
+            List<Component> tooltips = getTraitTooltips(recipe.getTraits(statOptional.get().getIdentifier()), mouseX, mouseY, lineNumber);
+            if (!tooltips.isEmpty()) {
+                return tooltips;
+            }
         }
 
         // LIMB
         if (limbOptional.isPresent()) {
             lineNumber++;
+            LimbMaterialStats limb = limbOptional.get();
             Optional<List<Component>> component = Stream.of(
-                            getStatTooltip("tool_stat.tconstruct.durability", mouseX, mouseY, lineNumber++),
-                            getStatTooltip( "tool_stat.tconstruct.draw_speed", mouseX, mouseY, lineNumber++),
-                            getStatTooltip( "tool_stat.tconstruct.velocity", mouseX, mouseY, lineNumber++),
-                            getStatTooltip("tool_stat.tconstruct.accuracy", mouseX, mouseY, lineNumber++))
+                            getStatTooltip(limb, 0, mouseX, mouseY, lineNumber++),
+                            getStatTooltip(limb, 1, mouseX, mouseY, lineNumber++),
+                            getStatTooltip(limb, 2, mouseX, mouseY, lineNumber++),
+                            getStatTooltip(limb, 3, mouseX, mouseY, lineNumber++))
                     .filter(list -> !list.isEmpty())
                     .findFirst();
             if (component.isPresent()) {
@@ -126,10 +134,11 @@ public class RangedStatsCategory extends AbstractToolStatsCategory {
         // GRIP
         if (gripOptional.isPresent()) {
             lineNumber++;
+            GripMaterialStats grip = gripOptional.get();
             Optional<List<Component>> component = Stream.of(
-                            getStatTooltip("tool_stat.tconstruct.durability", mouseX, mouseY, lineNumber++),
-                            getStatTooltip("tool_stat.tconstruct.accuracy", mouseX, mouseY, lineNumber++),
-                            getStatTooltip( "tool_stat.tconstruct.attack_damage", mouseX, mouseY, lineNumber))
+                            getStatTooltip(grip, 0, mouseX, mouseY, lineNumber++),
+                            getStatTooltip(grip, 1, mouseX, mouseY, lineNumber++),
+                            getStatTooltip(grip, 2, mouseX, mouseY, lineNumber))
                     .filter(list -> !list.isEmpty())
                     .findFirst();
             if (component.isPresent()) {
