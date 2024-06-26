@@ -26,13 +26,11 @@ import static net.minecraftforge.common.ForgeI18n.getPattern;
 public class RangedStatsCategory extends AbstractToolStatsCategory {
 
     public RangedStatsCategory(IGuiHelper guiHelper) {
+        super(guiHelper);
         icon = guiHelper.createDrawable(new ResourceLocation(MOD_ID, "textures/gui/jei.png"), 16, 0, 16, 16);
         title = MutableComponent.create(new LiteralContents("Ranged Stats"));
         recipeType = RecipeType.create(MOD_ID, "ranged_stats", ToolStatsWrapper.class);
         tag = TinkerTags.Items.RANGED;
-        WIDTH = 172;
-        HEIGHT = 200;
-        createBackground(guiHelper);
     }
 
     @Override
@@ -46,7 +44,7 @@ public class RangedStatsCategory extends AbstractToolStatsCategory {
         Optional<StatlessMaterialStats> stringOptional = recipe.getStats(StatlessMaterialStats.BOWSTRING.getIdentifier());
 
         // MATERIAL
-        drawShadow(stack, MATERIAL_NAME, (WIDTH - FONT.width(MATERIAL_NAME)) / 2f, LINE_SPACING, MATERIAL_COLOR);
+        drawShadow(stack, MATERIAL_NAME, (WIDTH - FONT.width(MATERIAL_NAME)) / 2, LINE_SPACING, MATERIAL_COLOR);
 
         // TRAITS
         Optional<? extends IMaterialStats> statOptional = Stream.of(limbOptional, gripOptional, stringOptional)

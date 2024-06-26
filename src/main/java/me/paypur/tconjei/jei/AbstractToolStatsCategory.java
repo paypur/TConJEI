@@ -45,14 +45,15 @@ public abstract class AbstractToolStatsCategory implements IRecipeCategory<ToolS
     static protected final Font FONT = Minecraft.getInstance().font;
     static protected final int LINE_HEIGHT = 10;
     static protected final float LINE_SPACING = 0.5f;
+    static protected final int WIDTH = 172;
+    static protected final int HEIGHT = 200;
     protected Component title;
     protected RecipeType<ToolStatsWrapper> recipeType;
     protected IDrawable background, icon;
     protected TagKey<Item> tag;
-    protected int WIDTH, HEIGHT;
 
-    protected void createBackground(IGuiHelper guiHelper) {
-        background = guiHelper.createBlankDrawable(WIDTH, HEIGHT);
+    public AbstractToolStatsCategory(IGuiHelper guiHelper) {
+        this.background = guiHelper.createBlankDrawable(WIDTH, HEIGHT);
     }
 
     @Override
@@ -81,33 +82,30 @@ public abstract class AbstractToolStatsCategory implements IRecipeCategory<ToolS
         return List.of();
     }
 
-    protected void drawStatsShadow(PoseStack poseStack, Component component, float lineNumber, int ACCENT_COLOR) {
+
+    protected void draw(PoseStack stack, String string, int x, float lineNumber, int color) {
+        FONT.draw(stack, string, x, lineNumber * LINE_HEIGHT, color);
+    }
+
+    protected void drawShadow(PoseStack stack, String string, int x, float lineNumber, int color) {
+        draw(stack, string, x + 1, lineNumber + 0.1f, getShade(color, 6));
+        draw(stack, string, x, lineNumber, color);
+    }
+
+    protected void drawStatsShadow(PoseStack stack, Component component, float lineNumber, int color) {
         String[] strings = component.getString().split(":");
         strings[0] += ":";
-        float width = FONT.width(strings[0]);
-        FONT.draw(poseStack, strings[0], 0, lineNumber * LINE_HEIGHT, TEXT_COLOR);
-        drawShadow(poseStack, strings[1], width, lineNumber, ACCENT_COLOR);
+        int width = FONT.width(strings[0]);
+        draw(stack, strings[0], 0, lineNumber, TEXT_COLOR);
+        drawShadow(stack, strings[1], width, lineNumber, color);
     }
 
-    protected void drawStatsShadow(PoseStack poseStack, String string, float lineNumber, int ACCENT_COLOR) {
-        String[] strings = string.split(":");
-        strings[0] += ":";
-        float width = FONT.width(strings[0]);
-        FONT.draw(poseStack, strings[0], 0, lineNumber * LINE_HEIGHT, TEXT_COLOR);
-        drawShadow(poseStack, strings[1], width, lineNumber, ACCENT_COLOR);
-    }
-
-    protected void drawTraits(PoseStack poseStack, List<ModifierEntry> traits, float lineNumber) {
+    protected void drawTraits(PoseStack stack, List<ModifierEntry> traits, float lineNumber) {
         for (ModifierEntry trait : traits) {
             String pattern = getPattern(makeTranslationKey("modifier", trait.getId()));
             int traitColor = ResourceColorManager.getColor(makeTranslationKey("modifier", trait.getId()));
-            drawShadow(poseStack, pattern, WIDTH - FONT.getSplitter().stringWidth(pattern), lineNumber++, traitColor);
+            drawShadow(stack, pattern, WIDTH - FONT.width(pattern), lineNumber++, traitColor);
         }
-    }
-
-    protected void drawShadow(PoseStack poseStack, String string, float x, float lineNumber, int color) {
-        FONT.draw(poseStack, string, x + 1f, lineNumber * LINE_HEIGHT + 1f, getShade(color, 6));
-        FONT.draw(poseStack, string, x, lineNumber * LINE_HEIGHT, color);
     }
 
     protected List<Component> getStatTooltip(IMaterialStats stats, int i, double mouseX, double mouseY, float lineNumber) {
