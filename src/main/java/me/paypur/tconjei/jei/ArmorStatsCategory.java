@@ -52,13 +52,13 @@ public class ArmorStatsCategory extends AbstractToolStatsCategory {
         drawShadow(stack, MATERIAL_NAME, (WIDTH - FONT.width(MATERIAL_NAME)) / 2, LINE_SPACING, MATERIAL_COLOR);
 
         // TRAITS
-        Optional<List<ModifierEntry>> traits = Stream.of(helmetOptional, chestplateOptional, leggingsOptional, bootsOptional, shieldOptional, coreOptional, mailleOptional)
+        Optional<? extends IMaterialStats> statOptional = Stream.of(helmetOptional, chestplateOptional, leggingsOptional, bootsOptional, shieldOptional, coreOptional, mailleOptional)
                 .filter(Optional::isPresent)
-                .findFirst()
-                .map(stat -> recipe.getTraits(stat.get().getIdentifier()));
+                .map(Optional::get)
+                .findFirst();
 
-        if (traits.isPresent()) {
-            drawTraits(stack, traits.get(), lineNumber);
+        if (statOptional.isPresent()) {
+            drawTraits(stack, recipe.getTraits(statOptional.get().getIdentifier()), lineNumber);
         }
 
         List<ArmorStat> armorStats = new ArrayList<>();
@@ -200,9 +200,6 @@ public class ArmorStatsCategory extends AbstractToolStatsCategory {
                 return component.get();
             }
         }
-
-        // TODO: add tooltips to the stats themselves to help distinguish them
-        List<Optional<PlatingMaterialStats>> plating = List.of(helmetOptional, chestplateOptional, leggingsOptional, bootsOptional, shieldOptional);
 
         return List.of();
     }

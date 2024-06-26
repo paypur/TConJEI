@@ -13,22 +13,17 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.network.chat.contents.LiteralContents;
 import net.minecraft.network.chat.contents.TranslatableContents;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.fluids.FluidStack;
 import org.jetbrains.annotations.NotNull;
 import slimeknights.mantle.client.ResourceColorManager;
-import slimeknights.tconstruct.library.client.materials.MaterialTooltipCache;
 import slimeknights.tconstruct.library.materials.stats.IMaterialStats;
-import slimeknights.tconstruct.library.materials.stats.MaterialStatsId;
 import slimeknights.tconstruct.library.modifiers.ModifierEntry;
 import slimeknights.tconstruct.library.utils.Util;
 
-import java.util.Collections;
 import java.util.List;
 
 import static me.paypur.tconjei.ColorManager.TEXT_COLOR;
@@ -37,7 +32,6 @@ import static me.paypur.tconjei.TConJEI.inBox;
 import static mezz.jei.api.recipe.RecipeIngredientRole.INPUT;
 import static mezz.jei.api.recipe.RecipeIngredientRole.RENDER_ONLY;
 import static net.minecraftforge.common.ForgeI18n.getPattern;
-import static slimeknights.mantle.client.ResourceColorManager.getColor;
 import static slimeknights.tconstruct.library.utils.Util.makeTranslationKey;
 
 public abstract class AbstractToolStatsCategory implements IRecipeCategory<ToolStatsWrapper> {
