@@ -18,6 +18,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.fluids.FluidStack;
 import org.jetbrains.annotations.NotNull;
+import slimeknights.tconstruct.library.materials.stats.IMaterialStats;
 import slimeknights.tconstruct.library.modifiers.ModifierEntry;
 
 import java.util.Collections;
@@ -34,18 +35,19 @@ import static slimeknights.tconstruct.library.utils.Util.makeTranslationKey;
 
 public abstract class AbstractToolStatsCategory implements IRecipeCategory<ToolStatsWrapper> {
 
+    static protected final Font FONT = Minecraft.getInstance().font;
+    static protected final int LINE_HEIGHT = 10;
+    static protected final float LINE_SPACING = 0.5f;
+    static protected final int WIDTH = 172;
+    static protected final int HEIGHT = 200;
     protected Component title;
     protected RecipeType<ToolStatsWrapper> recipeType;
     protected ResourceLocation uid;
     protected IDrawable background, icon;
-    static protected final Font FONT = Minecraft.getInstance().font;
-    protected final int WIDTH = 172, HEIGHT = 140, LINE_HEIGHT = 10;
-    protected float LINE_SPACING = 0.5f;
     protected TagKey<Item> tag;
 
-    public AbstractToolStatsCategory(IGuiHelper guiHelper, TagKey<Item> tag) {
+    public AbstractToolStatsCategory(IGuiHelper guiHelper) {
         this.background = guiHelper.createBlankDrawable(WIDTH, HEIGHT);
-        this.tag = tag;
     }
 
     @Override
@@ -64,11 +66,21 @@ public abstract class AbstractToolStatsCategory implements IRecipeCategory<ToolS
         builder.addInvisibleIngredients(INPUT).addItemStacks(inputsParts);
     }
 
-    protected void drawStatsShadow(PoseStack poseStack, String type, String stat, float lineNumber, int ACCENT_COLOR) {
-        String pattern = getPattern(type);
-        float width = FONT.width(pattern);
-        FONT.draw(poseStack, pattern, 0, lineNumber * LINE_HEIGHT, TEXT_COLOR);
-        drawShadow(poseStack, stat, width, lineNumber, ACCENT_COLOR);
+    protected void draw(PoseStack stack, String string, int x, float lineNumber, int color) {
+        FONT.draw(stack, string, x, lineNumber * LINE_HEIGHT, color);
+    }
+
+    protected void drawShadow(PoseStack stack, String string, int x, float lineNumber, int color) {
+        draw(stack, string, x + 1, lineNumber + 0.1f, getShade(color, 6));
+        draw(stack, string, x, lineNumber, color);
+    }
+
+    protected void drawStatsShadow(PoseStack stack, Component component, float lineNumber, int color) {
+        String[] strings = component.getString().split(":");
+        strings[0] += ":";
+        int width = FONT.width(strings[0]);
+        draw(stack, strings[0], 0, lineNumber, TEXT_COLOR);
+        drawShadow(stack, strings[1], width, lineNumber, color);
     }
 
     protected void drawTraits(PoseStack poseStack, List<ModifierEntry> traits, float lineNumber) {
@@ -79,24 +91,17 @@ public abstract class AbstractToolStatsCategory implements IRecipeCategory<ToolS
         }
     }
 
-    protected void drawShadow(PoseStack poseStack, String string, float x, float lineNumber, int color) {
-        FONT.draw(poseStack, string, x + 1f, lineNumber * LINE_HEIGHT + 1f, getShade(color, 6));
-        FONT.draw(poseStack, string, x, lineNumber * LINE_HEIGHT, color);
-    }
-
-    protected List<Component> getStatTooltip(String pattern, double mouseX, double mouseY, float lineNumber) {
-        String string = getPattern(pattern);
-        int textWidth = FONT.width(string);
+    protected List<Component> getStatTooltip(IMaterialStats stats, int i, double mouseX, double mouseY, float lineNumber) {
+        int textWidth = FONT.width(stats.getLocalizedInfo().get(i).getString().split(":")[0]);
         if (inBox(mouseX, mouseY, 0, lineNumber * LINE_HEIGHT - 1, textWidth, LINE_HEIGHT)) {
-            return List.of(new TranslatableComponent(pattern + ".description"));
+            return List.of(stats.getLocalizedDescriptions().get(i));
         }
-        return Collections.emptyList();
+        return List.of();
     }
 
     protected List<Component> getTraitTooltips(List<ModifierEntry> traits, double mouseX, double mouseY, float lineNumber) {
         for (ModifierEntry trait : traits) {
-            String string = getPattern(makeTranslationKey("modifier", trait.getId()));
-            int textWidth = FONT.width(string);
+            int textWidth = FONT.width(getPattern(makeTranslationKey("modifier", trait.getId())));
             if (inBox(mouseX, mouseY, WIDTH - textWidth, lineNumber++ * LINE_HEIGHT - 1, textWidth, LINE_HEIGHT)) {
                 return List.of(new TranslatableComponent(makeTranslationKey("modifier", trait.getId()) + ".flavor").withStyle(ChatFormatting.ITALIC),
                         new TranslatableComponent(makeTranslationKey("modifier", trait.getId()) + ".description"));

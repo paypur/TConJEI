@@ -42,7 +42,6 @@ public class TConJEIPlugin implements IModPlugin {
                 .stream()
                 .filter(iMaterial -> !iMaterial.isHidden())
                 .map(ToolStatsWrapper::new)
-//                .filter(ToolStatsWrapper::hasAnyTraits)
                 .toList();
 
         registration.addRecipes(HARVEST_STATS, statsWrappers.stream().filter(w -> w.hasStats(List.of(HeadMaterialStats.ID, ExtraMaterialStats.ID, HandleMaterialStats.ID))).toList());
@@ -60,15 +59,9 @@ public class TConJEIPlugin implements IModPlugin {
 
     @Override
     public void registerRecipeCatalysts(IRecipeCatalystRegistration registration) {
-        registration.addRecipeCatalyst(new ItemStack(tinkerStation.asItem()), HARVEST_STATS);
-        registration.addRecipeCatalyst(new ItemStack(tinkersAnvil.asItem()), HARVEST_STATS);
-        registration.addRecipeCatalyst(new ItemStack(scorchedAnvil.asItem()), HARVEST_STATS);
-        registration.addRecipeCatalyst(new ItemStack(tinkerStation.asItem()), RANGED_STATS);
-        registration.addRecipeCatalyst(new ItemStack(tinkersAnvil.asItem()), RANGED_STATS);
-        registration.addRecipeCatalyst(new ItemStack(scorchedAnvil.asItem()), RANGED_STATS);
-        registration.addRecipeCatalyst(new ItemStack(tinkerStation.asItem()), TOOL_PARTS);
-        registration.addRecipeCatalyst(new ItemStack(tinkersAnvil.asItem()), TOOL_PARTS);
-        registration.addRecipeCatalyst(new ItemStack(scorchedAnvil.asItem()), TOOL_PARTS);
+        registration.addRecipeCatalyst(new ItemStack(tinkerStation.asItem()), HARVEST_STATS, RANGED_STATS, TOOL_PARTS);
+        registration.addRecipeCatalyst(new ItemStack(tinkersAnvil.asItem()), HARVEST_STATS, RANGED_STATS, TOOL_PARTS);
+        registration.addRecipeCatalyst(new ItemStack(scorchedAnvil.asItem()), HARVEST_STATS, RANGED_STATS, TOOL_PARTS);
     }
 
     private List<ToolPartsWrapper> toolDefinitions() {

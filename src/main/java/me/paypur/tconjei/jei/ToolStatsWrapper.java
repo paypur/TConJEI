@@ -20,13 +20,10 @@ import slimeknights.tconstruct.library.modifiers.ModifierEntry;
 import slimeknights.tconstruct.library.recipe.TinkerRecipeTypes;
 import slimeknights.tconstruct.library.recipe.casting.material.MaterialCastingLookup;
 import slimeknights.tconstruct.library.recipe.material.MaterialRecipe;
-import slimeknights.tconstruct.library.tools.item.IModifiableDisplay;
+import slimeknights.tconstruct.library.tools.item.IModifiable;
 import slimeknights.tconstruct.tools.TinkerToolParts;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 public record ToolStatsWrapper(IMaterial material) {
     private static final IMaterialRegistry REGISTRY = MaterialRegistry.getInstance();
@@ -67,12 +64,14 @@ public record ToolStatsWrapper(IMaterial material) {
 
     // taken from AbstractMaterialContent
     public List<ItemStack> getInputsParts(TagKey<Item> tag) {
+        Set<Item> seen = new HashSet<>();
         return RegistryHelper.getTagValueStream(Registry.ITEM, tag)
-            .filter(item -> item instanceof IModifiableDisplay)
-            .flatMap(item -> ((IModifiableDisplay) item).getToolDefinition().getData().getParts().stream()
+            .filter(item -> item instanceof IModifiable)
+            .flatMap(item -> ((IModifiable) item).getToolDefinition().getData().getParts().stream()
                     .filter(part -> part.canUseMaterial(material.getIdentifier()))
-                    .map(part -> part.getPart().withMaterial(material.getIdentifier()))
-            )
+                    .map(part -> part.getPart().withMaterial(material.getIdentifier())))
+            .filter(part -> seen.add(part.getItem()))
+            .sorted(Comparator.comparing(a -> a.getItem().getDescriptionId()))
             .toList();
     }
 
@@ -81,8 +80,7 @@ public record ToolStatsWrapper(IMaterial material) {
     }
 
     public boolean hasStats(List<MaterialStatsId> statsIds) {
-        return statsIds.stream()
-                .anyMatch(stat -> getStats(stat).isPresent());
+        return statsIds.stream().anyMatch(stat -> getStats(stat).isPresent());
     }
 
     public List<ModifierEntry> getTraits(MaterialStatsId statsId) {
