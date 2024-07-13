@@ -1,6 +1,7 @@
 package me.paypur.tconjei.jei;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import me.paypur.tconjei.TConJEIUtils;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.recipe.RecipeType;
@@ -97,16 +98,8 @@ public class ArmorStatsCategory extends AbstractToolStatsCategory {
             PlatingMaterialStats plating = platingStats.get();
             drawShadow(stack, String.format("[%s]", getPattern("stat.tconstruct.plating")), 0, lineNumber++, MATERIAL_COLOR);
 
-            String durabilityText, armorText;
-            if (plating.getLocalizedInfo().get(0).getString().contains(":")) {
-                durabilityText = plating.getLocalizedInfo().get(0).getString().split(":")[0] + ": ";
-                armorText = plating.getLocalizedInfo().get(1).getString().split(":")[0] + ": ";
-            } else if (plating.getLocalizedInfo().get(0).getString().contains("：")) {
-                durabilityText = plating.getLocalizedInfo().get(0).getString().split("：")[0] + "： ";
-                armorText = plating.getLocalizedInfo().get(1).getString().split("：")[0] + "： ";
-            } else {
-                throw new RuntimeException("Unsupported language");
-            }
+            String durabilityText = TConJEIUtils.colonSplit(plating.getLocalizedInfo().get(0).getString())[0],
+                    armorText = TConJEIUtils.colonSplit(plating.getLocalizedInfo().get(1).getString())[0];
 
             int durabilityTextWidth = FONT.width(durabilityText);
             int armorTextWidth = FONT.width(armorText);
