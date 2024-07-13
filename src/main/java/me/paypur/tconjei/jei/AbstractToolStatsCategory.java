@@ -88,8 +88,7 @@ public abstract class AbstractToolStatsCategory implements IRecipeCategory<ToolS
     }
 
     protected void drawStatsShadow(PoseStack stack, Component component, float lineNumber, int color) {
-        String stringraw = component.getString();
-        String[] strings = TConJEIUtils.colonSplit(stringraw);
+        String[] strings = TConJEIUtils.colonSplit(component.getString(), true);
         int width = FONT.width(strings[0]);
         draw(stack, strings[0], 0, lineNumber, TEXT_COLOR);
         drawShadow(stack, strings[1], width, lineNumber, color);
@@ -104,7 +103,7 @@ public abstract class AbstractToolStatsCategory implements IRecipeCategory<ToolS
     }
 
     protected List<Component> getStatTooltip(IMaterialStats stats, int i, double mouseX, double mouseY, float lineNumber) {
-        int textWidth = FONT.width(stats.getLocalizedInfo().get(i).getString().split(":")[0]);
+        int textWidth = FONT.width(TConJEIUtils.colonSplit(stats.getLocalizedInfo().get(i).getString(), false)[0]);
         if (inBox(mouseX, mouseY, 0, lineNumber * LINE_HEIGHT - 1, textWidth, LINE_HEIGHT)) {
             return List.of(stats.getLocalizedDescriptions().get(i));
         }

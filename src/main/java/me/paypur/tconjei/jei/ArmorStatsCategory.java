@@ -98,8 +98,8 @@ public class ArmorStatsCategory extends AbstractToolStatsCategory {
             PlatingMaterialStats plating = platingStats.get();
             drawShadow(stack, String.format("[%s]", getPattern("stat.tconstruct.plating")), 0, lineNumber++, MATERIAL_COLOR);
 
-            String durabilityText = TConJEIUtils.colonSplit(plating.getLocalizedInfo().get(0).getString())[0],
-                    armorText = TConJEIUtils.colonSplit(plating.getLocalizedInfo().get(1).getString())[0];
+            String durabilityText = TConJEIUtils.colonSplit(plating.getLocalizedInfo().get(0).getString(), true)[0];
+            String armorText = TConJEIUtils.colonSplit(plating.getLocalizedInfo().get(1).getString(), true)[0];
 
             int durabilityTextWidth = FONT.width(durabilityText);
             int armorTextWidth = FONT.width(armorText);
