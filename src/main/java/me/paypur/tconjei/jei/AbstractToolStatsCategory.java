@@ -87,8 +87,17 @@ public abstract class AbstractToolStatsCategory implements IRecipeCategory<ToolS
     }
 
     protected void drawStatsShadow(PoseStack stack, Component component, float lineNumber, int color) {
-        String[] strings = component.getString().split(":");
-        strings[0] += ":";
+        String stringraw = component.getString();
+        String[] strings;
+        if (stringraw.contains(":")) {
+            strings = stringraw.split(":");
+            strings[0] += ":";
+        } else if (stringraw.contains("：")) {
+            strings = stringraw.split("：");
+            strings[0] += "：";
+        } else {
+            throw new RuntimeException("Unsupported language");
+        }
         int width = FONT.width(strings[0]);
         draw(stack, strings[0], 0, lineNumber, TEXT_COLOR);
         drawShadow(stack, strings[1], width, lineNumber, color);

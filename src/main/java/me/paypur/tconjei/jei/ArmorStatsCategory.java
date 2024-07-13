@@ -97,8 +97,16 @@ public class ArmorStatsCategory extends AbstractToolStatsCategory {
             PlatingMaterialStats plating = platingStats.get();
             drawShadow(stack, String.format("[%s]", getPattern("stat.tconstruct.plating")), 0, lineNumber++, MATERIAL_COLOR);
 
-            String durabilityText = plating.getLocalizedInfo().get(0).getString().split(":")[0] + ": ";
-            String armorText = plating.getLocalizedInfo().get(1).getString().split(":")[0] + ": ";
+            String durabilityText, armorText;
+            if (plating.getLocalizedInfo().get(0).getString().contains(":")) {
+                durabilityText = plating.getLocalizedInfo().get(0).getString().split(":")[0] + ": ";
+                armorText = plating.getLocalizedInfo().get(1).getString().split(":")[0] + ": ";
+            } else if (plating.getLocalizedInfo().get(0).getString().contains("：")) {
+                durabilityText = plating.getLocalizedInfo().get(0).getString().split("：")[0] + "： ";
+                armorText = plating.getLocalizedInfo().get(1).getString().split("：")[0] + "： ";
+            } else {
+                throw new RuntimeException("Unsupported language");
+            }
 
             int durabilityTextWidth = FONT.width(durabilityText);
             int armorTextWidth = FONT.width(armorText);
