@@ -1,16 +1,14 @@
 package me.paypur.tconjei;
 
-public class TConJEIUtils {
-    public static String[] colonSplit(String str, boolean needColon) {
+public class Utils {
+    public static String[] colonSplit(String str) {
         String[] strings;
         if (str.contains(":")) {
             strings = str.split(":");
-            if (needColon)
-                strings[0] += ":";
+            strings[0] += ":";
         } else if (str.contains("：")) {
             strings = str.split("：");
-            if (needColon)
-                strings[0] += "：";
+            strings[0] += "：";
         } else {
             strings = new String[] {str, ""};
         }
