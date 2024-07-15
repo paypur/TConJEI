@@ -1,6 +1,7 @@
 package me.paypur.tconjei.jei;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import me.paypur.tconjei.Utils;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.recipe.RecipeType;
@@ -11,7 +12,6 @@ import net.minecraft.resources.ResourceLocation;
 import slimeknights.tconstruct.common.TinkerTags;
 import slimeknights.tconstruct.library.client.materials.MaterialTooltipCache;
 import slimeknights.tconstruct.library.materials.stats.IMaterialStats;
-import slimeknights.tconstruct.library.modifiers.ModifierEntry;
 import slimeknights.tconstruct.library.utils.Util;
 import slimeknights.tconstruct.tools.stats.PlatingMaterialStats;
 import slimeknights.tconstruct.tools.stats.StatlessMaterialStats;
@@ -97,8 +97,8 @@ public class ArmorStatsCategory extends AbstractToolStatsCategory {
             PlatingMaterialStats plating = platingStats.get();
             drawShadow(stack, String.format("[%s]", getPattern("stat.tconstruct.plating")), 0, lineNumber++, MATERIAL_COLOR);
 
-            String durabilityText = plating.getLocalizedInfo().get(0).getString().split(":")[0] + ": ";
-            String armorText = plating.getLocalizedInfo().get(1).getString().split(":")[0] + ": ";
+            String durabilityText = Utils.colonSplit(plating.getLocalizedInfo().get(0).getString())[0];
+            String armorText = Utils.colonSplit(plating.getLocalizedInfo().get(1).getString())[0];
 
             int durabilityTextWidth = FONT.width(durabilityText);
             int armorTextWidth = FONT.width(armorText);

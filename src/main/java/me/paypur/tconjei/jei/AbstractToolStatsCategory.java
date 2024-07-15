@@ -1,6 +1,7 @@
 package me.paypur.tconjei.jei;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import me.paypur.tconjei.Utils;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
@@ -87,8 +88,7 @@ public abstract class AbstractToolStatsCategory implements IRecipeCategory<ToolS
     }
 
     protected void drawStatsShadow(PoseStack stack, Component component, float lineNumber, int color) {
-        String[] strings = component.getString().split(":");
-        strings[0] += ":";
+        String[] strings = Utils.colonSplit(component.getString());
         int width = FONT.width(strings[0]);
         draw(stack, strings[0], 0, lineNumber, TEXT_COLOR);
         drawShadow(stack, strings[1], width, lineNumber, color);
@@ -103,7 +103,7 @@ public abstract class AbstractToolStatsCategory implements IRecipeCategory<ToolS
     }
 
     protected List<Component> getStatTooltip(IMaterialStats stats, int i, double mouseX, double mouseY, float lineNumber) {
-        int textWidth = FONT.width(stats.getLocalizedInfo().get(i).getString().split(":")[0]);
+        int textWidth = FONT.width(Utils.colonSplit(stats.getLocalizedInfo().get(i).getString())[0]);
         if (inBox(mouseX, mouseY, 0, lineNumber * LINE_HEIGHT - 1, textWidth, LINE_HEIGHT)) {
             return List.of(stats.getLocalizedDescriptions().get(i));
         }
