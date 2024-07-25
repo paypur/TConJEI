@@ -48,7 +48,9 @@ public class ToolPartsCategory implements IRecipeCategory<ToolPartsWrapper> {
         List<LayoutSlot> slots = recipe.getSlots();
         List<ItemStack> items = recipe.getDisplayParts();
 
-        assert items.size() == slots.size();
+        if (items.size() != slots.size()) {
+            return;
+        }
 
         Vec2 offsets = getOffsets(recipe);
         for (int i = 0; i < items.size(); i++) {
@@ -62,6 +64,10 @@ public class ToolPartsCategory implements IRecipeCategory<ToolPartsWrapper> {
     public void draw(ToolPartsWrapper recipe, IRecipeSlotsView recipeSlotsView, PoseStack stack, double mouseX, double mouseY) {
         if (recipe.isBroadTool()) {
             this.anvil.draw(stack, 65, 42);
+        }
+
+        if (recipe.getSlots().isEmpty()) {
+            return;
         }
 
         Vec2 offsets = getOffsets(recipe);
