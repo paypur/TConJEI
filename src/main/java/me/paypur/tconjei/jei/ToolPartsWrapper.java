@@ -15,7 +15,17 @@ import slimeknights.tconstruct.library.tools.part.IToolPart;
 import java.util.ArrayList;
 import java.util.List;
 
-public record ToolPartsWrapper(ToolDefinition definition) {
+public class ToolPartsWrapper() {
+
+    private ToolDefinition definition;
+
+    public ToolPartsWrapper(ToolDefinition definition) {
+        this.definition = definition;
+    }
+
+    public ToolDefinition getDefinition() {
+        return definition;
+    }
 
     static List<IMaterial> MATERIALS = MaterialRegistry.getMaterials()
             .stream()

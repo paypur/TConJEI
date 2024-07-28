@@ -25,8 +25,14 @@ import slimeknights.tconstruct.tools.TinkerToolParts;
 
 import java.util.*;
 
-public record ToolStatsWrapper(IMaterial material) {
+public class ToolStatsWrapper() {
     private static final IMaterialRegistry REGISTRY = MaterialRegistry.getInstance();
+
+    private IMaterial material;
+
+    public ToolStatsWrapper(IMaterial material) {
+        this.material = material;
+    }
 
     public MaterialId getMaterialId() {
         return material.getIdentifier().getId();
