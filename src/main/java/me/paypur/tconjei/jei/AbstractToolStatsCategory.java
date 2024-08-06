@@ -21,18 +21,16 @@ import net.minecraftforge.fluids.FluidStack;
 import org.jetbrains.annotations.NotNull;
 import slimeknights.tconstruct.library.materials.stats.IMaterialStats;
 import slimeknights.tconstruct.library.modifiers.ModifierEntry;
+import slimeknights.tconstruct.library.utils.Util;
 
-import java.util.Collections;
 import java.util.List;
 
 import static me.paypur.tconjei.ColorManager.TEXT_COLOR;
 import static me.paypur.tconjei.ColorManager.getShade;
-import static me.paypur.tconjei.Utils.inBox;
 import static mezz.jei.api.recipe.RecipeIngredientRole.INPUT;
 import static mezz.jei.api.recipe.RecipeIngredientRole.RENDER_ONLY;
 import static net.minecraftforge.common.ForgeI18n.getPattern;
 import static slimeknights.mantle.client.ResourceColorManager.getColor;
-import static slimeknights.tconstruct.library.utils.Util.makeTranslationKey;
 
 public abstract class AbstractToolStatsCategory implements IRecipeCategory<ToolStatsWrapper> {
 
@@ -85,15 +83,15 @@ public abstract class AbstractToolStatsCategory implements IRecipeCategory<ToolS
 
     protected void drawTraits(PoseStack poseStack, List<ModifierEntry> traits, float lineNumber) {
         for (ModifierEntry trait : traits) {
-            String pattern = getPattern(makeTranslationKey("modifier", trait.getId()));
-            int traitColor = getColor(makeTranslationKey("modifier", trait.getId()));
+            String pattern = getPattern(Util.makeTranslationKey("modifier", trait.getId()));
+            int traitColor = getColor(Util.makeTranslationKey("modifier", trait.getId()));
             drawShadow(poseStack, pattern, WIDTH - FONT.width(pattern), lineNumber++, traitColor);
         }
     }
 
     protected List<Component> getStatTooltip(IMaterialStats stats, int i, double mouseX, double mouseY, float lineNumber) {
         int textWidth = FONT.width(Utils.colonSplit(stats.getLocalizedInfo().get(i).getString())[0]);
-        if (inBox(mouseX, mouseY, 0, lineNumber * LINE_HEIGHT - 1, textWidth, LINE_HEIGHT)) {
+        if (Utils.inBox(mouseX, mouseY, 0, lineNumber * LINE_HEIGHT - 1, textWidth, LINE_HEIGHT)) {
             return List.of(stats.getLocalizedDescriptions().get(i));
         }
         return List.of();
@@ -101,13 +99,13 @@ public abstract class AbstractToolStatsCategory implements IRecipeCategory<ToolS
 
     protected List<Component> getTraitTooltips(List<ModifierEntry> traits, double mouseX, double mouseY, float lineNumber) {
         for (ModifierEntry trait : traits) {
-            int textWidth = FONT.width(getPattern(makeTranslationKey("modifier", trait.getId())));
-            if (inBox(mouseX, mouseY, WIDTH - textWidth, lineNumber++ * LINE_HEIGHT - 1, textWidth, LINE_HEIGHT)) {
-                return List.of(new TranslatableComponent(makeTranslationKey("modifier", trait.getId()) + ".flavor").withStyle(ChatFormatting.ITALIC),
-                        new TranslatableComponent(makeTranslationKey("modifier", trait.getId()) + ".description"));
+            int textWidth = FONT.width(getPattern(Util.makeTranslationKey("modifier", trait.getId())));
+            if (Utils.inBox(mouseX, mouseY, WIDTH - textWidth, lineNumber++ * LINE_HEIGHT - 1, textWidth, LINE_HEIGHT)) {
+                return List.of(new TranslatableComponent(Util.makeTranslationKey("modifier", trait.getId()) + ".flavor").withStyle(ChatFormatting.ITALIC),
+                        new TranslatableComponent(Util.makeTranslationKey("modifier", trait.getId()) + ".description"));
             }
         }
-        return Collections.emptyList();
+        return List.of();
     }
 
     @NotNull

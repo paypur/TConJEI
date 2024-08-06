@@ -1,6 +1,7 @@
 package me.paypur.tconjei.jei;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import me.paypur.tconjei.Utils;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
@@ -11,6 +12,7 @@ import mezz.jei.api.recipe.RecipeType;
 import mezz.jei.api.recipe.category.IRecipeCategory;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec2;
@@ -18,15 +20,13 @@ import slimeknights.tconstruct.library.tools.layout.LayoutSlot;
 import slimeknights.tconstruct.tools.TinkerTools;
 
 import javax.annotation.Nonnull;
-import java.util.Collections;
 import java.util.List;
 
 import static me.paypur.tconjei.TConJEI.MOD_ID;
-import static me.paypur.tconjei.Utils.inBox;
 
 public class ToolPartsCategory implements IRecipeCategory<ToolPartsWrapper> {
 
-    static final Component TITLE = new TextComponent("Tool Recipe");
+    static final Component TITLE = new TranslatableComponent("tconjei.toolparts");
     static final RecipeType<ToolPartsWrapper> RECIPE_TYPE = RecipeType.create(MOD_ID, "tool_parts", ToolPartsWrapper.class);
     static final ResourceLocation UID = new ResourceLocation(MOD_ID, "tool_parts");
     final IDrawable background, icon, anvil, slot;
@@ -79,9 +79,9 @@ public class ToolPartsCategory implements IRecipeCategory<ToolPartsWrapper> {
 
     @Override
     public List<Component> getTooltipStrings(ToolPartsWrapper recipe, IRecipeSlotsView recipeSlotsView, double mouseX, double mouseY) {
-        return recipe.isBroadTool() && inBox(mouseX, mouseY, 65, 42, ITEM_SIZE, ITEM_SIZE) ?
-                Collections.singletonList(new TextComponent("Broad tools require a Tinker's Anvil!")) :
-                    Collections.emptyList();
+        return recipe.isBroadTool() && Utils.inBox(mouseX, mouseY, 65, 42, ITEM_SIZE, ITEM_SIZE) ?
+                List.of(new TranslatableComponent("tconjei.toolparts.anvil")) :
+                    List.of();
     }
 
     private Vec2 getOffsets(ToolPartsWrapper recipe) {

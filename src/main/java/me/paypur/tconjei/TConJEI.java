@@ -59,7 +59,6 @@ public class TConJEI {
 
                     in.close();
                     out.close();
-
                 } catch (IOException e) {
                     LogUtils.getLogger().error("Failed to copy built-in resource pack", e);
                 }
@@ -71,16 +70,16 @@ public class TConJEI {
     public final class ForgeBusHandler {
         @SubscribeEvent
         public static void login(RecipesUpdatedEvent event) {
-            Level world = Minecraft.getInstance().level;
-            if (world == null) {
-                return;
-            }
-            List<ItemStack> repairStacks;
-            repairStacks = RecipeHelper.getUIRecipes(world.getRecipeManager(), TinkerRecipeTypes.MATERIAL.get(), MaterialRecipe.class, recipe -> true)
-                    .stream()
-                    .flatMap(recipe -> Arrays.stream(recipe.getIngredient().getItems()))
-                    .toList();
             if (AllInputs.isEmpty()) {
+                Level world = Minecraft.getInstance().level;
+                if (world == null) {
+                    return;
+                }
+                // TODO: includes glass for some reason
+                List<ItemStack> repairStacks = RecipeHelper.getRecipes(world.getRecipeManager(), TinkerRecipeTypes.MATERIAL.get(), MaterialRecipe.class)
+                        .stream()
+                        .flatMap(recipe -> Arrays.stream(recipe.getIngredient().getItems()))
+                        .toList();
                 AllInputs = new HashSet<>(
                     repairStacks.stream().map(ItemStack::getItem).toList()
                 );

@@ -6,7 +6,6 @@ import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.recipe.RecipeType;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.ForgeI18n;
@@ -30,7 +29,7 @@ public class RangedStatsCategory extends AbstractToolStatsCategory {
     public RangedStatsCategory(IGuiHelper guiHelper) {
         super(guiHelper);
         this.icon = guiHelper.createDrawable(new ResourceLocation(MOD_ID, "textures/gui/jei.png"), 16, 0, 16, 16);
-        this.title = new TextComponent("Ranged Stats");
+        this.title = new TranslatableComponent("tconjei.toolstats.ranged");
         this.recipeType = RecipeType.create(MOD_ID, "ranged_stats", ToolStatsWrapper.class);
         this.uid = new ResourceLocation(MOD_ID, "ranged_stats");
         this.tag = TinkerTags.Items.RANGED;

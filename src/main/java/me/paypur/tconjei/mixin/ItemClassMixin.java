@@ -3,7 +3,7 @@ package me.paypur.tconjei.mixin;
 import me.paypur.tconjei.TConJEI;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
@@ -21,7 +21,7 @@ public abstract class ItemClassMixin {
     @Inject(method = "appendHoverText(Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/level/Level;Ljava/util/List;Lnet/minecraft/world/item/TooltipFlag;)V", at = @At("HEAD"))
     public void appendHoverText(ItemStack pStack, Level pLevel, List<Component> pTooltipComponents, TooltipFlag pIsAdvanced, CallbackInfo ci) {
         if (TConJEI.AllInputs.contains(pStack.getItem())) {
-            pTooltipComponents.add((new TextComponent("Can be used to construct Tinkers' Construct tools").withStyle(ChatFormatting.GRAY)));
+            pTooltipComponents.add((new TranslatableComponent("tconjei.tooltip").withStyle(ChatFormatting.GRAY)));
         }
     }
 
