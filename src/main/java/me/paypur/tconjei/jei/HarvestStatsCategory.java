@@ -23,7 +23,7 @@ import java.util.stream.Stream;
 
 import static me.paypur.tconjei.ColorManager.*;
 import static me.paypur.tconjei.TConJEI.MOD_ID;
-import static me.paypur.tconjei.TConJEI.inBox;
+import static me.paypur.tconjei.Utils.inBox;
 
 public class HarvestStatsCategory extends AbstractToolStatsCategory {
 

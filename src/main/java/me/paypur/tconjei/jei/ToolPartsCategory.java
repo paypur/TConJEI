@@ -22,7 +22,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static me.paypur.tconjei.TConJEI.MOD_ID;
-import static me.paypur.tconjei.TConJEI.inBox;
+import static me.paypur.tconjei.Utils.inBox;
 
 public class ToolPartsCategory implements IRecipeCategory<ToolPartsWrapper> {
 

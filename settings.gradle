@@ -1,15 +1,11 @@
 pluginManagement {
     repositories {
-        gradlePluginPortal()
-        maven {
-            name = 'MinecraftForge'
-            url = 'https://maven.minecraftforge.net/'
-        }
-        maven { // parchment
-            url = 'https://maven.parchmentmc.org'
-        }
+        // These repositories are only for Gradle plugins, put any other repositories in the repository block further below
+        mavenCentral()
+        maven { url = 'https://maven.minecraftforge.net' }
+        maven { url = 'https://repo.spongepowered.org/repository/maven-public/' }
+        maven { url = 'https://maven.parchmentmc.org' }
     }
 }
-
 
 rootProject.name = 'TConJEI'

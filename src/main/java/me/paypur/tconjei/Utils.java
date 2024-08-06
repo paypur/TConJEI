@@ -1,6 +1,7 @@
 package me.paypur.tconjei;
 
 public class Utils {
+
     public static String[] colonSplit(String str) {
         String[] strings;
         if (str.contains(":")) {
@@ -14,4 +15,9 @@ public class Utils {
         }
         return strings;
     }
+
+    public static boolean inBox(double mX, double mY, float x, float y, float w, float h) {
+        return (x <= mX && mX <= x + w && y <= mY && mY <= y + h);
+    }
+
 }

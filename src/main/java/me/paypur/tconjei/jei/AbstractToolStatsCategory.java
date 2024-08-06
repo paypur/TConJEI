@@ -27,7 +27,7 @@ import java.util.List;
 
 import static me.paypur.tconjei.ColorManager.TEXT_COLOR;
 import static me.paypur.tconjei.ColorManager.getShade;
-import static me.paypur.tconjei.TConJEI.inBox;
+import static me.paypur.tconjei.Utils.inBox;
 import static mezz.jei.api.recipe.RecipeIngredientRole.INPUT;
 import static mezz.jei.api.recipe.RecipeIngredientRole.RENDER_ONLY;
 import static net.minecraftforge.common.ForgeI18n.getPattern;

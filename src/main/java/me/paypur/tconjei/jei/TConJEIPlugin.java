@@ -40,7 +40,6 @@ public class TConJEIPlugin implements IModPlugin {
     public void registerRecipes(IRecipeRegistration registration) {
         List<ToolStatsWrapper> statsWrappers = MaterialRegistry.getMaterials()
                 .stream()
-                .filter(iMaterial -> !iMaterial.isHidden())
                 .map(ToolStatsWrapper::new)
                 .toList();
 

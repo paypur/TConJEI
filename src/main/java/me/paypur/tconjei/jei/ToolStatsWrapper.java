@@ -67,7 +67,8 @@ public record ToolStatsWrapper(IMaterial material) {
         Set<Item> seen = new HashSet<>();
         return RegistryHelper.getTagValueStream(Registry.ITEM, tag)
             .filter(item -> item instanceof IModifiable)
-            .flatMap(item -> ((IModifiable) item).getToolDefinition().getData().getParts().stream()
+            .flatMap(item -> ((IModifiable) item).getToolDefinition().getData().getParts()
+                    .stream()
                     .filter(part -> part.canUseMaterial(material.getIdentifier()))
                     .map(part -> part.getPart().withMaterial(material.getIdentifier())))
             .filter(part -> seen.add(part.getItem()))
