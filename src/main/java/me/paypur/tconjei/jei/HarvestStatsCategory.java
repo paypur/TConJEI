@@ -82,9 +82,9 @@ public class HarvestStatsCategory extends AbstractToolStatsCategory {
             HandleMaterialStats handle = handleOptional.get();
             drawShadow(stack, String.format("[%s]", handle.getLocalizedName().getString()), 0, lineNumber++, MATERIAL_COLOR);
             drawStatsShadow(stack, handle.getLocalizedInfo().get(0), lineNumber++, getMultiplierColor(handle.getDurability()));
-            drawStatsShadow(stack, handle.getLocalizedInfo().get(0), lineNumber++, getMultiplierColor(handle.getAttackDamage()));
-            drawStatsShadow(stack, handle.getLocalizedInfo().get(0), lineNumber++, getMultiplierColor(handle.getAttackSpeed()));
-            drawStatsShadow(stack, handle.getLocalizedInfo().get(0), lineNumber, getMultiplierColor(handle.getMiningSpeed()));
+            drawStatsShadow(stack, handle.getLocalizedInfo().get(1), lineNumber++, getMultiplierColor(handle.getAttackDamage()));
+            drawStatsShadow(stack, handle.getLocalizedInfo().get(2), lineNumber++, getMultiplierColor(handle.getAttackSpeed()));
+            drawStatsShadow(stack, handle.getLocalizedInfo().get(3), lineNumber, getMultiplierColor(handle.getMiningSpeed()));
         }
     }
 
