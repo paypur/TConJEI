@@ -57,20 +57,20 @@ description='''${mod_description}'''
 [[dependencies.${mod_id}]]
    modId="mantle"
    mandatory=true
-   versionRange="[1.10.36,)"
+   versionRange="${mantle_range}"
    ordering="NONE"
    side="BOTH"
 
 [[dependencies.${mod_id}]]
    modId="tconstruct"
    mandatory=true
-   versionRange="[3.8.3.39,)"
+   versionRange="${tconstruct_range}"
    ordering="NONE"
    side="BOTH"
 
 [[dependencies.${mod_id}]]
    modId="jei"
    mandatory=true
-   versionRange="[11.6.0.1019,)"
+   versionRange="${jei_range}"
    ordering="NONE"
    side="BOTH"

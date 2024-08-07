@@ -7,7 +7,7 @@ import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.recipe.RecipeType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.network.chat.contents.LiteralContents;
+import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.resources.ResourceLocation;
 import slimeknights.tconstruct.common.TinkerTags;
 import slimeknights.tconstruct.library.client.materials.MaterialTooltipCache;
@@ -29,7 +29,7 @@ public class ArmorStatsCategory extends AbstractToolStatsCategory {
     public ArmorStatsCategory(IGuiHelper guiHelper) {
         super(guiHelper);
         this.icon = guiHelper.createDrawable(new ResourceLocation(MOD_ID, "textures/gui/jei.png"), 32, 0, 16, 16);
-        this.title = MutableComponent.create(new LiteralContents("Armor Stats"));
+        this.title = MutableComponent.create(new TranslatableContents("tconjei.tool_stats.armor"));
         this.recipeType = RecipeType.create(MOD_ID, "armor_stats", ToolStatsWrapper.class);
         this.tag = TinkerTags.Items.ARMOR;
     }

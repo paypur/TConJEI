@@ -6,8 +6,9 @@ import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.recipe.RecipeType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.network.chat.contents.LiteralContents;
+import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraftforge.common.ForgeI18n;
 import slimeknights.tconstruct.common.TinkerTags;
 import slimeknights.tconstruct.library.client.materials.MaterialTooltipCache;
 import slimeknights.tconstruct.library.materials.stats.IMaterialStats;
@@ -21,21 +22,20 @@ import java.util.stream.Stream;
 
 import static me.paypur.tconjei.ColorManager.*;
 import static me.paypur.tconjei.TConJEI.MOD_ID;
-import static net.minecraftforge.common.ForgeI18n.getPattern;
 
 public class HarvestStatsCategory extends AbstractToolStatsCategory {
 
     public HarvestStatsCategory(IGuiHelper guiHelper) {
         super(guiHelper);
-        icon = guiHelper.createDrawable(new ResourceLocation(MOD_ID, "textures/gui/jei.png"), 0, 0, 16, 16);
-        title =  MutableComponent.create(new LiteralContents("Harvest Stats"));
-        recipeType = RecipeType.create(MOD_ID, "harvest_stats", ToolStatsWrapper.class);
-        tag = TinkerTags.Items.HARVEST;
+        this.icon = guiHelper.createDrawable(new ResourceLocation(MOD_ID, "textures/gui/jei.png"), 0, 0, 16, 16);
+        this.title = MutableComponent.create(new TranslatableContents("tconjei.tool_stats.harvest"));
+        this.recipeType = RecipeType.create(MOD_ID, "harvest_stats", ToolStatsWrapper.class);
+        this.tag = TinkerTags.Items.HARVEST;
     }
 
     @Override
     public void draw(ToolStatsWrapper recipe, IRecipeSlotsView recipeSlotsView, PoseStack stack, double mouseX, double mouseY) {
-        final String MATERIAL_NAME = getPattern(Util.makeTranslationKey("material", recipe.getMaterialId()));
+        final String MATERIAL_NAME = ForgeI18n.getPattern(Util.makeTranslationKey("material", recipe.getMaterialId()));
         final int MATERIAL_COLOR = MaterialTooltipCache.getColor(recipe.getMaterialId()).getValue();
         float lineNumber = 2f;
 
@@ -88,10 +88,11 @@ public class HarvestStatsCategory extends AbstractToolStatsCategory {
     @Nonnull
     @Override
     public List<Component> getTooltipStrings(ToolStatsWrapper recipe, IRecipeSlotsView recipeSlotsView, double mouseX, double mouseY) {
+        final String MATERIAL_NAME = ForgeI18n.getPattern(Util.makeTranslationKey("material", recipe.getMaterialId()));
         float lineNumber = 2f;
 
         Optional<HeadMaterialStats> headOptional = recipe.getStats(HeadMaterialStats.ID);
-        Optional<IMaterialStats> extraOptional = recipe.getStats(StatlessMaterialStats.BINDING.getIdentifier());
+        Optional<IMaterialStats> bindingOptional = recipe.getStats(StatlessMaterialStats.BINDING.getIdentifier());
         Optional<HandleMaterialStats> handleOptional =  recipe.getStats(HandleMaterialStats.ID);
 
         // MATERIAL
@@ -101,7 +102,7 @@ public class HarvestStatsCategory extends AbstractToolStatsCategory {
         }
 
         // TRAIT
-        Optional<? extends IMaterialStats> statOptional = Stream.of(handleOptional, extraOptional, handleOptional)
+        Optional<? extends IMaterialStats> statOptional = Stream.of(handleOptional, bindingOptional, handleOptional)
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .findFirst();
@@ -131,7 +132,7 @@ public class HarvestStatsCategory extends AbstractToolStatsCategory {
         }
 
         // EXTRA
-        if (extraOptional.isPresent()) {
+        if (bindingOptional.isPresent()) {
             lineNumber += LINE_SPACING + 1;
         }
 

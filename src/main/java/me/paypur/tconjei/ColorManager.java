@@ -70,13 +70,13 @@ public class ColorManager {
         int g = color >> 8 & 0xff;
         int b = color & 0xff;
         float[] hsb = new float[3];
-        Color.RGBtoHSB(r,g,b,hsb);
+        Color.RGBtoHSB(r, g, b, hsb);
 
         // use shade when it is possible to meet the minimum contrast ratio
         if (contrast(colorLuminance, 0) > contrastRatio) {
             factor = (float) Math.pow(
                     (colorLuminance + 0.05f - contrastRatio * 0.05f) / (contrastRatio * colorLuminance),
-                    1/2.2f
+                    1 / 2.2f
             );
         }
 

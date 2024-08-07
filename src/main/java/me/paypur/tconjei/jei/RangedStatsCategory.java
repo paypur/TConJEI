@@ -6,8 +6,9 @@ import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.recipe.RecipeType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.network.chat.contents.LiteralContents;
+import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraftforge.common.ForgeI18n;
 import slimeknights.tconstruct.common.TinkerTags;
 import slimeknights.tconstruct.library.client.materials.MaterialTooltipCache;
 import slimeknights.tconstruct.library.materials.stats.IMaterialStats;
@@ -21,21 +22,20 @@ import java.util.stream.Stream;
 
 import static me.paypur.tconjei.ColorManager.*;
 import static me.paypur.tconjei.TConJEI.MOD_ID;
-import static net.minecraftforge.common.ForgeI18n.getPattern;
 
 public class RangedStatsCategory extends AbstractToolStatsCategory {
 
     public RangedStatsCategory(IGuiHelper guiHelper) {
         super(guiHelper);
-        icon = guiHelper.createDrawable(new ResourceLocation(MOD_ID, "textures/gui/jei.png"), 16, 0, 16, 16);
-        title = MutableComponent.create(new LiteralContents("Ranged Stats"));
-        recipeType = RecipeType.create(MOD_ID, "ranged_stats", ToolStatsWrapper.class);
-        tag = TinkerTags.Items.RANGED;
+        this.icon = guiHelper.createDrawable(new ResourceLocation(MOD_ID, "textures/gui/jei.png"), 16, 0, 16, 16);
+        this.title = MutableComponent.create(new TranslatableContents("tconjei.tool_stats.ranged"));
+        this.recipeType = RecipeType.create(MOD_ID, "ranged_stats", ToolStatsWrapper.class);
+        this.tag = TinkerTags.Items.RANGED;
     }
 
     @Override
     public void draw(ToolStatsWrapper recipe, IRecipeSlotsView recipeSlotsView, PoseStack stack, double mouseX, double mouseY) {
-        final String MATERIAL_NAME = getPattern(Util.makeTranslationKey("material", recipe.getMaterialId()));
+        final String MATERIAL_NAME = ForgeI18n.getPattern(Util.makeTranslationKey("material", recipe.getMaterialId()));
         final int MATERIAL_COLOR = MaterialTooltipCache.getColor(recipe.getMaterialId()).getValue();
         float lineNumber = 2f;
 

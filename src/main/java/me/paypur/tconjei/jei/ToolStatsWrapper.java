@@ -25,9 +25,6 @@ import slimeknights.tconstruct.library.tools.item.IModifiable;
 import slimeknights.tconstruct.tools.TinkerToolParts;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Function;
-import java.util.function.Predicate;
 
 public record ToolStatsWrapper(IMaterial material) {
     private static final IMaterialRegistry REGISTRY = MaterialRegistry.getInstance();

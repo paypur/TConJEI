@@ -18,6 +18,7 @@ import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraftforge.common.ForgeI18n;
 import net.minecraftforge.fluids.FluidStack;
 import org.jetbrains.annotations.NotNull;
 import slimeknights.mantle.client.ResourceColorManager;
@@ -29,11 +30,8 @@ import java.util.List;
 
 import static me.paypur.tconjei.ColorManager.TEXT_COLOR;
 import static me.paypur.tconjei.ColorManager.getShade;
-import static me.paypur.tconjei.TConJEI.inBox;
 import static mezz.jei.api.recipe.RecipeIngredientRole.INPUT;
 import static mezz.jei.api.recipe.RecipeIngredientRole.RENDER_ONLY;
-import static net.minecraftforge.common.ForgeI18n.getPattern;
-import static slimeknights.tconstruct.library.utils.Util.makeTranslationKey;
 
 public abstract class AbstractToolStatsCategory implements IRecipeCategory<ToolStatsWrapper> {
 
@@ -69,10 +67,10 @@ public abstract class AbstractToolStatsCategory implements IRecipeCategory<ToolS
 
     @Override
     public List<Component> getTooltipStrings(ToolStatsWrapper recipe, IRecipeSlotsView recipeSlotsView, double mouseX, double mouseY) {
-        final String MATERIAL_NAME = getPattern(Util.makeTranslationKey("material", recipe.getMaterialId()));
+        final String MATERIAL_NAME = ForgeI18n.getPattern(Util.makeTranslationKey("material", recipe.getMaterialId()));
         final int materialWidth = FONT.width(MATERIAL_NAME);
-        if (inBox(mouseX, mouseY, (WIDTH - materialWidth) / 2f, 0.4f * LINE_HEIGHT - 1, materialWidth, LINE_HEIGHT)) {
-            return List.of(MutableComponent.create(new TranslatableContents( makeTranslationKey("material", recipe.getMaterialId()) + ".flavor")).withStyle(ChatFormatting.ITALIC));
+        if (Utils.inBox(mouseX, mouseY, (WIDTH - materialWidth) / 2f, 0.4f * LINE_HEIGHT - 1, materialWidth, LINE_HEIGHT)) {
+            return List.of(MutableComponent.create(new TranslatableContents(Util.makeTranslationKey("material", recipe.getMaterialId()) + ".flavor")).withStyle(ChatFormatting.ITALIC));
         }
         return List.of();
     }
@@ -96,15 +94,15 @@ public abstract class AbstractToolStatsCategory implements IRecipeCategory<ToolS
 
     protected void drawTraits(PoseStack stack, List<ModifierEntry> traits, float lineNumber) {
         for (ModifierEntry trait : traits) {
-            String pattern = getPattern(makeTranslationKey("modifier", trait.getId()));
-            int traitColor = ResourceColorManager.getColor(makeTranslationKey("modifier", trait.getId()));
+            String pattern = ForgeI18n.getPattern(Util.makeTranslationKey("modifier", trait.getId()));
+            int traitColor = ResourceColorManager.getColor(Util.makeTranslationKey("modifier", trait.getId()));
             drawShadow(stack, pattern, WIDTH - FONT.width(pattern), lineNumber++, traitColor);
         }
     }
 
     protected List<Component> getStatTooltip(IMaterialStats stats, int i, double mouseX, double mouseY, float lineNumber) {
         int textWidth = FONT.width(Utils.colonSplit(stats.getLocalizedInfo().get(i).getString())[0]);
-        if (inBox(mouseX, mouseY, 0, lineNumber * LINE_HEIGHT - 1, textWidth, LINE_HEIGHT)) {
+        if (Utils.inBox(mouseX, mouseY, 0, lineNumber * LINE_HEIGHT - 1, textWidth, LINE_HEIGHT)) {
             return List.of(stats.getLocalizedDescriptions().get(i));
         }
         return List.of();
@@ -112,10 +110,10 @@ public abstract class AbstractToolStatsCategory implements IRecipeCategory<ToolS
 
     protected List<Component> getTraitTooltips(List<ModifierEntry> traits, double mouseX, double mouseY, float lineNumber) {
         for (ModifierEntry trait : traits) {
-            int textWidth = FONT.width(getPattern(makeTranslationKey("modifier", trait.getId())));
-            if (inBox(mouseX, mouseY, WIDTH - textWidth, lineNumber++ * LINE_HEIGHT - 1, textWidth, LINE_HEIGHT)) {
-                return List.of(MutableComponent.create(new TranslatableContents(makeTranslationKey("modifier", trait.getId()) + ".flavor")).withStyle(ChatFormatting.ITALIC),
-                        MutableComponent.create(new TranslatableContents(makeTranslationKey("modifier", trait.getId()) + ".description")));
+            int textWidth = FONT.width(ForgeI18n.getPattern(Util.makeTranslationKey("modifier", trait.getId())));
+            if (Utils.inBox(mouseX, mouseY, WIDTH - textWidth, lineNumber++ * LINE_HEIGHT - 1, textWidth, LINE_HEIGHT)) {
+                return List.of(MutableComponent.create(new TranslatableContents(Util.makeTranslationKey("modifier", trait.getId()) + ".flavor")).withStyle(ChatFormatting.ITALIC),
+                        MutableComponent.create(new TranslatableContents(Util.makeTranslationKey("modifier", trait.getId()) + ".description")));
             }
         }
         return List.of();

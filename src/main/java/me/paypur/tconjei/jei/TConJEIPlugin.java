@@ -13,14 +13,13 @@ import org.jetbrains.annotations.NotNull;
 import slimeknights.tconstruct.library.materials.MaterialRegistry;
 import slimeknights.tconstruct.library.tools.definition.ToolDefinitionLoader;
 import slimeknights.tconstruct.library.tools.layout.StationSlotLayoutLoader;
+import slimeknights.tconstruct.tables.TinkerTables;
 import slimeknights.tconstruct.tools.stats.*;
 
 import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static me.paypur.tconjei.TConJEI.MOD_ID;
-import static slimeknights.tconstruct.tables.TinkerTables.*;
 
 @SuppressWarnings("unused")
 @JeiPlugin
@@ -68,16 +67,16 @@ public class TConJEIPlugin implements IModPlugin {
 
     @Override
     public void registerRecipeCatalysts(IRecipeCatalystRegistration registration) {
-        registration.addRecipeCatalyst(new ItemStack(tinkerStation.asItem()), HARVEST_STATS, RANGED_STATS, TOOL_PARTS, ARMOR_STATS);
-        registration.addRecipeCatalyst(new ItemStack(tinkersAnvil.asItem()), HARVEST_STATS, RANGED_STATS, TOOL_PARTS, ARMOR_STATS);
-        registration.addRecipeCatalyst(new ItemStack(scorchedAnvil.asItem()), HARVEST_STATS, RANGED_STATS, TOOL_PARTS, ARMOR_STATS);
+        registration.addRecipeCatalyst(new ItemStack(TinkerTables.tinkerStation.asItem()), HARVEST_STATS, RANGED_STATS, TOOL_PARTS, ARMOR_STATS);
+        registration.addRecipeCatalyst(new ItemStack(TinkerTables.tinkerStation.asItem()), HARVEST_STATS, RANGED_STATS, TOOL_PARTS, ARMOR_STATS);
+        registration.addRecipeCatalyst(new ItemStack(TinkerTables.tinkerStation.asItem()), HARVEST_STATS, RANGED_STATS, TOOL_PARTS, ARMOR_STATS);
     }
 
     private List<ToolStatsWrapper> materials() {
         return MaterialRegistry.getInstance().getVisibleMaterials()
                 .stream()
                 .map(ToolStatsWrapper::new)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     private List<ToolPartsWrapper> toolDefinitions() {
@@ -88,6 +87,5 @@ public class TConJEIPlugin implements IModPlugin {
                 .map(ToolPartsWrapper::new)
                 .toList();
     }
-
 
 }
