@@ -11,7 +11,6 @@ import mezz.jei.api.recipe.RecipeIngredientRole;
 import mezz.jei.api.recipe.RecipeType;
 import mezz.jei.api.recipe.category.IRecipeCategory;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
@@ -26,7 +25,7 @@ import static me.paypur.tconjei.TConJEI.MOD_ID;
 
 public class ToolPartsCategory implements IRecipeCategory<ToolPartsWrapper> {
 
-    static final Component TITLE = new TranslatableComponent("tconjei.toolparts");
+    static final Component TITLE = new TranslatableComponent("tconjei.tool_parts");
     static final RecipeType<ToolPartsWrapper> RECIPE_TYPE = RecipeType.create(MOD_ID, "tool_parts", ToolPartsWrapper.class);
     static final ResourceLocation UID = new ResourceLocation(MOD_ID, "tool_parts");
     final IDrawable background, icon, anvil, slot;
@@ -80,7 +79,7 @@ public class ToolPartsCategory implements IRecipeCategory<ToolPartsWrapper> {
     @Override
     public List<Component> getTooltipStrings(ToolPartsWrapper recipe, IRecipeSlotsView recipeSlotsView, double mouseX, double mouseY) {
         return recipe.isBroadTool() && Utils.inBox(mouseX, mouseY, 65, 42, ITEM_SIZE, ITEM_SIZE) ?
-                List.of(new TranslatableComponent("tconjei.toolparts.anvil")) :
+                List.of(new TranslatableComponent("tconjei.tool_parts.anvil")) :
                     List.of();
     }
 

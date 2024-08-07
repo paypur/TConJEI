@@ -1,20 +1,10 @@
 package me.paypur.tconjei;
 
-import com.mojang.logging.LogUtils;
-import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.TextureStitchEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
 import slimeknights.mantle.client.ResourceColorManager;
 import slimeknights.tconstruct.library.utils.Util;
 
-import javax.imageio.ImageIO;
 import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.io.InputStream;
 
 import static me.paypur.tconjei.TConJEI.MOD_ID;
 
@@ -26,25 +16,7 @@ public class ColorManager {
     public static int DURABILITY_COLOR = 0x47CC47; //0x298E29 dark versions maybe
     public static int MINING_COLOR = 0x78A0CD; //0x4A7EBA
     public static int ATTACK_COLOR = 0xD76464; //0xD05353
-    static ResourceLocation palette = new ResourceLocation(MOD_ID, "textures/gui/palette.png");
-
-    @Mod.EventBusSubscriber(modid = MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
-    public final class ClientForgeHandler {
-        @SubscribeEvent
-        public static void onClientReload(TextureStitchEvent.Post event) {
-            try {
-                InputStream stream = Minecraft.getInstance().getResourceManager().getResource(palette).getInputStream();
-                BufferedImage image = ImageIO.read(stream);
-                ColorManager.TEXT_COLOR = image.getRGB(0, 0);
-                ColorManager.DURABILITY_COLOR = image.getRGB(1, 0);
-                ColorManager.MINING_COLOR = image.getRGB(0, 1);
-                ColorManager.ATTACK_COLOR = image.getRGB(1, 1);
-                stream.close();
-            } catch (IOException e) {
-                LogUtils.getLogger().error("Error loading palette", e);
-            }
-        }
-    }
+    public static ResourceLocation palette = new ResourceLocation(MOD_ID, "textures/gui/palette.png");
 
     // https://www.w3.org/TR/WCAG20-TECHS/G17.html#G17-procedure
     public static float luminance(int color) {
@@ -69,13 +41,13 @@ public class ColorManager {
         int g = color >> 8 & 0xff;
         int b = color & 0xff;
         float[] hsb = new float[3];
-        Color.RGBtoHSB(r,g,b,hsb);
+        Color.RGBtoHSB(r, g, b, hsb);
 
         // use shade when it is possible to meet the minimum contrast ratio
         if (contrast(colorLuminance, 0) > contrastRatio) {
             factor = (float) Math.pow(
                     (colorLuminance + 0.05f - contrastRatio * 0.05f) / (contrastRatio * colorLuminance),
-                    1/2.2f
+                    1 / 2.2f
             );
         }
 

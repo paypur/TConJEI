@@ -1,9 +1,9 @@
 {
-    "tconjei.toolstats.harvest":  "Harvest Tool Stats",
-    "tconjei.toolstats.ranged":  "Ranged Tool Stats",
+    "tconjei.tool_stats.harvest":  "Harvest Tool Stats",
+    "tconjei.tool_stats.ranged":  "Ranged Tool Stats",
 
-    "tconjei.toolparts": "Tool Building",
-    "tconjei.toolparts.anvil":  "Broad tools require a Tinker's Anvil!",
+    "tconjei.tool_parts": "Tool Building",
+    "tconjei.tool_parts.anvil":  "Broad tools require a Tinker's Anvil!",
 
-    "tconjei.tooltip": "Can be used to build Tinkers' Construct tools"
+    "tconjei.tooltip": "Can be used in tool building"
 }

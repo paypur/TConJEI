@@ -13,13 +13,13 @@ import org.jetbrains.annotations.NotNull;
 import slimeknights.tconstruct.library.materials.MaterialRegistry;
 import slimeknights.tconstruct.library.tools.definition.ToolDefinitionLoader;
 import slimeknights.tconstruct.library.tools.layout.StationSlotLayoutLoader;
+import slimeknights.tconstruct.tables.TinkerTables;
 import slimeknights.tconstruct.tools.stats.*;
 
 import java.util.Comparator;
 import java.util.List;
 
 import static me.paypur.tconjei.TConJEI.MOD_ID;
-import static slimeknights.tconstruct.tables.TinkerTables.*;
 
 @SuppressWarnings("unused")
 @JeiPlugin
@@ -42,7 +42,6 @@ public class TConJEIPlugin implements IModPlugin {
                 .stream()
                 .map(ToolStatsWrapper::new)
                 .toList();
-
         registration.addRecipes(HARVEST_STATS, statsWrappers.stream().filter(w -> w.hasStats(List.of(HeadMaterialStats.ID, ExtraMaterialStats.ID, HandleMaterialStats.ID))).toList());
         registration.addRecipes(RANGED_STATS, statsWrappers.stream().filter(w -> w.hasStats(List.of(LimbMaterialStats.ID, GripMaterialStats.ID, BowstringMaterialStats.ID))).toList());
         registration.addRecipes(TOOL_PARTS, toolDefinitions());
@@ -58,9 +57,9 @@ public class TConJEIPlugin implements IModPlugin {
 
     @Override
     public void registerRecipeCatalysts(IRecipeCatalystRegistration registration) {
-        registration.addRecipeCatalyst(new ItemStack(tinkerStation.asItem()), HARVEST_STATS, RANGED_STATS, TOOL_PARTS);
-        registration.addRecipeCatalyst(new ItemStack(tinkersAnvil.asItem()), HARVEST_STATS, RANGED_STATS, TOOL_PARTS);
-        registration.addRecipeCatalyst(new ItemStack(scorchedAnvil.asItem()), HARVEST_STATS, RANGED_STATS, TOOL_PARTS);
+        registration.addRecipeCatalyst(new ItemStack(TinkerTables.tinkerStation.asItem()), HARVEST_STATS, RANGED_STATS, TOOL_PARTS);
+        registration.addRecipeCatalyst(new ItemStack(TinkerTables.tinkersAnvil.asItem()), HARVEST_STATS, RANGED_STATS, TOOL_PARTS);
+        registration.addRecipeCatalyst(new ItemStack(TinkerTables.scorchedAnvil.asItem()), HARVEST_STATS, RANGED_STATS, TOOL_PARTS);
     }
 
     private List<ToolPartsWrapper> toolDefinitions() {
