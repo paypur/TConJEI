@@ -33,9 +33,8 @@ import static me.paypur.tconjei.TConJEI.MOD_ID;
 public class TConJEI {
     public static final String MOD_ID = "tconjei";
 
-
     @Mod.EventBusSubscriber(modid = MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
-    public final class ClientModHandler {
+    public static final class ClientModHandler {
         @SubscribeEvent
         public static void clientSetup(FMLClientSetupEvent event) {
             File folder = new File("resourcepacks");
@@ -83,8 +82,8 @@ public class TConJEI {
         }
     }
 
-    @Mod.EventBusSubscriber(modid = MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
-    public final class ForgeHandler {
+    @Mod.EventBusSubscriber(modid = MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
+    public static final class ClientForgeHandler {
         @SubscribeEvent
         public static void onLogin(RecipesUpdatedEvent event) {
             if (Utils.AllInputs.isEmpty()) {

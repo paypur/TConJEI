@@ -30,7 +30,7 @@ public class ColorManager {
     static ResourceLocation palette = new ResourceLocation(MOD_ID, "textures/gui/palette.png");
 
     @Mod.EventBusSubscriber(modid = MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
-    public final class ClientForgeHandler {
+    public static final class ClientForgeHandler {
         @SubscribeEvent
         public static void onClientReload(TextureStitchEvent.Post event) {
             try {

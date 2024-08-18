@@ -9,6 +9,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraftforge.common.ForgeI18n;
 import slimeknights.tconstruct.common.TinkerTags;
 import slimeknights.tconstruct.library.client.materials.MaterialTooltipCache;
 import slimeknights.tconstruct.library.materials.stats.IMaterialStats;
@@ -22,7 +23,6 @@ import java.util.stream.Stream;
 
 import static me.paypur.tconjei.ColorManager.*;
 import static me.paypur.tconjei.TConJEI.MOD_ID;
-import static net.minecraftforge.common.ForgeI18n.getPattern;
 
 public class ArmorStatsCategory extends AbstractToolStatsCategory {
 
@@ -36,7 +36,7 @@ public class ArmorStatsCategory extends AbstractToolStatsCategory {
 
     @Override
     public void draw(ToolStatsWrapper recipe, IRecipeSlotsView recipeSlotsView, PoseStack stack, double mouseX, double mouseY) {
-        final String MATERIAL_NAME = getPattern(Util.makeTranslationKey("material", recipe.getMaterialId()));
+        final String MATERIAL_NAME = ForgeI18n.getPattern(Util.makeTranslationKey("material", recipe.getMaterialId()));
         final int MATERIAL_COLOR = MaterialTooltipCache.getColor(recipe.getMaterialId()).getValue();
         float lineNumber = 2f;
 
@@ -95,7 +95,7 @@ public class ArmorStatsCategory extends AbstractToolStatsCategory {
 
         if (platingStats.isPresent()) {
             PlatingMaterialStats plating = platingStats.get();
-            drawShadow(stack, String.format("[%s]", getPattern("stat.tconstruct.plating")), 0, lineNumber++, MATERIAL_COLOR);
+            drawShadow(stack, String.format("[%s]", ForgeI18n.getPattern("stat.tconstruct.plating")), 0, lineNumber++, MATERIAL_COLOR);
 
             String durabilityText = Utils.colonSplit(plating.getLocalizedInfo().get(0).getString())[0] + " ";
             String armorText = Utils.colonSplit(plating.getLocalizedInfo().get(1).getString())[0] + " ";

@@ -28,7 +28,6 @@ public class ToolPartsCategory implements IRecipeCategory<ToolPartsWrapper> {
 
     static final MutableComponent TITLE = MutableComponent.create(new TranslatableContents("tconjei.tool_parts"));
     static final RecipeType<ToolPartsWrapper> RECIPE_TYPE = RecipeType.create(MOD_ID, "tool_parts", ToolPartsWrapper.class);
-    static final ResourceLocation UID = new ResourceLocation(MOD_ID, "tool_parts");
     final IDrawable background, icon, anvil, slot;
     static final int WIDTH = 120;
     static final int HEIGHT = 60;
