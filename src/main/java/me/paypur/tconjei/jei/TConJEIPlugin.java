@@ -11,12 +11,9 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import slimeknights.tconstruct.library.materials.MaterialRegistry;
-import slimeknights.tconstruct.library.tools.definition.ToolDefinitionLoader;
-import slimeknights.tconstruct.library.tools.layout.StationSlotLayoutLoader;
 import slimeknights.tconstruct.tables.TinkerTables;
 import slimeknights.tconstruct.tools.stats.*;
 
-import java.util.Comparator;
 import java.util.List;
 
 import static me.paypur.tconjei.TConJEI.MOD_ID;
@@ -29,11 +26,10 @@ public class TConJEIPlugin implements IModPlugin {
     private static final RecipeType<ToolStatsWrapper> HARVEST_STATS = RecipeType.create(MOD_ID, "harvest_stats", ToolStatsWrapper.class);
     private static final RecipeType<ToolStatsWrapper> RANGED_STATS = RecipeType.create(MOD_ID, "ranged_stats", ToolStatsWrapper.class);
     private static final RecipeType<ToolStatsWrapper> ARMOR_STATS = RecipeType.create(MOD_ID, "armor_stats", ToolStatsWrapper.class);
-    private static final RecipeType<ToolPartsWrapper> TOOL_PARTS = RecipeType.create(MOD_ID, "tool_parts", ToolPartsWrapper.class);
 
     @NotNull
     @Override
-    public  ResourceLocation getPluginUid() {
+    public ResourceLocation getPluginUid() {
         return UID;
     }
 
@@ -53,7 +49,6 @@ public class TConJEIPlugin implements IModPlugin {
                         PlatingMaterialStats.SHIELD.getId(), StatlessMaterialStats.MAILLE.getIdentifier(),
                         StatlessMaterialStats.SHIELD_CORE.getIdentifier())))
                 .toList());
-        registration.addRecipes(TOOL_PARTS, toolDefinitions());
     }
 
     @Override
@@ -62,29 +57,19 @@ public class TConJEIPlugin implements IModPlugin {
         registration.addRecipeCategories(new HarvestStatsCategory(guiHelper));
         registration.addRecipeCategories(new RangedStatsCategory(guiHelper));
         registration.addRecipeCategories(new ArmorStatsCategory(guiHelper));
-        registration.addRecipeCategories(new ToolPartsCategory(guiHelper));
     }
 
     @Override
     public void registerRecipeCatalysts(IRecipeCatalystRegistration registration) {
-        registration.addRecipeCatalyst(new ItemStack(TinkerTables.tinkerStation.asItem()), HARVEST_STATS, RANGED_STATS, TOOL_PARTS, ARMOR_STATS);
-        registration.addRecipeCatalyst(new ItemStack(TinkerTables.tinkerStation.asItem()), HARVEST_STATS, RANGED_STATS, TOOL_PARTS, ARMOR_STATS);
-        registration.addRecipeCatalyst(new ItemStack(TinkerTables.tinkerStation.asItem()), HARVEST_STATS, RANGED_STATS, TOOL_PARTS, ARMOR_STATS);
+        registration.addRecipeCatalyst(new ItemStack(TinkerTables.tinkerStation.asItem()), HARVEST_STATS, RANGED_STATS, ARMOR_STATS);
+        registration.addRecipeCatalyst(new ItemStack(TinkerTables.tinkerStation.asItem()), HARVEST_STATS, RANGED_STATS, ARMOR_STATS);
+        registration.addRecipeCatalyst(new ItemStack(TinkerTables.tinkerStation.asItem()), HARVEST_STATS, RANGED_STATS, ARMOR_STATS);
     }
 
     private List<ToolStatsWrapper> materials() {
         return MaterialRegistry.getInstance().getVisibleMaterials()
                 .stream()
                 .map(ToolStatsWrapper::new)
-                .toList();
-    }
-
-    private List<ToolPartsWrapper> toolDefinitions() {
-        return ToolDefinitionLoader.getInstance().getRegisteredToolDefinitions()
-                .stream()
-                .filter(definition -> definition.hasMaterials() && !definition.getId().equals(new ResourceLocation("tconstruct", "slime_helmet")))
-                .sorted(Comparator.comparingInt(a -> StationSlotLayoutLoader.getInstance().get(a.getId()).getSortIndex()))
-                .map(ToolPartsWrapper::new)
                 .toList();
     }
 
