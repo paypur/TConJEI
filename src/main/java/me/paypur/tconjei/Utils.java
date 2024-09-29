@@ -1,12 +1,22 @@
 package me.paypur.tconjei;
 
-import net.minecraft.world.item.Item;
+import me.paypur.tconjei.jei.MaterialStatsWrapper;
+import net.minecraft.network.chat.Component;
+import slimeknights.tconstruct.library.materials.MaterialRegistry;
 
-import java.util.HashSet;
+import java.util.HashMap;
+import java.util.List;
 
 public class Utils {
 
-    public static HashSet<Item> AllInputs = new HashSet<>();
+    public static HashMap<String, Component> allMaterialsTooltip = new HashMap<>();
+
+    public static List<MaterialStatsWrapper> getMaterialWrappers() {
+        return MaterialRegistry.getInstance().getVisibleMaterials()
+                .stream()
+                .map(MaterialStatsWrapper::new)
+                .toList();
+    }
 
     public static boolean inBox(double mX, double mY, float x, float y, float w, float h) {
         return (x <= mX && mX <= x + w && y <= mY && mY <= y + h);

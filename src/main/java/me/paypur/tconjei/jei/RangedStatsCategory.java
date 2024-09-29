@@ -30,13 +30,13 @@ public class RangedStatsCategory extends AbstractToolStatsCategory {
         super(guiHelper);
         this.icon = guiHelper.createDrawable(new ResourceLocation(MOD_ID, "textures/gui/jei.png"), 16, 0, 16, 16);
         this.title = new TranslatableComponent("tconjei.tool_stats.ranged");
-        this.recipeType = RecipeType.create(MOD_ID, "ranged_stats", ToolStatsWrapper.class);
+        this.recipeType = RecipeType.create(MOD_ID, "ranged_stats", MaterialStatsWrapper.class);
         this.uid = new ResourceLocation(MOD_ID, "ranged_stats");
         this.tag = TinkerTags.Items.RANGED;
     }
 
     @Override
-    public void draw(ToolStatsWrapper recipe, IRecipeSlotsView recipeSlotsView, PoseStack stack, double mouseX, double mouseY) {
+    public void draw(MaterialStatsWrapper recipe, IRecipeSlotsView recipeSlotsView, PoseStack stack, double mouseX, double mouseY) {
         final String MATERIAL_NAME = ForgeI18n.getPattern(Util.makeTranslationKey("material", recipe.getMaterialId()));
         final int MATERIAL_COLOR = MaterialTooltipCache.getColor(recipe.getMaterialId()).getValue();
         float lineNumber = 2f;
@@ -63,9 +63,9 @@ public class RangedStatsCategory extends AbstractToolStatsCategory {
             LimbMaterialStats limb = limbOptional.get();
             drawShadow(stack, String.format("[%s]", limb.getLocalizedName().getString()), 0, lineNumber++, MATERIAL_COLOR);
             drawStatsShadow(stack, limb.getLocalizedInfo().get(0), lineNumber++, DURABILITY_COLOR);
-            drawStatsShadow(stack, limb.getLocalizedInfo().get(1), lineNumber++, getDifferenceColor(limb.getDrawSpeed()));
-            drawStatsShadow(stack, limb.getLocalizedInfo().get(2), lineNumber++, getDifferenceColor(limb.getVelocity()));
-            drawStatsShadow(stack, limb.getLocalizedInfo().get(3), lineNumber++, getDifferenceColor(limb.getAccuracy()));
+            drawStatsShadow(stack, limb.getLocalizedInfo().get(1), lineNumber++, getMultiplierColor(limb.getDrawSpeed()));
+            drawStatsShadow(stack, limb.getLocalizedInfo().get(2), lineNumber++, getMultiplierColor(limb.getVelocity()));
+            drawStatsShadow(stack, limb.getLocalizedInfo().get(3), lineNumber++, getMultiplierColor(limb.getAccuracy()));
             lineNumber += LINE_SPACING;
         }
 
@@ -74,7 +74,7 @@ public class RangedStatsCategory extends AbstractToolStatsCategory {
             GripMaterialStats grip = gripOptional.get();
             drawShadow(stack, String.format("[%s]", grip.getLocalizedName().getString()), 0, lineNumber++, MATERIAL_COLOR);
             drawStatsShadow(stack, grip.getLocalizedInfo().get(0), lineNumber++, getMultiplierColor(grip.getDurability()));
-            drawStatsShadow(stack, grip.getLocalizedInfo().get(1), lineNumber++, getDifferenceColor(grip.getAccuracy()));
+            drawStatsShadow(stack, grip.getLocalizedInfo().get(1), lineNumber++, getMultiplierColor(grip.getAccuracy()));
             drawStatsShadow(stack, grip.getLocalizedInfo().get(2), lineNumber++, ATTACK_COLOR);
             lineNumber += LINE_SPACING;
         }
@@ -88,7 +88,7 @@ public class RangedStatsCategory extends AbstractToolStatsCategory {
 
     @Nonnull
     @Override
-    public List<Component> getTooltipStrings(ToolStatsWrapper recipe, IRecipeSlotsView recipeSlotsView, double mouseX, double mouseY) {
+    public List<Component> getTooltipStrings(MaterialStatsWrapper recipe, IRecipeSlotsView recipeSlotsView, double mouseX, double mouseY) {
         final String MATERIAL_NAME = ForgeI18n.getPattern(Util.makeTranslationKey("material", recipe.getMaterialId()));
         float lineNumber = 2f;
 

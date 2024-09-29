@@ -1,22 +1,23 @@
 package me.paypur.tconjei;
 
 import net.minecraft.resources.ResourceLocation;
-import slimeknights.mantle.client.ResourceColorManager;
-import slimeknights.tconstruct.library.utils.Util;
+import slimeknights.tconstruct.library.client.materials.MaterialTooltipCache;
+import slimeknights.tconstruct.library.materials.definition.MaterialId;
 
 import java.awt.*;
+import java.util.Optional;
 
 import static me.paypur.tconjei.TConJEI.MOD_ID;
 
 public class ColorManager {
 
-    public static final int WHITE = 0xFFFFFF;
-    public static final int BLACK = 0x000000;
+//    public static final int WHITE = 0xFFFFFF;
+//    public static final int BLACK = 0x000000;
     public static int TEXT_COLOR = 0x3F3F3F;
     public static int DURABILITY_COLOR = 0x47CC47; //0x298E29 dark versions maybe
     public static int MINING_COLOR = 0x78A0CD; //0x4A7EBA
     public static int ATTACK_COLOR = 0xD76464; //0xD05353
-    public static ResourceLocation palette = new ResourceLocation(MOD_ID, "textures/gui/palette.png");
+    static ResourceLocation palette = new ResourceLocation(MOD_ID, "textures/gui/palette.png");
 
     // https://www.w3.org/TR/WCAG20-TECHS/G17.html#G17-procedure
     public static float luminance(int color) {
@@ -62,15 +63,9 @@ public class ColorManager {
         return Color.HSBtoRGB(hsb[0], hsb[1], hsb[2] * factor);
     }
 
-    public static int getMiningLevelColor(ResourceLocation miningLevel) {
-        // TODO: found colors in assets/tconstruct/mantle/colors.json
-        // for some reason the library specified colors are different
-        // are also even harder to read
-        return ResourceColorManager.getColor(Util.makeTranslationKey("harvest_tier", miningLevel));
-    }
-
     // @formatter:off
-    public static int getMultiplierColor(Float f) {
+    public static int getMultiplierColor(float f) {
+        f += 1f;
         if (f < 0.55f) { return 0xbd0000; }
         if (f < 0.60f) { return 0xbd2600; }
         if (f < 0.65f) { return 0xbd4b00; }
@@ -93,8 +88,14 @@ public class ColorManager {
     }
     // @formatter:on
 
-    public static int getDifferenceColor(float f) {
-        return getMultiplierColor(f + 1f);
+    public static Optional<Integer> getTierColor(int i) {
+        return switch (i) {
+            case 1 -> Optional.of(MaterialTooltipCache.getColor(MaterialId.tryParse("tconstruct:bone")).getValue());
+            case 2 -> Optional.of(MaterialTooltipCache.getColor(MaterialId.tryParse("tconstruct:slimewood")).getValue());
+            case 3 -> Optional.of(MaterialTooltipCache.getColor(MaterialId.tryParse("tconstruct:cobalt")).getValue());
+            case 4 -> Optional.of(MaterialTooltipCache.getColor(MaterialId.tryParse("tconstruct:manyullyn")).getValue());
+            default -> Optional.empty();
+        };
     }
 
 }

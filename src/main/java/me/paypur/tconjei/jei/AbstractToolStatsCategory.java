@@ -32,7 +32,7 @@ import static mezz.jei.api.recipe.RecipeIngredientRole.RENDER_ONLY;
 import static net.minecraftforge.common.ForgeI18n.getPattern;
 import static slimeknights.mantle.client.ResourceColorManager.getColor;
 
-public abstract class AbstractToolStatsCategory implements IRecipeCategory<ToolStatsWrapper> {
+public abstract class AbstractToolStatsCategory implements IRecipeCategory<MaterialStatsWrapper> {
 
     static protected final Font FONT = Minecraft.getInstance().font;
     static protected final int LINE_HEIGHT = 10;
@@ -40,7 +40,7 @@ public abstract class AbstractToolStatsCategory implements IRecipeCategory<ToolS
     static protected final int WIDTH = 172;
     static protected final int HEIGHT = 200;
     protected Component title;
-    protected RecipeType<ToolStatsWrapper> recipeType;
+    protected RecipeType<MaterialStatsWrapper> recipeType;
     protected ResourceLocation uid;
     protected IDrawable background, icon;
     protected TagKey<Item> tag;
@@ -50,7 +50,7 @@ public abstract class AbstractToolStatsCategory implements IRecipeCategory<ToolS
     }
 
     @Override
-    public void setRecipe(IRecipeLayoutBuilder builder, ToolStatsWrapper recipe, IFocusGroup focuses) {
+    public void setRecipe(IRecipeLayoutBuilder builder, MaterialStatsWrapper recipe, IFocusGroup focuses) {
         FluidStack fluidStack = recipe.getFluidStack();
         if (!fluidStack.isEmpty()) {
             final int BUCKET = 1000; // milli buckets
@@ -115,7 +115,7 @@ public abstract class AbstractToolStatsCategory implements IRecipeCategory<ToolS
     }
     @NotNull
     @Override
-    public RecipeType<ToolStatsWrapper> getRecipeType() {
+    public RecipeType<MaterialStatsWrapper> getRecipeType() {
         return recipeType;
     }
 
@@ -139,8 +139,8 @@ public abstract class AbstractToolStatsCategory implements IRecipeCategory<ToolS
 
     @NotNull
     @Override
-    public Class<? extends ToolStatsWrapper> getRecipeClass() {
-        return ToolStatsWrapper.class;
+    public Class<? extends MaterialStatsWrapper> getRecipeClass() {
+        return MaterialStatsWrapper.class;
     }
 
 }

@@ -30,13 +30,13 @@ public class HarvestStatsCategory extends AbstractToolStatsCategory {
         super(guiHelper);
         this.icon = guiHelper.createDrawable(new ResourceLocation(MOD_ID, "textures/gui/jei.png"), 0, 0, 16, 16);
         this.title = new TranslatableComponent("tconjei.tool_stats.harvest");
-        this.recipeType = RecipeType.create(MOD_ID, "harvest_stats", ToolStatsWrapper.class);
+        this.recipeType = RecipeType.create(MOD_ID, "harvest_stats", MaterialStatsWrapper.class);
         this.uid = new ResourceLocation(MOD_ID, "harvest_stats");
         this.tag = TinkerTags.Items.HARVEST;
     }
 
     @Override
-    public void draw(ToolStatsWrapper recipe, IRecipeSlotsView recipeSlotsView, PoseStack stack, double mouseX, double mouseY) {
+    public void draw(MaterialStatsWrapper recipe, IRecipeSlotsView recipeSlotsView, PoseStack stack, double mouseX, double mouseY) {
         final String MATERIAL_NAME = ForgeI18n.getPattern(Util.makeTranslationKey("material", recipe.getMaterialId()));
         final int MATERIAL_COLOR = MaterialTooltipCache.getColor(recipe.getMaterialId()).getValue();
         float lineNumber = 2f;
@@ -63,7 +63,7 @@ public class HarvestStatsCategory extends AbstractToolStatsCategory {
             HeadMaterialStats head = headOptional.get();
             drawShadow(stack, String.format("[%s]", head.getLocalizedName().getString()), 0, lineNumber++, MATERIAL_COLOR);
             drawStatsShadow(stack, head.getLocalizedInfo().get(0), lineNumber++, DURABILITY_COLOR);
-            drawStatsShadow(stack, head.getLocalizedInfo().get(1), lineNumber++, getMiningLevelColor(head.getTierId()));
+            drawStatsShadow(stack, head.getLocalizedInfo().get(1), lineNumber++, head.getLocalizedInfo().get(1).getStyle().getColor().getValue());
             drawStatsShadow(stack, head.getLocalizedInfo().get(2), lineNumber++, MINING_COLOR);
             drawStatsShadow(stack, head.getLocalizedInfo().get(3), lineNumber++, ATTACK_COLOR);
             lineNumber += LINE_SPACING;
@@ -89,7 +89,7 @@ public class HarvestStatsCategory extends AbstractToolStatsCategory {
 
     @Nonnull
     @Override
-    public List<Component> getTooltipStrings(ToolStatsWrapper recipe, IRecipeSlotsView recipeSlotsView, double mouseX, double mouseY) {
+    public List<Component> getTooltipStrings(MaterialStatsWrapper recipe, IRecipeSlotsView recipeSlotsView, double mouseX, double mouseY) {
         final String MATERIAL_NAME = ForgeI18n.getPattern(Util.makeTranslationKey("material", recipe.getMaterialId()));
         float lineNumber = 2f;
 
