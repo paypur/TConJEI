@@ -1,11 +1,9 @@
 package me.paypur.tconjei.jei;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import me.paypur.tconjei.Utils;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.recipe.RecipeType;
-import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
@@ -13,7 +11,6 @@ import net.minecraftforge.common.ForgeI18n;
 import slimeknights.tconstruct.common.TinkerTags;
 import slimeknights.tconstruct.library.client.materials.MaterialTooltipCache;
 import slimeknights.tconstruct.library.materials.stats.IMaterialStats;
-import slimeknights.tconstruct.library.utils.Util;
 import slimeknights.tconstruct.tools.stats.*;
 
 import javax.annotation.Nonnull;
@@ -24,7 +21,7 @@ import java.util.stream.Stream;
 import static me.paypur.tconjei.ColorManager.*;
 import static me.paypur.tconjei.TConJEI.MOD_ID;
 
-public class RangedStatsCategory extends AbstractToolStatsCategory {
+public class RangedStatsCategory extends AbstractMaterialStatsCategory {
 
     public RangedStatsCategory(IGuiHelper guiHelper) {
         super(guiHelper);
@@ -36,17 +33,15 @@ public class RangedStatsCategory extends AbstractToolStatsCategory {
     }
 
     @Override
-    public void draw(MaterialStatsWrapper recipe, IRecipeSlotsView recipeSlotsView, PoseStack stack, double mouseX, double mouseY) {
-        final String MATERIAL_NAME = ForgeI18n.getPattern(Util.makeTranslationKey("material", recipe.getMaterialId()));
-        final int MATERIAL_COLOR = MaterialTooltipCache.getColor(recipe.getMaterialId()).getValue();
+    public void draw(MaterialStatsWrapper wrapper, IRecipeSlotsView recipeSlotsView, PoseStack stack, double mouseX, double mouseY) {
+        super.draw(wrapper, recipeSlotsView, stack, mouseX, mouseY);
+
+        final int color = MaterialTooltipCache.getColor(wrapper.getMaterialId()).getValue();
         float lineNumber = 2f;
 
-        Optional<LimbMaterialStats> limbOptional = recipe.getStats(LimbMaterialStats.ID);
-        Optional<GripMaterialStats> gripOptional = recipe.getStats(GripMaterialStats.ID);
-        Optional<BowstringMaterialStats> stringOptional = recipe.getStats(BowstringMaterialStats.ID);
-
-        // MATERIAL
-        drawShadow(stack, MATERIAL_NAME, (WIDTH - FONT.width(MATERIAL_NAME)) / 2, LINE_SPACING, MATERIAL_COLOR);
+        Optional<LimbMaterialStats> limbOptional = wrapper.getStats(LimbMaterialStats.ID);
+        Optional<GripMaterialStats> gripOptional = wrapper.getStats(GripMaterialStats.ID);
+        Optional<BowstringMaterialStats> stringOptional = wrapper.getStats(BowstringMaterialStats.ID);
 
         // TRAITS
         Optional<? extends IMaterialStats> statOptional = Stream.of(limbOptional, gripOptional, stringOptional)
@@ -55,13 +50,13 @@ public class RangedStatsCategory extends AbstractToolStatsCategory {
                 .findFirst();
 
         if (statOptional.isPresent()) {
-            drawTraits(stack, recipe.getTraits(statOptional.get().getIdentifier()), lineNumber);
+            drawTraits(stack, wrapper.getTraits(statOptional.get().getIdentifier()), lineNumber);
         }
 
         // LIMB
         if (limbOptional.isPresent()) {
             LimbMaterialStats limb = limbOptional.get();
-            drawShadow(stack, String.format("[%s]", limb.getLocalizedName().getString()), 0, lineNumber++, MATERIAL_COLOR);
+            drawShadow(stack, String.format("[%s]", limb.getLocalizedName().getString()), 0, lineNumber++, color);
             drawStatsShadow(stack, limb.getLocalizedInfo().get(0), lineNumber++, DURABILITY_COLOR);
             drawStatsShadow(stack, limb.getLocalizedInfo().get(1), lineNumber++, getMultiplierColor(limb.getDrawSpeed()));
             drawStatsShadow(stack, limb.getLocalizedInfo().get(2), lineNumber++, getMultiplierColor(limb.getVelocity()));
@@ -72,7 +67,7 @@ public class RangedStatsCategory extends AbstractToolStatsCategory {
         // GRIP
         if (gripOptional.isPresent()) {
             GripMaterialStats grip = gripOptional.get();
-            drawShadow(stack, String.format("[%s]", grip.getLocalizedName().getString()), 0, lineNumber++, MATERIAL_COLOR);
+            drawShadow(stack, String.format("[%s]", grip.getLocalizedName().getString()), 0, lineNumber++, color);
             drawStatsShadow(stack, grip.getLocalizedInfo().get(0), lineNumber++, getMultiplierColor(grip.getDurability()));
             drawStatsShadow(stack, grip.getLocalizedInfo().get(1), lineNumber++, getMultiplierColor(grip.getAccuracy()));
             drawStatsShadow(stack, grip.getLocalizedInfo().get(2), lineNumber++, ATTACK_COLOR);
@@ -82,25 +77,24 @@ public class RangedStatsCategory extends AbstractToolStatsCategory {
         // STRING
         if (stringOptional.isPresent()) {
             BowstringMaterialStats string = stringOptional.get();
-            drawShadow(stack, String.format("[%s]", string.getLocalizedName().getString()), 0, lineNumber, MATERIAL_COLOR);
+            drawShadow(stack, String.format("[%s]", string.getLocalizedName().getString()), 0, lineNumber++, color);
+            drawString(stack, ForgeI18n.getPattern("tool_stat.tconstruct.extra.no_stats"), 0, lineNumber, TEXT_COLOR);
         }
     }
 
     @Nonnull
     @Override
-    public List<Component> getTooltipStrings(MaterialStatsWrapper recipe, IRecipeSlotsView recipeSlotsView, double mouseX, double mouseY) {
-        final String MATERIAL_NAME = ForgeI18n.getPattern(Util.makeTranslationKey("material", recipe.getMaterialId()));
+    public List<Component> getTooltipStrings(MaterialStatsWrapper wrapper, IRecipeSlotsView recipeSlotsView, double mouseX, double mouseY) {
         float lineNumber = 2f;
 
-        Optional<LimbMaterialStats> limbOptional = recipe.getStats(LimbMaterialStats.ID);
-        Optional<GripMaterialStats> gripOptional = recipe.getStats(GripMaterialStats.ID);
-        Optional<BowstringMaterialStats> stringOptional = recipe.getStats(BowstringMaterialStats.ID);
+        Optional<LimbMaterialStats> limbOptional = wrapper.getStats(LimbMaterialStats.ID);
+        Optional<GripMaterialStats> gripOptional = wrapper.getStats(GripMaterialStats.ID);
+        Optional<BowstringMaterialStats> stringOptional = wrapper.getStats(BowstringMaterialStats.ID);
 
         // MATERIAL
-        int materialWidth = FONT.width(MATERIAL_NAME);
-        if (Utils.inBox(mouseX, mouseY, (WIDTH - materialWidth) / 2f, LINE_SPACING * LINE_HEIGHT - 1, materialWidth, LINE_HEIGHT)) {
-            return List.of(new TranslatableComponent(Util.makeTranslationKey("material", recipe.getMaterialId()) + ".flavor")
-                        .withStyle(ChatFormatting.ITALIC));
+        List<Component> material = super.getTooltipStrings(wrapper, recipeSlotsView, mouseX, mouseY);
+        if (!material.isEmpty()) {
+            return material;
         }
 
         // TRAIT
@@ -110,7 +104,7 @@ public class RangedStatsCategory extends AbstractToolStatsCategory {
                 .findFirst();
 
         if (statOptional.isPresent()) {
-            List<Component> tooltips = getTraitTooltips(recipe.getTraits(statOptional.get().getIdentifier()), mouseX, mouseY, lineNumber);
+            List<Component> tooltips = getTraitTooltips(wrapper.getTraits(statOptional.get().getIdentifier()), mouseX, mouseY, lineNumber);
             if (!tooltips.isEmpty()) {
                 return tooltips;
             }

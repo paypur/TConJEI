@@ -63,6 +63,7 @@ public class ColorManager {
         return Color.HSBtoRGB(hsb[0], hsb[1], hsb[2] * factor);
     }
 
+    // TODO: deal with this
     // @formatter:off
     public static int getMultiplierColor(float f) {
         f += 1f;

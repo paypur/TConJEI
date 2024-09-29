@@ -14,7 +14,7 @@ import slimeknights.tconstruct.library.materials.MaterialRegistry;
 import slimeknights.tconstruct.library.materials.definition.IMaterial;
 import slimeknights.tconstruct.library.materials.definition.MaterialId;
 import slimeknights.tconstruct.library.materials.definition.MaterialVariantId;
-import slimeknights.tconstruct.library.materials.stats.BaseMaterialStats;
+import slimeknights.tconstruct.library.materials.stats.IMaterialStats;
 import slimeknights.tconstruct.library.materials.stats.MaterialStatsId;
 import slimeknights.tconstruct.library.modifiers.ModifierEntry;
 import slimeknights.tconstruct.library.recipe.TinkerRecipeTypes;
@@ -67,25 +67,29 @@ public record MaterialStatsWrapper(IMaterial material) {
         Set<Item> seen = new HashSet<>();
         return RegistryHelper.getTagValueStream(Registry.ITEM, tag)
             .filter(item -> item instanceof IModifiable)
-            .flatMap(item -> ((IModifiable) item).getToolDefinition().getData().getParts()
-                    .stream()
-                    .filter(part -> part.canUseMaterial(material.getIdentifier()))
-                    .map(part -> part.getPart().withMaterial(material.getIdentifier())))
+            .flatMap(
+                item -> ((IModifiable) item).getToolDefinition()
+                        .getData()
+                        .getParts()
+                        .stream()
+                        .filter(part -> part.canUseMaterial(material.getIdentifier()))
+                        .map(part -> part.getPart().withMaterial(material.getIdentifier()))
+            )
             .filter(part -> seen.add(part.getItem()))
             .sorted(Comparator.comparing(a -> a.getItem().getDescriptionId()))
             .toList();
     }
 
-    public <T extends BaseMaterialStats> Optional<T> getStats(MaterialStatsId statsId) {
-        return REGISTRY.getMaterialStats(getMaterialId(), statsId);
+    public <T extends IMaterialStats> Optional<T> getStats(MaterialStatsId materialStatsId) {
+        return REGISTRY.getMaterialStats(getMaterialId(), materialStatsId);
     }
 
-    public boolean hasStats(List<MaterialStatsId> statsIds) {
-        return statsIds.stream().anyMatch(stat -> getStats(stat).isPresent());
+    public boolean hasStats(List<MaterialStatsId> materialStatsId) {
+        return materialStatsId.stream().anyMatch(stat -> getStats(stat).isPresent());
     }
 
-    public List<ModifierEntry> getTraits(MaterialStatsId statsId) {
-        return REGISTRY.getTraits(material.getIdentifier().getId(), statsId);
+    public List<ModifierEntry> getTraits(MaterialStatsId materialStatsId) {
+        return REGISTRY.getTraits(material.getIdentifier().getId(), materialStatsId);
     }
 
 }
