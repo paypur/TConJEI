@@ -3,8 +3,12 @@
     "tconjei.tool_stats.ranged":  "Ranged Tool Stats",
     "tconjei.tool_stats.armor":  "Armor Stats",
 
-    "tconjei.tool_parts": "Tool Building",
-    "tconjei.tool_parts.anvil":  "Broad tools require a Tinker's Anvil!",
-
-    "tconjei.tooltip": "Can be used in tool building"
+    "tconjei.tooltip.tier": "Tier %s",
+    "tconjei.tooltip.harvest": " harvest material",
+    "tconjei.tooltip.harvest_ranged": " harvest, and ranged material",
+    "tconjei.tooltip.harvest_armor": " harvest, and armor material",
+    "tconjei.tooltip.harvest_ranged_armor": " harvest, ranged, and armor material",
+    "tconjei.tooltip.ranged": " ranged material",
+    "tconjei.tooltip.ranged_armor": " ranged, and armor material",
+    "tconjei.tooltip.armor": " armor material"
 }

@@ -1,20 +1,21 @@
 package me.paypur.tconjei;
 
 import com.mojang.logging.LogUtils;
+import me.paypur.tconjei.jei.MaterialStatsWrapper;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.RecipesUpdatedEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
-import slimeknights.mantle.recipe.helper.RecipeHelper;
-import slimeknights.tconstruct.library.recipe.TinkerRecipeTypes;
-import slimeknights.tconstruct.library.recipe.material.MaterialRecipe;
+import slimeknights.tconstruct.library.materials.stats.MaterialStatsId;
+import slimeknights.tconstruct.tools.stats.*;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -22,8 +23,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 
 import static me.paypur.tconjei.TConJEI.MOD_ID;
@@ -31,7 +30,19 @@ import static me.paypur.tconjei.TConJEI.MOD_ID;
 // The value here should match an entry in the META-INF/mods.toml file
 @Mod(MOD_ID)
 public class TConJEI {
+
     public static final String MOD_ID = "tconjei";
+    public static final List<MaterialStatsId> HARVEST_STAT_IDS = List.of(HeadMaterialStats.ID, StatlessMaterialStats.BINDING.getIdentifier(), HandleMaterialStats.ID);
+    public static final List<MaterialStatsId> RANGED_STAT_IDS = List.of(LimbMaterialStats.ID, GripMaterialStats.ID, StatlessMaterialStats.BOWSTRING.getIdentifier());
+    public static final List<MaterialStatsId> ARMOR_STAT_IDS = List.of(
+            PlatingMaterialStats.HELMET.getId(),
+            PlatingMaterialStats.CHESTPLATE.getId(),
+            PlatingMaterialStats.LEGGINGS.getId(),
+            PlatingMaterialStats.BOOTS.getId(),
+            PlatingMaterialStats.SHIELD.getId(),
+            StatlessMaterialStats.MAILLE.getIdentifier(),
+            StatlessMaterialStats.SHIELD_CORE.getIdentifier()
+    );
 
     @Mod.EventBusSubscriber(modid = MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
     public static final class ClientModHandler {
@@ -84,19 +95,40 @@ public class TConJEI {
 
     @Mod.EventBusSubscriber(modid = MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
     public static final class ClientForgeHandler {
+        // TODO: might have problems if server changes and valid materials change too
+        // runs on reload too
         @SubscribeEvent
         public static void onLogin(RecipesUpdatedEvent event) {
-            if (Utils.AllInputs.isEmpty()) {
-                Level world = Minecraft.getInstance().level;
-                if (world == null) {
-                    return;
+            if (!Utils.allMaterialsTooltip.isEmpty()) {
+                return;
+            }
+
+            for (MaterialStatsWrapper wrapper : Utils.getMaterialWrappers()) {
+                for (ItemStack stack : wrapper.getInputs()) {
+                    int h = wrapper.hasStats(HARVEST_STAT_IDS) ? 1 : 0;
+                    int r = wrapper.hasStats(RANGED_STAT_IDS) ? 1 : 0;
+                    int a = wrapper.hasStats(ARMOR_STAT_IDS) ? 1 : 0;
+
+                    int flag = h << 2 | r << 1 | a;
+
+                    if (flag == 0) {
+                        break;
+                    }
+
+                    MutableComponent component = Component.translatable("tconjei.tooltip.tier", wrapper.material().getTier()).withStyle(ChatFormatting.GRAY);
+
+                    switch (flag) {
+                        case 0b001 -> component.append(Component.translatable("tconjei.tooltip.armor"));
+                        case 0b010 -> component.append(Component.translatable("tconjei.tooltip.ranged"));
+                        case 0b011 -> component.append(Component.translatable("tconjei.tooltip.ranged_armor"));
+                        case 0b100 -> component.append(Component.translatable("tconjei.tooltip.harvest"));
+                        case 0b101 -> component.append(Component.translatable("tconjei.tooltip.harvest_armor"));
+                        case 0b110 -> component.append(Component.translatable("tconjei.tooltip.harvest_ranged"));
+                        case 0b111 -> component.append(Component.translatable("tconjei.tooltip.harvest_ranged_armor"));
+                    }
+
+                    Utils.allMaterialsTooltip.put(stack.getItem().getDescriptionId(), component);
                 }
-                List<Item> repairItems = RecipeHelper.getRecipes(world.getRecipeManager(), TinkerRecipeTypes.MATERIAL.get(), MaterialRecipe.class)
-                        .stream()
-                        .flatMap(recipe -> Arrays.stream(recipe.getIngredient().getItems()))
-                        .map(ItemStack::getItem)
-                        .toList();
-                Utils.AllInputs = new HashSet<>(repairItems);
             }
         }
     }
