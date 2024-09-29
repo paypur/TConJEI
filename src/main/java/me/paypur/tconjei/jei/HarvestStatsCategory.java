@@ -5,14 +5,11 @@ import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.recipe.RecipeType;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.ForgeI18n;
 import slimeknights.tconstruct.common.TinkerTags;
 import slimeknights.tconstruct.library.client.materials.MaterialTooltipCache;
 import slimeknights.tconstruct.library.materials.stats.IMaterialStats;
-import slimeknights.tconstruct.library.utils.Util;
 import slimeknights.tconstruct.tools.stats.*;
 
 import javax.annotation.Nonnull;
@@ -23,28 +20,26 @@ import java.util.stream.Stream;
 import static me.paypur.tconjei.ColorManager.*;
 import static me.paypur.tconjei.TConJEI.MOD_ID;
 
-public class HarvestStatsCategory extends AbstractToolStatsCategory {
+public class HarvestStatsCategory extends AbstractMaterialStatsCategory {
 
     public HarvestStatsCategory(IGuiHelper guiHelper) {
         super(guiHelper);
         this.icon = guiHelper.createDrawable(new ResourceLocation(MOD_ID, "textures/gui/jei.png"), 0, 0, 16, 16);
-        this.title = MutableComponent.create(new TranslatableContents("tconjei.tool_stats.harvest"));
-        this.recipeType = RecipeType.create(MOD_ID, "harvest_stats", ToolStatsWrapper.class);
+        this.title = Component.translatable("tconjei.tool_stats.harvest");
+        this.recipeType = RecipeType.create(MOD_ID, "harvest_stats", MaterialStatsWrapper.class);
         this.tag = TinkerTags.Items.HARVEST;
     }
 
     @Override
-    public void draw(ToolStatsWrapper recipe, IRecipeSlotsView recipeSlotsView, PoseStack stack, double mouseX, double mouseY) {
-        final String MATERIAL_NAME = ForgeI18n.getPattern(Util.makeTranslationKey("material", recipe.getMaterialId()));
-        final int MATERIAL_COLOR = MaterialTooltipCache.getColor(recipe.getMaterialId()).getValue();
+    public void draw(MaterialStatsWrapper wrapper, IRecipeSlotsView recipeSlotsView, PoseStack stack, double mouseX, double mouseY) {
+        super.draw(wrapper, recipeSlotsView, stack, mouseX, mouseY);
+
+        final int color = MaterialTooltipCache.getColor(wrapper.getMaterialId()).getValue();
         float lineNumber = 2f;
 
-        Optional<HeadMaterialStats> headOptional = recipe.getStats(HeadMaterialStats.ID);
-        Optional<StatlessMaterialStats> bindingOptional = recipe.getStats(StatlessMaterialStats.BINDING.getIdentifier());
-        Optional<HandleMaterialStats> handleOptional = recipe.getStats(HandleMaterialStats.ID);
-
-        // MATERIAL
-        drawShadow(stack, MATERIAL_NAME, (WIDTH - FONT.width(MATERIAL_NAME)) / 2, LINE_SPACING, MATERIAL_COLOR);
+        Optional<HeadMaterialStats> headOptional = wrapper.getStats(HeadMaterialStats.ID);
+        Optional<StatlessMaterialStats> bindingOptional = wrapper.getStats(StatlessMaterialStats.BINDING.getIdentifier());
+        Optional<HandleMaterialStats> handleOptional = wrapper.getStats(HandleMaterialStats.ID);
 
         // TRAITS
         Optional<? extends IMaterialStats> statOptional = Stream.of(headOptional, bindingOptional, handleOptional)
@@ -53,13 +48,13 @@ public class HarvestStatsCategory extends AbstractToolStatsCategory {
                 .findFirst();
 
         if (statOptional.isPresent()) {
-            drawTraits(stack, recipe.getTraits(statOptional.get().getIdentifier()), lineNumber);
+            drawTraits(stack, wrapper.getTraits(statOptional.get().getIdentifier()), lineNumber);
         }
 
         // HEAD
         if (headOptional.isPresent()) {
             HeadMaterialStats head = headOptional.get();
-            drawShadow(stack, String.format("[%s]", head.getLocalizedName().getString()), 0, lineNumber++, MATERIAL_COLOR);
+            drawShadow(stack, String.format("[%s]", head.getLocalizedName().getString()), 0, lineNumber++, color);
             drawStatsShadow(stack, head.getLocalizedInfo().get(0), lineNumber++, DURABILITY_COLOR);
             drawStatsShadow(stack, head.getLocalizedInfo().get(1), lineNumber++, head.getLocalizedInfo().get(1).getSiblings().get(0).getStyle().getColor().getValue());
             drawStatsShadow(stack, head.getLocalizedInfo().get(2), lineNumber++, MINING_COLOR);
@@ -70,14 +65,15 @@ public class HarvestStatsCategory extends AbstractToolStatsCategory {
         // BINDING
         if (bindingOptional.isPresent()) {
             StatlessMaterialStats binding = bindingOptional.get();
-            drawShadow(stack, String.format("[%s]", binding.getLocalizedName().getString()), 0, lineNumber++, MATERIAL_COLOR);
+            drawShadow(stack, String.format("[%s]", binding.getLocalizedName().getString()), 0, lineNumber++, color);
+            drawString(stack, ForgeI18n.getPattern("tool_stat.tconstruct.extra.no_stats"), 0, lineNumber++, TEXT_COLOR);
             lineNumber += LINE_SPACING;
         }
 
         // HANDLE
         if (handleOptional.isPresent()) {
             HandleMaterialStats handle = handleOptional.get();
-            drawShadow(stack, String.format("[%s]", handle.getLocalizedName().getString()), 0, lineNumber++, MATERIAL_COLOR);
+            drawShadow(stack, String.format("[%s]", handle.getLocalizedName().getString()), 0, lineNumber++, color);
             drawStatsShadow(stack, handle.getLocalizedInfo().get(0), lineNumber++, getMultiplierColor(handle.durability()));
             drawStatsShadow(stack, handle.getLocalizedInfo().get(1), lineNumber++, getMultiplierColor(handle.attackDamage()));
             drawStatsShadow(stack, handle.getLocalizedInfo().get(2), lineNumber++, getMultiplierColor(handle.durability()));
@@ -87,16 +83,15 @@ public class HarvestStatsCategory extends AbstractToolStatsCategory {
 
     @Nonnull
     @Override
-    public List<Component> getTooltipStrings(ToolStatsWrapper recipe, IRecipeSlotsView recipeSlotsView, double mouseX, double mouseY) {
-        final String MATERIAL_NAME = ForgeI18n.getPattern(Util.makeTranslationKey("material", recipe.getMaterialId()));
+    public List<Component> getTooltipStrings(MaterialStatsWrapper wrapper, IRecipeSlotsView recipeSlotsView, double mouseX, double mouseY) {
         float lineNumber = 2f;
 
-        Optional<HeadMaterialStats> headOptional = recipe.getStats(HeadMaterialStats.ID);
-        Optional<IMaterialStats> bindingOptional = recipe.getStats(StatlessMaterialStats.BINDING.getIdentifier());
-        Optional<HandleMaterialStats> handleOptional =  recipe.getStats(HandleMaterialStats.ID);
+        Optional<HeadMaterialStats> headOptional = wrapper.getStats(HeadMaterialStats.ID);
+        Optional<IMaterialStats> bindingOptional = wrapper.getStats(StatlessMaterialStats.BINDING.getIdentifier());
+        Optional<HandleMaterialStats> handleOptional =  wrapper.getStats(HandleMaterialStats.ID);
 
         // MATERIAL
-        List<Component> material = super.getTooltipStrings(recipe, recipeSlotsView, mouseX, mouseY);
+        List<Component> material = super.getTooltipStrings(wrapper, recipeSlotsView, mouseX, mouseY);
         if (!material.isEmpty()) {
             return material;
         }
@@ -108,7 +103,7 @@ public class HarvestStatsCategory extends AbstractToolStatsCategory {
                 .findFirst();
 
         if (statOptional.isPresent()) {
-            List<Component> tooltips = getTraitTooltips(recipe.getTraits(statOptional.get().getIdentifier()), mouseX, mouseY, lineNumber);
+            List<Component> tooltips = getTraitTooltips(wrapper.getTraits(statOptional.get().getIdentifier()), mouseX, mouseY, lineNumber);
             if (!tooltips.isEmpty()) {
                 return tooltips;
             }
@@ -133,7 +128,7 @@ public class HarvestStatsCategory extends AbstractToolStatsCategory {
 
         // EXTRA
         if (bindingOptional.isPresent()) {
-            lineNumber += LINE_SPACING + 1;
+            lineNumber += LINE_SPACING + 2;
         }
 
         // HANDLE

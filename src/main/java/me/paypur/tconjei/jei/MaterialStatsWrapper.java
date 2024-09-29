@@ -26,7 +26,7 @@ import slimeknights.tconstruct.tools.TinkerToolParts;
 
 import java.util.*;
 
-public record ToolStatsWrapper(IMaterial material) {
+public record MaterialStatsWrapper(IMaterial material) {
     private static final IMaterialRegistry REGISTRY = MaterialRegistry.getInstance();
 
     public MaterialId getMaterialId() {
@@ -68,7 +68,8 @@ public record ToolStatsWrapper(IMaterial material) {
         Set<Item> seen = new HashSet<>();
         return RegistryHelper.getTagValueStream(Registry.ITEM, tag)
                 .filter(item -> item instanceof IModifiable)
-                .flatMap(item -> ToolPartsHook.parts(((IModifiable) item).getToolDefinition()).stream()
+                .flatMap(
+                    item -> ToolPartsHook.parts(((IModifiable) item).getToolDefinition()).stream()
                         .filter(part -> part.canUseMaterial(material.getIdentifier()))
                         .map(part -> part.withMaterial(material.getIdentifier()))
                 )

@@ -1,8 +1,11 @@
 package me.paypur.tconjei;
 
 import net.minecraft.resources.ResourceLocation;
+import slimeknights.tconstruct.library.client.materials.MaterialTooltipCache;
+import slimeknights.tconstruct.library.materials.definition.MaterialId;
 
 import java.awt.*;
+import java.util.Optional;
 
 import static me.paypur.tconjei.TConJEI.MOD_ID;
 
@@ -61,6 +64,7 @@ public class ColorManager {
         return Color.HSBtoRGB(hsb[0], hsb[1], hsb[2] * factor);
     }
 
+    // TODO: deal with this
     // @formatter:off
     public static int getMultiplierColor(float f) {
         f += 1f;

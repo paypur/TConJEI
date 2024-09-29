@@ -6,14 +6,11 @@ import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.recipe.RecipeType;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.ForgeI18n;
 import slimeknights.tconstruct.common.TinkerTags;
 import slimeknights.tconstruct.library.client.materials.MaterialTooltipCache;
 import slimeknights.tconstruct.library.materials.stats.IMaterialStats;
-import slimeknights.tconstruct.library.utils.Util;
 import slimeknights.tconstruct.tools.stats.PlatingMaterialStats;
 import slimeknights.tconstruct.tools.stats.StatlessMaterialStats;
 
@@ -24,32 +21,30 @@ import java.util.stream.Stream;
 import static me.paypur.tconjei.ColorManager.*;
 import static me.paypur.tconjei.TConJEI.MOD_ID;
 
-public class ArmorStatsCategory extends AbstractToolStatsCategory {
+public class ArmorStatsCategory extends AbstractMaterialStatsCategory {
 
     public ArmorStatsCategory(IGuiHelper guiHelper) {
         super(guiHelper);
         this.icon = guiHelper.createDrawable(new ResourceLocation(MOD_ID, "textures/gui/jei.png"), 32, 0, 16, 16);
-        this.title = MutableComponent.create(new TranslatableContents("tconjei.tool_stats.armor"));
-        this.recipeType = RecipeType.create(MOD_ID, "armor_stats", ToolStatsWrapper.class);
+        this.title = Component.translatable("tconjei.tool_stats.armor");
+        this.recipeType = RecipeType.create(MOD_ID, "armor_stats", MaterialStatsWrapper.class);
         this.tag = TinkerTags.Items.ARMOR;
     }
 
     @Override
-    public void draw(ToolStatsWrapper recipe, IRecipeSlotsView recipeSlotsView, PoseStack stack, double mouseX, double mouseY) {
-        final String MATERIAL_NAME = ForgeI18n.getPattern(Util.makeTranslationKey("material", recipe.getMaterialId()));
-        final int MATERIAL_COLOR = MaterialTooltipCache.getColor(recipe.getMaterialId()).getValue();
+    public void draw(MaterialStatsWrapper wrapper, IRecipeSlotsView recipeSlotsView, PoseStack stack, double mouseX, double mouseY) {
+        super.draw(wrapper, recipeSlotsView, stack, mouseX, mouseY);
+
+        final int color = MaterialTooltipCache.getColor(wrapper.getMaterialId()).getValue();
         float lineNumber = 2f;
 
-        Optional<PlatingMaterialStats> helmetOptional = recipe.getStats(PlatingMaterialStats.HELMET.getId());
-        Optional<PlatingMaterialStats> chestplateOptional = recipe.getStats(PlatingMaterialStats.CHESTPLATE.getId());
-        Optional<PlatingMaterialStats> leggingsOptional = recipe.getStats(PlatingMaterialStats.LEGGINGS.getId());
-        Optional<PlatingMaterialStats> bootsOptional = recipe.getStats(PlatingMaterialStats.BOOTS.getId());
-        Optional<PlatingMaterialStats> shieldOptional = recipe.getStats(PlatingMaterialStats.SHIELD.getId());
-        Optional<StatlessMaterialStats> coreOptional = recipe.getStats(StatlessMaterialStats.SHIELD_CORE.getIdentifier());
-        Optional<StatlessMaterialStats> mailleOptional = recipe.getStats(StatlessMaterialStats.MAILLE.getIdentifier());
-
-        // MATERIAL
-        drawShadow(stack, MATERIAL_NAME, (WIDTH - FONT.width(MATERIAL_NAME)) / 2, LINE_SPACING, MATERIAL_COLOR);
+        Optional<PlatingMaterialStats> helmetOptional = wrapper.getStats(PlatingMaterialStats.HELMET.getId());
+        Optional<PlatingMaterialStats> chestplateOptional = wrapper.getStats(PlatingMaterialStats.CHESTPLATE.getId());
+        Optional<PlatingMaterialStats> leggingsOptional = wrapper.getStats(PlatingMaterialStats.LEGGINGS.getId());
+        Optional<PlatingMaterialStats> bootsOptional = wrapper.getStats(PlatingMaterialStats.BOOTS.getId());
+        Optional<PlatingMaterialStats> shieldOptional = wrapper.getStats(PlatingMaterialStats.SHIELD.getId());
+        Optional<StatlessMaterialStats> coreOptional = wrapper.getStats(StatlessMaterialStats.SHIELD_CORE.getIdentifier());
+        Optional<StatlessMaterialStats> mailleOptional = wrapper.getStats(StatlessMaterialStats.MAILLE.getIdentifier());
 
         // TRAITS
         Optional<? extends IMaterialStats> statOptional = Stream.of(helmetOptional, chestplateOptional, leggingsOptional, bootsOptional, shieldOptional, coreOptional, mailleOptional)
@@ -58,7 +53,7 @@ public class ArmorStatsCategory extends AbstractToolStatsCategory {
                 .findFirst();
 
         if (statOptional.isPresent()) {
-            drawTraits(stack, recipe.getTraits(statOptional.get().getIdentifier()), lineNumber);
+            drawTraits(stack, wrapper.getTraits(statOptional.get().getIdentifier()), lineNumber);
         }
 
         List<ArmorStat> armorStats = new ArrayList<>();
@@ -95,7 +90,7 @@ public class ArmorStatsCategory extends AbstractToolStatsCategory {
 
         if (platingStats.isPresent()) {
             PlatingMaterialStats plating = platingStats.get();
-            drawShadow(stack, String.format("[%s]", ForgeI18n.getPattern("stat.tconstruct.plating")), 0, lineNumber++, MATERIAL_COLOR);
+            drawShadow(stack, String.format("[%s]", ForgeI18n.getPattern("stat.tconstruct.plating")), 0, lineNumber++, color);
 
             String durabilityText = Utils.colonSplit(plating.getLocalizedInfo().get(0).getString())[0] + " ";
             String armorText = Utils.colonSplit(plating.getLocalizedInfo().get(1).getString())[0] + " ";
@@ -113,15 +108,15 @@ public class ArmorStatsCategory extends AbstractToolStatsCategory {
             int durabilityLine = (maxTextWidth + maxArmorWidth + maxDurabilityWidth - durabilityTextWidth) / lineWidth - 1;
             int armorLine = (maxTextWidth + maxArmorWidth - armorTextWidth) / lineWidth - 1;
 
-            draw(stack, durabilityText, 0, lineNumber, TEXT_COLOR);
+            drawString(stack, durabilityText, 0, lineNumber, TEXT_COLOR);
             drawShadow(stack, line.repeat(durabilityLine) + "┐", durabilityTextWidth, lineNumber++, DURABILITY_COLOR);
             drawShadow(stack, "│", durabilityTextWidth + lineWidth * durabilityLine, lineNumber, DURABILITY_COLOR);
 
-            draw(stack, armorText, 0, lineNumber, TEXT_COLOR);
+            drawString(stack, armorText, 0, lineNumber, TEXT_COLOR);
             drawShadow(stack, line.repeat(armorLine) + "┐", armorTextWidth, lineNumber++, ARMOR_COLOR);
 
             for (ArmorStat armorStat : armorStats) {
-                draw(stack, armorStat.text, 0, lineNumber, TEXT_COLOR);
+                drawString(stack, armorStat.text, 0, lineNumber, TEXT_COLOR);
                 drawShadow(stack, armorStat.armor, maxTextWidth, lineNumber, ARMOR_COLOR); // armor, drawn first because its on the left
                 drawShadow(stack, armorStat.durability, maxTextWidth + maxArmorWidth, lineNumber++, DURABILITY_COLOR); // durability
             }
@@ -134,30 +129,32 @@ public class ArmorStatsCategory extends AbstractToolStatsCategory {
 
         if (coreOptional.isPresent()) {
             StatlessMaterialStats core = coreOptional.get();
-            drawShadow(stack, String.format("[%s]", core.getLocalizedName().getString()), 0, lineNumber++, MATERIAL_COLOR);
+            drawShadow(stack, String.format("[%s]", core.getLocalizedName().getString()), 0, lineNumber++, color);
+            drawString(stack, ForgeI18n.getPattern("tool_stat.tconstruct.extra.no_stats"), 0, lineNumber++, TEXT_COLOR);
             lineNumber += LINE_SPACING;
         }
 
         if (mailleOptional.isPresent()) {
             StatlessMaterialStats maille = mailleOptional.get();
-            drawShadow(stack, String.format("[%s]", maille.getLocalizedName().getString()), 0, lineNumber, MATERIAL_COLOR);
+            drawShadow(stack, String.format("[%s]", maille.getLocalizedName().getString()), 0, lineNumber++, color);
+            drawString(stack, ForgeI18n.getPattern("tool_stat.tconstruct.extra.no_stats"), 0, lineNumber, TEXT_COLOR);
         }
     }
 
     @Override
-    public List<Component> getTooltipStrings(ToolStatsWrapper recipe, IRecipeSlotsView recipeSlotsView, double mouseX, double mouseY) {
+    public List<Component> getTooltipStrings(MaterialStatsWrapper wrapper, IRecipeSlotsView recipeSlotsView, double mouseX, double mouseY) {
         float lineNumber = 2f;
 
-        Optional<PlatingMaterialStats> helmetOptional = recipe.getStats(PlatingMaterialStats.HELMET.getId());
-        Optional<PlatingMaterialStats> chestplateOptional = recipe.getStats(PlatingMaterialStats.CHESTPLATE.getId());
-        Optional<PlatingMaterialStats> leggingsOptional = recipe.getStats(PlatingMaterialStats.LEGGINGS.getId());
-        Optional<PlatingMaterialStats> bootsOptional = recipe.getStats(PlatingMaterialStats.BOOTS.getId());
-        Optional<PlatingMaterialStats> shieldOptional = recipe.getStats(PlatingMaterialStats.SHIELD.getId());
-        Optional<StatlessMaterialStats> coreOptional = recipe.getStats(StatlessMaterialStats.SHIELD_CORE.getIdentifier());
-        Optional<StatlessMaterialStats> mailleOptional = recipe.getStats(StatlessMaterialStats.MAILLE.getIdentifier());
+        Optional<PlatingMaterialStats> helmetOptional = wrapper.getStats(PlatingMaterialStats.HELMET.getId());
+        Optional<PlatingMaterialStats> chestplateOptional = wrapper.getStats(PlatingMaterialStats.CHESTPLATE.getId());
+        Optional<PlatingMaterialStats> leggingsOptional = wrapper.getStats(PlatingMaterialStats.LEGGINGS.getId());
+        Optional<PlatingMaterialStats> bootsOptional = wrapper.getStats(PlatingMaterialStats.BOOTS.getId());
+        Optional<PlatingMaterialStats> shieldOptional = wrapper.getStats(PlatingMaterialStats.SHIELD.getId());
+        Optional<StatlessMaterialStats> coreOptional = wrapper.getStats(StatlessMaterialStats.SHIELD_CORE.getIdentifier());
+        Optional<StatlessMaterialStats> mailleOptional = wrapper.getStats(StatlessMaterialStats.MAILLE.getIdentifier());
 
         // MATERIAL
-        List<Component> material = super.getTooltipStrings(recipe, recipeSlotsView, mouseX, mouseY);
+        List<Component> material = super.getTooltipStrings(wrapper, recipeSlotsView, mouseX, mouseY);
         if (!material.isEmpty()) {
             return material;
         }
@@ -169,7 +166,7 @@ public class ArmorStatsCategory extends AbstractToolStatsCategory {
                 .findFirst();
 
         if (statOptional.isPresent()) {
-            List<Component> tooltips = getTraitTooltips(recipe.getTraits(statOptional.get().getIdentifier()), mouseX, mouseY, lineNumber);
+            List<Component> tooltips = getTraitTooltips(wrapper.getTraits(statOptional.get().getIdentifier()), mouseX, mouseY, lineNumber);
             if (!tooltips.isEmpty()) {
                 return tooltips;
             }
