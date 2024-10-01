@@ -1,6 +1,7 @@
 package me.paypur.tconjei.jei;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import me.paypur.tconjei.ColorManager;
 import me.paypur.tconjei.Utils;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
@@ -69,11 +70,10 @@ public abstract class AbstractMaterialStatsCategory implements IRecipeCategory<M
 
     @Override
     public void draw(MaterialStatsWrapper wrapper, IRecipeSlotsView recipeSlotsView, PoseStack stack, double mouseX, double mouseY) {
-        final String name = ForgeI18n.getPattern(Util.makeTranslationKey("material", wrapper.getMaterialId()));
-        final int color = MaterialTooltipCache.getColor(wrapper.getMaterialId()).getValue();
         final int tier = wrapper.material().getTier();
-        drawShadowCentered(stack, name, 0, color);
-        drawShadowCentered(stack, new TranslatableComponent("tconjei.tooltip.tier", tier).getString(), 1, color);
+        final int color = MaterialTooltipCache.getColor(wrapper.getMaterialId()).getValue();
+        drawShadowCentered(stack, ForgeI18n.getPattern(Util.makeTranslationKey("material", wrapper.getMaterialId())), 0, color);
+        drawShadowCentered(stack, new TranslatableComponent("tconjei.tooltip.tier", tier).getString(), 1, ColorManager.getTierColor(tier).orElse(color));
     }
 
     @Override
