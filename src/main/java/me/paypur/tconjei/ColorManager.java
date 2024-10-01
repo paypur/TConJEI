@@ -91,13 +91,18 @@ public class ColorManager {
     // @formatter:on
 
     public static Optional<Integer> getTierColor(int i) {
-        return switch (i) {
-            case 1 -> Optional.of(MaterialTooltipCache.getColor(MaterialId.tryParse("tconstruct:bone")).getValue());
-            case 2 -> Optional.of(MaterialTooltipCache.getColor(MaterialId.tryParse("tconstruct:slimewood")).getValue());
-            case 3 -> Optional.of(MaterialTooltipCache.getColor(MaterialId.tryParse("tconstruct:cobalt")).getValue());
-            case 4 -> Optional.of(MaterialTooltipCache.getColor(MaterialId.tryParse("tconstruct:manyullyn")).getValue());
-            default -> Optional.empty();
+        MaterialId id = switch (i) {
+            case 1 -> MaterialId.tryParse("tconstruct:bone");
+            case 2 -> MaterialId.tryParse("tconstruct:slimewood");
+            case 3 -> MaterialId.tryParse("tconstruct:cobalt");
+            case 4 -> MaterialId.tryParse("tconstruct:manyullyn");
+            default -> null;
         };
+        if (id != null) {
+            return Optional.of(MaterialTooltipCache.getColor(id).getValue());
+        } else {
+            return Optional.empty();
+        }
     }
 
 }
