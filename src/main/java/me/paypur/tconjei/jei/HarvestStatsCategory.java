@@ -4,10 +4,10 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.recipe.RecipeType;
+import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.common.ForgeI18n;
 import slimeknights.tconstruct.common.TinkerTags;
 import slimeknights.tconstruct.library.client.materials.MaterialTooltipCache;
 import slimeknights.tconstruct.library.materials.stats.IMaterialStats;
@@ -56,8 +56,7 @@ public class HarvestStatsCategory extends AbstractMaterialStatsCategory {
         // HEAD
         if (headOptional.isPresent()) {
             HeadMaterialStats head = headOptional.get();
-            // TODO: change to underline
-            drawStringShadow(stack, String.format("[%s]", head.getLocalizedName().getString()), 0, lineNumber++, color);
+            drawComponentShadow(stack, head.getLocalizedName().withStyle(ChatFormatting.UNDERLINE), 0, lineNumber++, color);
             drawStatComponentShadow(stack, head.getLocalizedInfo().get(0), lineNumber++); // durability
             drawStatComponentShadow(stack, head.getLocalizedInfo().get(1), lineNumber++); // mining tier
             drawStatComponentShadow(stack, head.getLocalizedInfo().get(2), lineNumber++); // mining speed
@@ -68,17 +67,15 @@ public class HarvestStatsCategory extends AbstractMaterialStatsCategory {
         // BINDING
         if (bindingOptional.isPresent()) {
             ExtraMaterialStats binding = bindingOptional.get();
-            // TODO: change to underline
-            drawStringShadow(stack, String.format("[%s]", binding.getLocalizedName().getString()), 0, lineNumber++, color);
-            drawString(stack, ForgeI18n.getPattern("tool_stat.tconstruct.extra.no_stats"), 0, lineNumber++, TEXT_COLOR);
+            drawComponentShadow(stack, binding.getLocalizedName().withStyle(ChatFormatting.UNDERLINE), 0, lineNumber++, color);
+            drawComponent(stack, binding.getLocalizedInfo().get(0), 0, lineNumber++, TEXT_COLOR);
             lineNumber += LINE_SPACING;
         }
 
         // HANDLE
         if (handleOptional.isPresent()) {
             HandleMaterialStats handle = handleOptional.get();
-            // TODO: change to underline
-            drawStringShadow(stack, String.format("[%s]", handle.getLocalizedName().getString()), 0, lineNumber++, color);
+            drawComponentShadow(stack, handle.getLocalizedName().withStyle(ChatFormatting.UNDERLINE), 0, lineNumber++, color);
             drawStatComponentShadow(stack, handle.getLocalizedInfo().get(0), lineNumber++); // durability
             drawStatComponentShadow(stack, handle.getLocalizedInfo().get(1), lineNumber++); // melee damage
             drawStatComponentShadow(stack, handle.getLocalizedInfo().get(2), lineNumber++); // melee speed
