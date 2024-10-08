@@ -6,6 +6,8 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.Style;
+import net.minecraft.network.chat.TextColor;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
@@ -32,6 +34,9 @@ import static me.paypur.tconjei.TConJEI.MOD_ID;
 public class TConJEI {
 
     public static final String MOD_ID = "tconjei";
+
+    public static final boolean ENCYCLOPEDIA_MODE = true;
+
     public static final List<MaterialStatsId> HARVEST_STAT_IDS = List.of(HeadMaterialStats.ID, StatlessMaterialStats.BINDING.getIdentifier(), HandleMaterialStats.ID);
     public static final List<MaterialStatsId> RANGED_STAT_IDS = List.of(LimbMaterialStats.ID, GripMaterialStats.ID, StatlessMaterialStats.BOWSTRING.getIdentifier());
     public static final List<MaterialStatsId> ARMOR_STAT_IDS = List.of(
@@ -53,41 +58,45 @@ public class TConJEI {
 
             folder.mkdirs();
 
-            if (!copy.exists()) {
-                try {
-                    folder.mkdirs();
+            if (copy.exists()) {
+                // delete potentially old versions
+                copy.delete();
+            }
 
-                    ResourceLocation texture = new ResourceLocation(MOD_ID, "tconjeidark.zip");
-                    InputStream in = Minecraft.getInstance().getResourceManager().getResource(texture).get().open();;
-                    FileOutputStream out = new FileOutputStream(copy);
+            try {
+                folder.mkdirs();
 
-                    byte[] buffer = new byte[4096];
-                    int read;
+                ResourceLocation texture = new ResourceLocation(MOD_ID, "tconjeidark.zip");
+                InputStream in = Minecraft.getInstance().getResourceManager().getResource(texture).get().open();;
+                FileOutputStream out = new FileOutputStream(copy);
 
-                    while ((read = in.read(buffer)) > 0) {
-                        out.write(buffer, 0, read);
-                        out.flush();
-                    }
+                byte[] buffer = new byte[4096];
+                int read;
 
-                    in.close();
-                    out.close();
-                } catch (IOException e) {
-                    LogUtils.getLogger().error("Failed to copy built-in resource pack", e);
+                while ((read = in.read(buffer)) > 0) {
+                    out.write(buffer, 0, read);
+                    out.flush();
                 }
+
+                in.close();
+                out.close();
+            } catch (IOException e) {
+                LogUtils.getLogger().error("Failed to copy built-in resource pack", e);
             }
         }
 
         @SubscribeEvent
         public static void onClientReload(TextureStitchEvent.Post event) {
             try {
-                InputStream stream = Minecraft.getInstance().getResourceManager().getResource(ColorManager.palette).get().open();;
+                InputStream stream = Minecraft.getInstance().getResourceManager().getResource(ColorManager.palette).get().open();
                 BufferedImage image = ImageIO.read(stream);
                 ColorManager.TEXT_COLOR = image.getRGB(0, 0);
                 ColorManager.DURABILITY_COLOR = image.getRGB(1, 0);
                 ColorManager.MINING_COLOR = image.getRGB(0, 1);
                 ColorManager.ATTACK_COLOR = image.getRGB(1, 1);
+                ColorManager.ARMOR_COLOR = image.getRGB(2, 1);
                 stream.close();
-            } catch (IOException e) {
+            } catch (ArrayIndexOutOfBoundsException | IOException e) {
                 LogUtils.getLogger().error("Error loading palette", e);
             }
         }
@@ -104,6 +113,8 @@ public class TConJEI {
             }
 
             for (MaterialStatsWrapper wrapper : Utils.getMaterialWrappers()) {
+                // TODO: some items for a material aren't included when they probably should
+                // ice and fire silver
                 for (ItemStack stack : wrapper.getInputs()) {
                     int h = wrapper.hasStats(HARVEST_STAT_IDS) ? 1 : 0;
                     int r = wrapper.hasStats(RANGED_STAT_IDS) ? 1 : 0;
@@ -115,19 +126,23 @@ public class TConJEI {
                         break;
                     }
 
-                    MutableComponent component = Component.translatable("tconjei.tooltip.tier", wrapper.material().getTier()).withStyle(ChatFormatting.GRAY);
+                    int tier = wrapper.material().getTier();
 
-                    switch (flag) {
-                        case 0b001 -> component.append(Component.translatable("tconjei.tooltip.armor"));
-                        case 0b010 -> component.append(Component.translatable("tconjei.tooltip.ranged"));
-                        case 0b011 -> component.append(Component.translatable("tconjei.tooltip.ranged_armor"));
-                        case 0b100 -> component.append(Component.translatable("tconjei.tooltip.harvest"));
-                        case 0b101 -> component.append(Component.translatable("tconjei.tooltip.harvest_armor"));
-                        case 0b110 -> component.append(Component.translatable("tconjei.tooltip.harvest_ranged"));
-                        case 0b111 -> component.append(Component.translatable("tconjei.tooltip.harvest_ranged_armor"));
-                    }
+                    MutableComponent component = Component.translatable("tconjei.tooltip.tier", tier)
+                            .withStyle(style -> style.withColor(ColorManager.getTierColor(tier).orElse(0xAAAAAA)));
 
-                    Utils.allMaterialsTooltip.put(stack.getItem().getDescriptionId(), component);
+                    MutableComponent extra = switch (flag) {
+                        case 0b001 -> Component.translatable("tconjei.tooltip.armor");
+                        case 0b010 -> Component.translatable("tconjei.tooltip.ranged");
+                        case 0b011 -> Component.translatable("tconjei.tooltip.ranged_armor");
+                        case 0b100 -> Component.translatable("tconjei.tooltip.harvest");
+                        case 0b101 -> Component.translatable("tconjei.tooltip.harvest_armor");
+                        case 0b110 -> Component.translatable("tconjei.tooltip.harvest_ranged");
+                        case 0b111 -> Component.translatable("tconjei.tooltip.harvest_ranged_armor");
+                        default -> Component.empty();
+                    };
+
+                    Utils.allMaterialsTooltip.put(stack.getItem().getDescriptionId(), component.append(extra.withStyle(ChatFormatting.GRAY)));
                 }
             }
         }

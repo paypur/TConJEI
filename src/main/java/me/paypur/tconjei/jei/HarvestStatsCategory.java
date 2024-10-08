@@ -54,18 +54,20 @@ public class HarvestStatsCategory extends AbstractMaterialStatsCategory {
         // HEAD
         if (headOptional.isPresent()) {
             HeadMaterialStats head = headOptional.get();
-            drawShadow(stack, String.format("[%s]", head.getLocalizedName().getString()), 0, lineNumber++, color);
-            drawStatsShadow(stack, head.getLocalizedInfo().get(0), lineNumber++, DURABILITY_COLOR);
-            drawStatsShadow(stack, head.getLocalizedInfo().get(1), lineNumber++, head.getLocalizedInfo().get(1).getSiblings().get(0).getStyle().getColor().getValue());
-            drawStatsShadow(stack, head.getLocalizedInfo().get(2), lineNumber++, MINING_COLOR);
-            drawStatsShadow(stack, head.getLocalizedInfo().get(3), lineNumber++, ATTACK_COLOR);
+            // TODO: change to underline
+            drawStringShadow(stack, String.format("[%s]", head.getLocalizedName().getString()), 0, lineNumber++, color);
+            drawStatComponentShadow(stack, head.getLocalizedInfo().get(0), lineNumber++); // durability
+            drawStatComponentShadow(stack, head.getLocalizedInfo().get(1), lineNumber++); // mining tier
+            drawStatComponentShadow(stack, head.getLocalizedInfo().get(2), lineNumber++); // mining speed
+            drawStatComponentShadow(stack, head.getLocalizedInfo().get(3), lineNumber++); // melee damage
             lineNumber += LINE_SPACING;
         }
 
         // BINDING
         if (bindingOptional.isPresent()) {
             StatlessMaterialStats binding = bindingOptional.get();
-            drawShadow(stack, String.format("[%s]", binding.getLocalizedName().getString()), 0, lineNumber++, color);
+            // TODO: change to underline
+            drawStringShadow(stack, String.format("[%s]", binding.getLocalizedName().getString()), 0, lineNumber++, color);
             drawString(stack, ForgeI18n.getPattern("tool_stat.tconstruct.extra.no_stats"), 0, lineNumber++, TEXT_COLOR);
             lineNumber += LINE_SPACING;
         }
@@ -73,28 +75,29 @@ public class HarvestStatsCategory extends AbstractMaterialStatsCategory {
         // HANDLE
         if (handleOptional.isPresent()) {
             HandleMaterialStats handle = handleOptional.get();
-            drawShadow(stack, String.format("[%s]", handle.getLocalizedName().getString()), 0, lineNumber++, color);
-            drawStatsShadow(stack, handle.getLocalizedInfo().get(0), lineNumber++, getMultiplierColor(handle.durability()));
-            drawStatsShadow(stack, handle.getLocalizedInfo().get(1), lineNumber++, getMultiplierColor(handle.attackDamage()));
-            drawStatsShadow(stack, handle.getLocalizedInfo().get(2), lineNumber++, getMultiplierColor(handle.durability()));
-            drawStatsShadow(stack, handle.getLocalizedInfo().get(3), lineNumber, getMultiplierColor(handle.attackDamage()));
+            // TODO: change to underline
+            drawStringShadow(stack, String.format("[%s]", handle.getLocalizedName().getString()), 0, lineNumber++, color);
+            drawStatComponentShadow(stack, handle.getLocalizedInfo().get(0), lineNumber++); // durability
+            drawStatComponentShadow(stack, handle.getLocalizedInfo().get(1), lineNumber++); // melee damage
+            drawStatComponentShadow(stack, handle.getLocalizedInfo().get(2), lineNumber++); // melee speed
+            drawStatComponentShadow(stack, handle.getLocalizedInfo().get(3), lineNumber); // mining speed
         }
     }
 
     @Nonnull
     @Override
     public List<Component> getTooltipStrings(MaterialStatsWrapper wrapper, IRecipeSlotsView recipeSlotsView, double mouseX, double mouseY) {
-        float lineNumber = 2f;
-
-        Optional<HeadMaterialStats> headOptional = wrapper.getStats(HeadMaterialStats.ID);
-        Optional<IMaterialStats> bindingOptional = wrapper.getStats(StatlessMaterialStats.BINDING.getIdentifier());
-        Optional<HandleMaterialStats> handleOptional =  wrapper.getStats(HandleMaterialStats.ID);
-
         // MATERIAL
         List<Component> material = super.getTooltipStrings(wrapper, recipeSlotsView, mouseX, mouseY);
         if (!material.isEmpty()) {
             return material;
         }
+
+        float lineNumber = 2f;
+
+        Optional<HeadMaterialStats> headOptional = wrapper.getStats(HeadMaterialStats.ID);
+        Optional<IMaterialStats> bindingOptional = wrapper.getStats(StatlessMaterialStats.BINDING.getIdentifier());
+        Optional<HandleMaterialStats> handleOptional =  wrapper.getStats(HandleMaterialStats.ID);
 
         // TRAIT
         Optional<? extends IMaterialStats> statOptional = Stream.of(handleOptional, bindingOptional, handleOptional)

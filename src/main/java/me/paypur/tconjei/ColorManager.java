@@ -1,6 +1,8 @@
 package me.paypur.tconjei;
 
+import net.minecraft.network.chat.TextColor;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
 import slimeknights.tconstruct.library.client.materials.MaterialTooltipCache;
 import slimeknights.tconstruct.library.materials.definition.MaterialId;
 
@@ -17,7 +19,7 @@ public class ColorManager {
     public static int DURABILITY_COLOR = 0x47CC47; //0x298E29 dark versions maybe
     public static int MINING_COLOR = 0x78A0CD; //0x4A7EBA
     public static int ATTACK_COLOR = 0xD76464; //0xD05353
-    public static int ARMOR_COLOR = 0x8346ca;
+    public static int ARMOR_COLOR = 0x8346CA;
     static ResourceLocation palette = new ResourceLocation(MOD_ID, "textures/gui/palette.png");
 
     // https://www.w3.org/TR/WCAG20-TECHS/G17.html#G17-procedure
@@ -64,45 +66,24 @@ public class ColorManager {
         return Color.HSBtoRGB(hsb[0], hsb[1], hsb[2] * factor);
     }
 
-    // TODO: deal with this
-    // @formatter:off
-    public static int getMultiplierColor(float f) {
-        f += 1f;
-        if (f < 0.55f) { return 0xbd0000; }
-        if (f < 0.60f) { return 0xbd2600; }
-        if (f < 0.65f) { return 0xbd4b00; }
-        if (f < 0.70f) { return 0xbd7100; }
-        if (f < 0.75f) { return 0xbd9700; }
-        if (f < 0.80f) { return 0xbdbd00; }
-        if (f < 0.85f) { return 0x97bd00; }
-        if (f < 0.90f) { return 0x71bd00; }
-        if (f < 0.95f) { return 0x4bbd00; }
-        if (f < 1.00f) { return 0x26bd00; }
-        if (f < 1.05f) { return 0x00bd00; }
-        if (f < 1.10f) { return 0x00bd26; }
-        if (f < 1.15f) { return 0x00bd4b; }
-        if (f < 1.20f) { return 0x00bd71; }
-        if (f < 1.25f) { return 0x00bd97; }
-        if (f < 1.30f) { return 0x00bdbd; }
-        if (f < 1.35f) { return 0x0097bd; }
-        if (f < 1.4f) { return 0x0071bd; }
-        return 0x004bbd;
+    public static int getShade(TextColor color, float contrastRatio) {
+        return getShade(color.getValue(), contrastRatio);
     }
-    // @formatter:on
 
-    public static Optional<Integer> getTierColor(int i) {
+    public static Optional<TextColor> getTierTextColor(int i) {
         MaterialId id = switch (i) {
-            case 1 -> MaterialId.tryParse("tconstruct:bone");
+            case 1 -> MaterialId.tryParse("tconstruct:rock");
             case 2 -> MaterialId.tryParse("tconstruct:slimewood");
             case 3 -> MaterialId.tryParse("tconstruct:cobalt");
             case 4 -> MaterialId.tryParse("tconstruct:manyullyn");
             default -> null;
         };
-        if (id != null) {
-            return Optional.of(MaterialTooltipCache.getColor(id).getValue());
-        } else {
-            return Optional.empty();
-        }
+
+        return id != null ? Optional.of(MaterialTooltipCache.getColor(id)) : Optional.empty();
+    }
+
+    public static Optional<Integer> getTierColor(int i) {
+        return getTierTextColor(i).map(TextColor::getValue);
     }
 
 }
