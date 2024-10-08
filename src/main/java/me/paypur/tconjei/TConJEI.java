@@ -2,7 +2,6 @@ package me.paypur.tconjei;
 
 import com.mojang.logging.LogUtils;
 import me.paypur.tconjei.jei.MaterialStatsWrapper;
-import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.TranslatableComponent;
@@ -44,27 +43,30 @@ public class TConJEI {
 
             folder.mkdirs();
 
-            if (!copy.exists()) {
-                try {
-                    folder.mkdirs();
+            if (copy.exists()) {
+                // delete potentially old versions
+                copy.delete();
+            }
 
-                    ResourceLocation texture = new ResourceLocation(MOD_ID, "tconjeidark.zip");
-                    InputStream in = Minecraft.getInstance().getResourceManager().getResource(texture).getInputStream();
-                    FileOutputStream out = new FileOutputStream(copy);
+            try {
+                folder.mkdirs();
 
-                    byte[] buffer = new byte[4096];
-                    int read;
+                ResourceLocation texture = new ResourceLocation(MOD_ID, "tconjeidark.zip");
+                InputStream in = Minecraft.getInstance().getResourceManager().getResource(texture).getInputStream();
+                FileOutputStream out = new FileOutputStream(copy);
 
-                    while ((read = in.read(buffer)) > 0) {
-                        out.write(buffer, 0, read);
-                        out.flush();
-                    }
+                byte[] buffer = new byte[4096];
+                int read;
 
-                    in.close();
-                    out.close();
-                } catch (IOException e) {
-                    LogUtils.getLogger().error("Failed to copy built-in resource pack", e);
+                while ((read = in.read(buffer)) > 0) {
+                    out.write(buffer, 0, read);
+                    out.flush();
                 }
+
+                in.close();
+                out.close();
+            } catch (IOException e) {
+                LogUtils.getLogger().error("Failed to copy built-in resource pack", e);
             }
         }
 
@@ -78,7 +80,7 @@ public class TConJEI {
                 ColorManager.MINING_COLOR = image.getRGB(0, 1);
                 ColorManager.ATTACK_COLOR = image.getRGB(1, 1);
                 stream.close();
-            } catch (IOException e) {
+            } catch (ArrayIndexOutOfBoundsException | IOException e) {
                 LogUtils.getLogger().error("Error loading palette", e);
             }
         }
@@ -95,6 +97,8 @@ public class TConJEI {
             }
 
             for (MaterialStatsWrapper wrapper : Utils.getMaterialWrappers()) {
+                // TODO: some items for a material aren't included when they probably should
+                // ice and fire silver
                 for (ItemStack stack : wrapper.getInputs()) {
                     int h = wrapper.hasStats(HARVEST_STAT_IDS) ? 1 : 0;
                     int r = wrapper.hasStats(RANGED_STAT_IDS) ? 1 : 0;
@@ -105,7 +109,10 @@ public class TConJEI {
                         break;
                     }
 
-                    MutableComponent component = new TranslatableComponent("tconjei.tooltip.tier", wrapper.material().getTier()).withStyle(ChatFormatting.GRAY);
+                    int tier = wrapper.material().getTier();
+
+                    MutableComponent component = new TranslatableComponent("tconjei.tooltip.tier", tier)
+                            .withStyle(style -> style.withColor(ColorManager.getTierColor(tier).orElse(0xAAAAAA)));
 
                     switch (flag) {
                         case 0b01 -> component.append(new TranslatableComponent("tconjei.tooltip.ranged"));

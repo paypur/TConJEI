@@ -56,28 +56,28 @@ public class RangedStatsCategory extends AbstractMaterialStatsCategory {
         // LIMB
         if (limbOptional.isPresent()) {
             LimbMaterialStats limb = limbOptional.get();
-            drawShadow(stack, String.format("[%s]", limb.getLocalizedName().getString()), 0, lineNumber++, color);
-            drawStatsShadow(stack, limb.getLocalizedInfo().get(0), lineNumber++, DURABILITY_COLOR);
-            drawStatsShadow(stack, limb.getLocalizedInfo().get(1), lineNumber++, getMultiplierColor(limb.getDrawSpeed()));
-            drawStatsShadow(stack, limb.getLocalizedInfo().get(2), lineNumber++, getMultiplierColor(limb.getVelocity()));
-            drawStatsShadow(stack, limb.getLocalizedInfo().get(3), lineNumber++, getMultiplierColor(limb.getAccuracy()));
+            drawStringShadow(stack, String.format("[%s]", limb.getLocalizedName().getString()), 0, lineNumber++, color);
+            drawStatComponentShadow(stack, limb.getLocalizedInfo().get(0), lineNumber++);
+            drawStatComponentShadow(stack, limb.getLocalizedInfo().get(1), lineNumber++);
+            drawStatComponentShadow(stack, limb.getLocalizedInfo().get(2), lineNumber++);
+            drawStatComponentShadow(stack, limb.getLocalizedInfo().get(3), lineNumber++);
             lineNumber += LINE_SPACING;
         }
 
         // GRIP
         if (gripOptional.isPresent()) {
             GripMaterialStats grip = gripOptional.get();
-            drawShadow(stack, String.format("[%s]", grip.getLocalizedName().getString()), 0, lineNumber++, color);
-            drawStatsShadow(stack, grip.getLocalizedInfo().get(0), lineNumber++, getMultiplierColor(grip.getDurability()));
-            drawStatsShadow(stack, grip.getLocalizedInfo().get(1), lineNumber++, getMultiplierColor(grip.getAccuracy()));
-            drawStatsShadow(stack, grip.getLocalizedInfo().get(2), lineNumber++, ATTACK_COLOR);
+            drawStringShadow(stack, String.format("[%s]", grip.getLocalizedName().getString()), 0, lineNumber++, color);
+            drawStatComponentShadow(stack, grip.getLocalizedInfo().get(0), lineNumber++);
+            drawStatComponentShadow(stack, grip.getLocalizedInfo().get(1), lineNumber++);
+            drawStatComponentShadow(stack, grip.getLocalizedInfo().get(2), lineNumber++);
             lineNumber += LINE_SPACING;
         }
 
         // STRING
         if (stringOptional.isPresent()) {
             BowstringMaterialStats string = stringOptional.get();
-            drawShadow(stack, String.format("[%s]", string.getLocalizedName().getString()), 0, lineNumber++, color);
+            drawStringShadow(stack, String.format("[%s]", string.getLocalizedName().getString()), 0, lineNumber++, color);
             drawString(stack, ForgeI18n.getPattern("tool_stat.tconstruct.extra.no_stats"), 0, lineNumber, TEXT_COLOR);
         }
     }
@@ -85,17 +85,17 @@ public class RangedStatsCategory extends AbstractMaterialStatsCategory {
     @Nonnull
     @Override
     public List<Component> getTooltipStrings(MaterialStatsWrapper wrapper, IRecipeSlotsView recipeSlotsView, double mouseX, double mouseY) {
-        float lineNumber = 2f;
-
-        Optional<LimbMaterialStats> limbOptional = wrapper.getStats(LimbMaterialStats.ID);
-        Optional<GripMaterialStats> gripOptional = wrapper.getStats(GripMaterialStats.ID);
-        Optional<BowstringMaterialStats> stringOptional = wrapper.getStats(BowstringMaterialStats.ID);
-
         // MATERIAL
         List<Component> material = super.getTooltipStrings(wrapper, recipeSlotsView, mouseX, mouseY);
         if (!material.isEmpty()) {
             return material;
         }
+
+        float lineNumber = 2f;
+
+        Optional<LimbMaterialStats> limbOptional = wrapper.getStats(LimbMaterialStats.ID);
+        Optional<GripMaterialStats> gripOptional = wrapper.getStats(GripMaterialStats.ID);
+        Optional<BowstringMaterialStats> stringOptional = wrapper.getStats(BowstringMaterialStats.ID);
 
         // TRAIT
         Optional<? extends IMaterialStats> statOptional = Stream.of(limbOptional, gripOptional, stringOptional)

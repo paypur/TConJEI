@@ -14,6 +14,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
@@ -53,15 +54,15 @@ public abstract class AbstractMaterialStatsCategory implements IRecipeCategory<M
     }
 
     @Override
-    public void setRecipe(IRecipeLayoutBuilder builder, MaterialStatsWrapper recipe, IFocusGroup focuses) {
-        final FluidStack fluidStack = recipe.getFluidStack();
+    public void setRecipe(IRecipeLayoutBuilder builder, MaterialStatsWrapper wrapper, IFocusGroup focuses) {
+        final FluidStack fluidStack = wrapper.getFluidStack();
         if (!fluidStack.isEmpty()) {
             final int bucket = 1000; // milli buckets
             builder.addSlot(RENDER_ONLY, 18, 0).addFluidStack(fluidStack.getFluid(), bucket);
             builder.addInvisibleIngredients(INPUT).addFluidStack(fluidStack.getFluid(), bucket);
         }
-        final List<ItemStack> inputs = recipe.getInputs();
-        final List<ItemStack> inputsParts = recipe.getInputsParts(tag);
+        final List<ItemStack> inputs = wrapper.getInputs();
+        final List<ItemStack> inputsParts = wrapper.getInputsParts(tag);
         builder.addSlot(RENDER_ONLY, 0, 0).addItemStacks(inputs);
         builder.addSlot(RENDER_ONLY, WIDTH - 16, 0).addItemStacks(inputsParts);
         builder.addInvisibleIngredients(INPUT).addItemStacks(inputs);
@@ -72,16 +73,16 @@ public abstract class AbstractMaterialStatsCategory implements IRecipeCategory<M
     public void draw(MaterialStatsWrapper wrapper, IRecipeSlotsView recipeSlotsView, PoseStack stack, double mouseX, double mouseY) {
         final int tier = wrapper.material().getTier();
         final int color = MaterialTooltipCache.getColor(wrapper.getMaterialId()).getValue();
-        drawShadowCentered(stack, ForgeI18n.getPattern(Util.makeTranslationKey("material", wrapper.getMaterialId())), 0, color);
-        drawShadowCentered(stack, new TranslatableComponent("tconjei.tooltip.tier", tier).getString(), 1, ColorManager.getTierColor(tier).orElse(color));
+        drawComponentShadowCentered(stack, new TranslatableComponent(Util.makeTranslationKey("material", wrapper.getMaterialId())).withStyle(ChatFormatting.UNDERLINE), 0, color);
+        drawComponentShadowCentered(stack, new TranslatableComponent("tconjei.tooltip.tier", tier), 1, ColorManager.getTierColor(tier).orElse(color));
     }
 
     @Override
-    public List<Component> getTooltipStrings(MaterialStatsWrapper recipe, IRecipeSlotsView recipeSlotsView, double mouseX, double mouseY) {
-        final String MATERIAL_NAME = ForgeI18n.getPattern(Util.makeTranslationKey("material", recipe.getMaterialId()));
-        final int materialWidth = FONT.width(MATERIAL_NAME);
-        if (Utils.inBox(mouseX, mouseY, (WIDTH - materialWidth) / 2f, -1, materialWidth, LINE_HEIGHT)) {
-            return List.of(new TranslatableComponent(Util.makeTranslationKey("material", recipe.getMaterialId()) + ".flavor").withStyle(ChatFormatting.ITALIC));
+    public List<Component> getTooltipStrings(MaterialStatsWrapper wrapper, IRecipeSlotsView recipeSlotsView, double mouseX, double mouseY) {
+        final String key = Util.makeTranslationKey("material", wrapper.getMaterialId());
+        final int width = FONT.width(ForgeI18n.getPattern(key));
+        if (Utils.inBox(mouseX, mouseY, (WIDTH - width) / 2f, -1, width, LINE_HEIGHT)) {
+            return List.of(new TranslatableComponent(key + ".flavor").withStyle(ChatFormatting.ITALIC));
         }
         return List.of();
     }
@@ -90,29 +91,37 @@ public abstract class AbstractMaterialStatsCategory implements IRecipeCategory<M
         FONT.draw(stack, string, x, lineNumber * LINE_HEIGHT, color);
     }
 
-    protected void drawShadow(PoseStack stack, String string, int x, float lineNumber, int color) {
+    protected void drawComponent(PoseStack stack, Component component, int x, float lineNumber, int color) {
+        FONT.draw(stack, component, x, lineNumber * LINE_HEIGHT, color);
+    }
+
+    protected void drawStringShadow(PoseStack stack, String string, int x, float lineNumber, int color) {
         drawString(stack, string, x + 1, lineNumber + 0.1f, getShade(color, 6));
         drawString(stack, string, x, lineNumber, color);
     }
 
-    protected void drawShadowCentered(PoseStack stack, String string, float lineNumber, int color) {
-        final int x = (WIDTH - FONT.width(string)) / 2;
-        drawString(stack, string, x + 1, lineNumber + 0.1f, getShade(color, 6));
-        drawString(stack, string, x, lineNumber, color);
+    protected void drawStatComponentShadow(PoseStack stack, Component component, float lineNumber) {
+        MutableComponent copy = component.plainCopy();
+        int width = FONT.width(copy.getVisualOrderText());
+
+        MutableComponent sibling = component.getSiblings().get(0).copy();
+        sibling.withStyle(style -> style.withColor(getShade(sibling.getStyle().getColor(), 6)));
+
+        drawComponent(stack, sibling, width + 1, lineNumber  + 0.1f, getShade(TEXT_COLOR, 6));
+        drawComponent(stack, component, 0, lineNumber, TEXT_COLOR);
     }
 
-    protected void drawStatsShadow(PoseStack stack, Component component, float lineNumber, int color) {
-        final String[] strings = Utils.colonSplit(component.getString());
-        final int width = FONT.width(strings[0]);
-        drawString(stack, strings[0], 0, lineNumber, TEXT_COLOR);
-        drawShadow(stack, strings[1], width, lineNumber, color);
+    protected void drawComponentShadowCentered(PoseStack stack, Component component, float lineNumber, int color) {
+        final int x = (WIDTH - FONT.width(component)) / 2;
+        drawComponent(stack, component, x + 1, lineNumber  + 0.1f, getShade(color, 6));
+        drawComponent(stack, component, x, lineNumber, color);
     }
 
     protected void drawTraits(PoseStack stack, List<ModifierEntry> traits, float lineNumber) {
         for (ModifierEntry trait : traits) {
-            String string = ForgeI18n.getPattern(Util.makeTranslationKey("modifier", trait.getId()));
-            int traitColor = ResourceColorManager.getColor(Util.makeTranslationKey("modifier", trait.getId()));
-            drawShadow(stack, string, WIDTH - FONT.width(string), lineNumber++, traitColor);
+            final String string = ForgeI18n.getPattern(Util.makeTranslationKey("modifier", trait.getId()));
+            final int color = ResourceColorManager.getColor(Util.makeTranslationKey("modifier", trait.getId()));
+            drawStringShadow(stack, string, WIDTH - FONT.width(string), lineNumber++, color);
         }
     }
 

@@ -1,6 +1,7 @@
 {
-    "tconjei.tool_stats.harvest":  "Harvest Tool Stats",
-    "tconjei.tool_stats.ranged":  "Ranged Tool Stats",
+    "tconjei.tool_stats.harvest":  "Harvest Stats",
+    "tconjei.tool_stats.ranged":  "Ranged Stats",
+    "tconjei.tool_stats.armor":  "Armor Stats",
 
     "tconjei.tooltip.tier": "Tier %s",
     "tconjei.tooltip.harvest": " harvest material",
