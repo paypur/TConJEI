@@ -4,9 +4,9 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.recipe.RecipeType;
+import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.common.ForgeI18n;
 import slimeknights.tconstruct.common.TinkerTags;
 import slimeknights.tconstruct.library.client.materials.MaterialTooltipCache;
 import slimeknights.tconstruct.library.materials.stats.IMaterialStats;
@@ -54,7 +54,7 @@ public class RangedStatsCategory extends AbstractMaterialStatsCategory {
         // LIMB
         if (limbOptional.isPresent()) {
             LimbMaterialStats limb = limbOptional.get();
-            drawStringShadow(stack, String.format("[%s]", limb.getLocalizedName().getString()), 0, lineNumber++, color);
+            drawComponentShadow(stack, limb.getLocalizedName().withStyle(ChatFormatting.UNDERLINE), 0, lineNumber++, color);
             drawStatComponentShadow(stack, limb.getLocalizedInfo().get(0), lineNumber++);
             drawStatComponentShadow(stack, limb.getLocalizedInfo().get(1), lineNumber++);
             drawStatComponentShadow(stack, limb.getLocalizedInfo().get(2), lineNumber++);
@@ -65,7 +65,7 @@ public class RangedStatsCategory extends AbstractMaterialStatsCategory {
         // GRIP
         if (gripOptional.isPresent()) {
             GripMaterialStats grip = gripOptional.get();
-            drawStringShadow(stack, String.format("[%s]", grip.getLocalizedName().getString()), 0, lineNumber++, color);
+            drawComponentShadow(stack, grip.getLocalizedName().withStyle(ChatFormatting.UNDERLINE), 0, lineNumber++, color);
             drawStatComponentShadow(stack, grip.getLocalizedInfo().get(0), lineNumber++);
             drawStatComponentShadow(stack, grip.getLocalizedInfo().get(1), lineNumber++);
             drawStatComponentShadow(stack, grip.getLocalizedInfo().get(2), lineNumber++);
@@ -75,8 +75,8 @@ public class RangedStatsCategory extends AbstractMaterialStatsCategory {
         // STRING
         if (stringOptional.isPresent()) {
             StatlessMaterialStats string = stringOptional.get();
-            drawStringShadow(stack, String.format("[%s]", string.getLocalizedName().getString()), 0, lineNumber++, color);
-            drawString(stack, ForgeI18n.getPattern("tool_stat.tconstruct.extra.no_stats"), 0, lineNumber, TEXT_COLOR);
+            drawComponentShadow(stack, string.getLocalizedName().withStyle(ChatFormatting.UNDERLINE), 0, lineNumber++, color);
+            drawComponent(stack, string.getLocalizedInfo().get(0), 0, lineNumber, TEXT_COLOR);
         }
     }
 

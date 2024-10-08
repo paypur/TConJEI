@@ -5,6 +5,7 @@ import me.paypur.tconjei.Utils;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.recipe.RecipeType;
+import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.ForgeI18n;
@@ -90,10 +91,10 @@ public class ArmorStatsCategory extends AbstractMaterialStatsCategory {
 
         if (platingStats.isPresent()) {
             PlatingMaterialStats plating = platingStats.get();
-            drawStringShadow(stack, String.format("[%s]", ForgeI18n.getPattern("stat.tconstruct.plating")), 0, lineNumber++, color);
+            drawComponentShadow(stack, Component.translatable("stat.tconstruct.plating").withStyle(ChatFormatting.UNDERLINE), 0, lineNumber++, color);
 
-            String durabilityText = Utils.colonSplit(plating.getLocalizedInfo().get(0).getString())[0] + " ";
-            String armorText = Utils.colonSplit(plating.getLocalizedInfo().get(1).getString())[0] + " ";
+            String durabilityText = plating.getLocalizedInfo().get(0).plainCopy().getString();
+            String armorText = plating.getLocalizedInfo().get(1).plainCopy().getString();
 
             int durabilityTextWidth = FONT.width(durabilityText);
             int armorTextWidth = FONT.width(armorText);
@@ -129,15 +130,15 @@ public class ArmorStatsCategory extends AbstractMaterialStatsCategory {
 
         if (coreOptional.isPresent()) {
             StatlessMaterialStats core = coreOptional.get();
-            drawStringShadow(stack, String.format("[%s]", core.getLocalizedName().getString()), 0, lineNumber++, color);
-            drawString(stack, ForgeI18n.getPattern("tool_stat.tconstruct.extra.no_stats"), 0, lineNumber++, TEXT_COLOR);
+            drawComponentShadow(stack, core.getLocalizedName().withStyle(ChatFormatting.UNDERLINE), 0, lineNumber++, color);
+            drawComponent(stack, core.getLocalizedInfo().get(0), 0, lineNumber++, TEXT_COLOR);
             lineNumber += LINE_SPACING;
         }
 
         if (mailleOptional.isPresent()) {
             StatlessMaterialStats maille = mailleOptional.get();
-            drawStringShadow(stack, String.format("[%s]", maille.getLocalizedName().getString()), 0, lineNumber++, color);
-            drawString(stack, ForgeI18n.getPattern("tool_stat.tconstruct.extra.no_stats"), 0, lineNumber, TEXT_COLOR);
+            drawComponentShadow(stack, maille.getLocalizedName().withStyle(ChatFormatting.UNDERLINE), 0, lineNumber++, color);
+            drawComponent(stack, maille.getLocalizedInfo().get(0), 0, lineNumber, TEXT_COLOR);
         }
     }
 

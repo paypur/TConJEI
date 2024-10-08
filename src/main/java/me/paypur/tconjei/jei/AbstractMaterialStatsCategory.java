@@ -14,7 +14,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.TextColor;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -97,32 +97,30 @@ public abstract class AbstractMaterialStatsCategory implements IRecipeCategory<M
     }
 
     protected void drawStatComponentShadow(PoseStack stack, Component component, float lineNumber) {
-        MutableComponent copy = component.plainCopy();
-        int width = FONT.width(copy.getVisualOrderText());
-
-        MutableComponent sibling = component.getSiblings().get(0).copy();
-        sibling.withStyle(style -> style.withColor(getShade(sibling.getStyle().getColor(), 6)));
-
-        drawComponent(stack, sibling, width + 1, lineNumber  + 0.1f, getShade(TEXT_COLOR, 6));
-        drawComponent(stack, component, 0, lineNumber, TEXT_COLOR);
+        Component sibling = component.getSiblings().get(0);
+        drawComponentShadow(stack, sibling.plainCopy(), FONT.width(component.plainCopy()), lineNumber, sibling.getStyle().getColor().getValue());
+        drawComponent(stack, component.plainCopy(), 0, lineNumber, TEXT_COLOR);
     }
 
-    protected void drawComponentShadowCentered(PoseStack stack, Component component, float lineNumber, int color) {
-        final int x = (WIDTH - FONT.width(component)) / 2;
+    protected void drawComponentShadow(PoseStack stack, Component component, int x, float lineNumber, int color) {
         drawComponent(stack, component, x + 1, lineNumber  + 0.1f, getShade(color, 6));
         drawComponent(stack, component, x, lineNumber, color);
     }
 
+    protected void drawComponentShadowCentered(PoseStack stack, Component component, float lineNumber, int color) {
+        drawComponentShadow(stack, component, (WIDTH - FONT.width(component)) / 2, lineNumber, color);
+    }
+
     protected void drawTraits(PoseStack stack, List<ModifierEntry> traits, float lineNumber) {
         for (ModifierEntry trait : traits) {
-            final String string = ForgeI18n.getPattern(Util.makeTranslationKey("modifier", trait.getId()));
+            final Component component = trait.getDisplayName().copy().withStyle(style -> style.withColor((TextColor) null));
             final int color = ResourceColorManager.getColor(Util.makeTranslationKey("modifier", trait.getId()));
-            drawStringShadow(stack, string, WIDTH - FONT.width(string), lineNumber++, color);
+            drawComponentShadow(stack, component, WIDTH - FONT.width(component), lineNumber++, color);
         }
     }
 
     protected List<Component> getStatTooltip(IMaterialStats stats, int i, double mouseX, double mouseY, float lineNumber) {
-        final int width = FONT.width(Utils.colonSplit(stats.getLocalizedInfo().get(i).getString())[0]);
+        final int width = FONT.width(stats.getLocalizedInfo().get(i).plainCopy());
         if (Utils.inBox(mouseX, mouseY, 0, lineNumber * LINE_HEIGHT - 1, width, LINE_HEIGHT)) {
             return List.of(stats.getLocalizedDescriptions().get(i));
         }
