@@ -2,8 +2,10 @@ package me.paypur.tconjei;
 
 import com.mojang.logging.LogUtils;
 import me.paypur.tconjei.jei.MaterialStatsWrapper;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
@@ -17,6 +19,7 @@ import slimeknights.tconstruct.library.materials.stats.MaterialStatsId;
 import slimeknights.tconstruct.tools.stats.*;
 
 import javax.imageio.ImageIO;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -97,8 +100,6 @@ public class TConJEI {
             }
 
             for (MaterialStatsWrapper wrapper : Utils.getMaterialWrappers()) {
-                // TODO: some items for a material aren't included when they probably should
-                // ice and fire silver
                 for (ItemStack stack : wrapper.getInputs()) {
                     int h = wrapper.hasStats(HARVEST_STAT_IDS) ? 1 : 0;
                     int r = wrapper.hasStats(RANGED_STAT_IDS) ? 1 : 0;
@@ -114,13 +115,14 @@ public class TConJEI {
                     MutableComponent component = new TranslatableComponent("tconjei.tooltip.tier", tier)
                             .withStyle(style -> style.withColor(ColorManager.getTierColor(tier).orElse(0xAAAAAA)));
 
-                    switch (flag) {
-                        case 0b01 -> component.append(new TranslatableComponent("tconjei.tooltip.ranged"));
-                        case 0b10 -> component.append(new TranslatableComponent("tconjei.tooltip.harvest"));
-                        case 0b11 -> component.append(new TranslatableComponent("tconjei.tooltip.harvest_ranged"));
-                    }
+                    MutableComponent extra = switch (flag) {
+                        case 0b01 -> new TranslatableComponent("tconjei.tooltip.ranged");
+                        case 0b10 -> new TranslatableComponent("tconjei.tooltip.harvest");
+                        case 0b11 -> new TranslatableComponent("tconjei.tooltip.harvest_ranged");
+                        default -> (MutableComponent) TextComponent.EMPTY;
+                    };
 
-                    Utils.allMaterialsTooltip.put(stack.getItem().getDescriptionId(), component);
+                    Utils.allMaterialsTooltip.put(stack.getItem(), component.append(extra.withStyle(ChatFormatting.GRAY)));
                 }
             }
         }
