@@ -38,7 +38,7 @@ public abstract class AbstractMaterialStatsCategory implements IRecipeCategory<M
     protected static final Font FONT = Minecraft.getInstance().font;
     protected static final int LINE_HEIGHT = 10;
     protected static final float LINE_SPACING = 0.5f;
-    protected static final int WIDTH = 176;
+    protected static final int WIDTH = 178;
     protected static final int HEIGHT = 200;
     protected Component title;
     protected RecipeType<MaterialStatsWrapper> recipeType;
@@ -77,6 +77,7 @@ public abstract class AbstractMaterialStatsCategory implements IRecipeCategory<M
     public List<Component> getTooltipStrings(MaterialStatsWrapper wrapper, IRecipeSlotsView recipeSlotsView, double mouseX, double mouseY) {
         final String key = Util.makeTranslationKey("material", wrapper.getMaterialId());
         final int width = FONT.width(ForgeI18n.getPattern(key));
+        // TODO: doesnt line up with actual text, slightly to the left
         if (Utils.inBox(mouseX, mouseY, (WIDTH - width) / 2f, -1, width, LINE_HEIGHT)) {
             return List.of(Component.translatable(key + ".flavor").withStyle(ChatFormatting.ITALIC));
         }
@@ -130,7 +131,7 @@ public abstract class AbstractMaterialStatsCategory implements IRecipeCategory<M
     protected List<Component> getTraitTooltips(List<ModifierEntry> traits, double mouseX, double mouseY, float lineNumber) {
         for (ModifierEntry trait : traits) {
             final String key = Util.makeTranslationKey("modifier", trait.getId());
-            final int width = FONT.width(ForgeI18n.getPattern(key));
+            final int width = FONT.width(trait.getDisplayName());
             if (Utils.inBox(mouseX, mouseY, WIDTH - width, lineNumber++ * LINE_HEIGHT - 1, width, LINE_HEIGHT)) {
                 return List.of(Component.translatable(key + ".flavor").withStyle(ChatFormatting.ITALIC),
                         Component.translatable(key + ".description"));

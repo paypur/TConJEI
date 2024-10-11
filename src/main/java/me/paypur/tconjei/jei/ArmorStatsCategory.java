@@ -118,8 +118,8 @@ public class ArmorStatsCategory extends AbstractMaterialStatsCategory {
 
             for (ArmorStat armorStat : armorStats) {
                 drawString(stack, armorStat.text, 0, lineNumber, TEXT_COLOR);
-                drawStringShadow(stack, armorStat.armor, maxTextWidth, lineNumber, ARMOR_COLOR); // armor, drawn first because its on the left
-                drawStringShadow(stack, armorStat.durability, maxTextWidth + maxArmorWidth, lineNumber++, DURABILITY_COLOR); // durability
+                drawStringShadow(stack, armorStat.armor, maxTextWidth + maxArmorWidth - FONT.width(armorStat.armor), lineNumber, ARMOR_COLOR); // armor, drawn first because its on the left
+                drawStringShadow(stack, armorStat.durability, maxTextWidth + maxArmorWidth + maxDurabilityWidth - FONT.width(armorStat.durability), lineNumber++, DURABILITY_COLOR); // durability
             }
 
             // these should be the same for the whole set

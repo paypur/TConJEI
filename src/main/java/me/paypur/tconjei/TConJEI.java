@@ -113,8 +113,6 @@ public class TConJEI {
             }
 
             for (MaterialStatsWrapper wrapper : Utils.getMaterialWrappers()) {
-                // TODO: some items for a material aren't included when they probably should
-                // ice and fire silver
                 for (ItemStack stack : wrapper.getInputs()) {
                     int h = wrapper.hasStats(HARVEST_STAT_IDS) ? 1 : 0;
                     int r = wrapper.hasStats(RANGED_STAT_IDS) ? 1 : 0;
@@ -142,7 +140,7 @@ public class TConJEI {
                         default -> Component.empty();
                     };
 
-                    Utils.allMaterialsTooltip.put(stack.getItem().getDescriptionId(), component.append(extra.withStyle(ChatFormatting.GRAY)));
+                    Utils.allMaterialsTooltip.put(stack.getItem(), component.append(extra.withStyle(ChatFormatting.GRAY)));
                 }
             }
         }
