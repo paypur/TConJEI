@@ -1,25 +1,17 @@
 package me.paypur.tconjei;
 
 import net.minecraft.network.chat.TextColor;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.Mth;
 import slimeknights.tconstruct.library.client.materials.MaterialTooltipCache;
 import slimeknights.tconstruct.library.materials.definition.MaterialId;
 
 import java.awt.*;
 import java.util.Optional;
 
-import static me.paypur.tconjei.TConJEI.MOD_ID;
-
 public class ColorManager {
 
 //    public static final int WHITE = 0xFFFFFF;
 //    public static final int BLACK = 0x000000;
     public static int TEXT_COLOR = 0x3F3F3F;
-    public static int DURABILITY_COLOR = 0x47CC47; //0x298E29 dark versions maybe
-    public static int MINING_COLOR = 0x78A0CD; //0x4A7EBA
-    public static int ATTACK_COLOR = 0xD76464; //0xD05353
-    static ResourceLocation palette = new ResourceLocation(MOD_ID, "textures/gui/palette.png");
 
     // https://www.w3.org/TR/WCAG20-TECHS/G17.html#G17-procedure
     public static float luminance(int color) {
@@ -63,10 +55,6 @@ public class ColorManager {
 
         // relationship between rgb is constant while changing brightness
         return Color.HSBtoRGB(hsb[0], hsb[1], hsb[2] * factor);
-    }
-
-    public static int getShade(TextColor color, float contrastRatio) {
-        return getShade(color.getValue(), contrastRatio);
     }
 
     public static Optional<TextColor> getTierTextColor(int i) {

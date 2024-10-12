@@ -88,17 +88,8 @@ public abstract class AbstractMaterialStatsCategory implements IRecipeCategory<M
         return List.of();
     }
 
-    protected void drawString(PoseStack stack, String string, int x, float lineNumber, int color) {
-        FONT.draw(stack, string, x, lineNumber * LINE_HEIGHT, color);
-    }
-
     protected void drawComponent(PoseStack stack, Component component, int x, float lineNumber, int color) {
         FONT.draw(stack, component, x, lineNumber * LINE_HEIGHT, color);
-    }
-
-    protected void drawStringShadow(PoseStack stack, String string, int x, float lineNumber, int color) {
-        drawString(stack, string, x + 1, lineNumber + 0.1f, getShade(color, 6));
-        drawString(stack, string, x, lineNumber, color);
     }
 
     protected void drawStatComponentShadow(PoseStack stack, Component component, float lineNumber) {

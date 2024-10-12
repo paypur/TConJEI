@@ -1,16 +1,11 @@
 package me.paypur.tconjei;
 
 import me.paypur.tconjei.jei.MaterialStatsWrapper;
-import net.minecraft.network.chat.Component;
-import net.minecraft.world.item.Item;
 import slimeknights.tconstruct.library.materials.MaterialRegistry;
 
-import java.util.HashMap;
 import java.util.List;
 
 public class Utils {
-
-    public static HashMap<Item, Component> allMaterialsTooltip = new HashMap<>();
 
     public static List<MaterialStatsWrapper> getMaterialWrappers() {
         return MaterialRegistry.getInstance().getVisibleMaterials()
