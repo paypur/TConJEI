@@ -16,7 +16,7 @@ import java.util.List;
 @Mixin(Item.class)
 public abstract class ItemClassMixin {
     // TODO: some items for a material aren't included when they probably should
-    // ice and fire (doesn't even appear in this function)
+    // ice and fire (doesn't even appear as an item in this function)
     // - silver ingot
     // - silver nugget
     // - wither bone

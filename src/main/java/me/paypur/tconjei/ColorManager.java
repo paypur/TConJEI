@@ -2,7 +2,6 @@ package me.paypur.tconjei;
 
 import net.minecraft.network.chat.TextColor;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.Mth;
 import slimeknights.tconstruct.library.client.materials.MaterialTooltipCache;
 import slimeknights.tconstruct.library.materials.definition.MaterialId;
 
@@ -64,10 +63,6 @@ public class ColorManager {
 
         // relationship between rgb is constant while changing brightness
         return Color.HSBtoRGB(hsb[0], hsb[1], hsb[2] * factor);
-    }
-
-    public static int getShade(TextColor color, float contrastRatio) {
-        return getShade(color.getValue(), contrastRatio);
     }
 
     public static Optional<TextColor> getTierTextColor(int i) {
