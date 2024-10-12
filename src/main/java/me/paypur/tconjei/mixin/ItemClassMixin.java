@@ -1,6 +1,6 @@
 package me.paypur.tconjei.mixin;
 
-import me.paypur.tconjei.Utils;
+import me.paypur.tconjei.TConJEI;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -23,8 +23,8 @@ public abstract class ItemClassMixin {
     @Inject(method = "appendHoverText(Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/level/Level;Ljava/util/List;Lnet/minecraft/world/item/TooltipFlag;)V", at = @At("HEAD"))
     public void appendHoverText(ItemStack pStack, Level pLevel, List<Component> pTooltipComponents, TooltipFlag pIsAdvanced, CallbackInfo ci) {
         Item key = pStack.getItem();
-        if (Utils.allMaterialsTooltip.containsKey(key)) {
-            pTooltipComponents.add(Utils.allMaterialsTooltip.get(key));
+        if (TConJEI.allMaterialsTooltip.containsKey(key)) {
+            pTooltipComponents.add(TConJEI.allMaterialsTooltip.get(key));
         }
     }
 

@@ -108,10 +108,12 @@ public class ArmorStatsCategory extends AbstractMaterialStatsCategory {
             int armorLine = (maxTextWidth + maxArmorWidth - armorTextWidth) / lineWidth - 1;
 
             drawString(stack, durabilityText, 0, lineNumber, TEXT_COLOR);
+            // durability line
             drawStringShadow(stack, line.repeat(durabilityLine) + "┐", durabilityTextWidth, lineNumber++, DURABILITY_COLOR);
             drawStringShadow(stack, "│", durabilityTextWidth + lineWidth * durabilityLine, lineNumber, DURABILITY_COLOR);
 
             drawString(stack, armorText, 0, lineNumber, TEXT_COLOR);
+            // armor line
             drawStringShadow(stack, line.repeat(armorLine) + "┐", armorTextWidth, lineNumber++, ARMOR_COLOR);
 
             for (ArmorStat armorStat : armorStats) {
