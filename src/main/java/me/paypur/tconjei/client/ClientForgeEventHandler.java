@@ -28,32 +28,33 @@ public class ClientForgeEventHandler {
         }
 
         for (MaterialStatsWrapper wrapper : Utils.getMaterialWrappers()) {
-            for (ItemStack stack : wrapper.getInputs()) {
-                int h = wrapper.hasStats(HARVEST_STAT_IDS) ? 1 : 0;
-                int r = wrapper.hasStats(RANGED_STAT_IDS) ? 1 : 0;
+            int h = wrapper.hasStats(HARVEST_STAT_IDS) ? 1 : 0;
+            int r = wrapper.hasStats(RANGED_STAT_IDS) ? 1 : 0;
 
-                int flag = h << 1 | r;
+            int flag = h << 1 | r;
 
-                if (flag == 0) {
-                    break;
-                }
+            if (flag == 0) {
+                continue;
+            }
 
-                int tier = wrapper.material().getTier();
+            int tier = wrapper.material().getTier();
 
-                MutableComponent component = new TranslatableComponent("tconjei.tooltip.tier", tier)
-                        .withStyle(style -> style.withColor(ColorManager.getTierColor(tier).orElse(0xAAAAAA)));
-
-                MutableComponent extra = switch (flag) {
+            MutableComponent component = new TranslatableComponent("tconjei.tooltip.tier", tier)
+                .withStyle(style -> style.withColor(ColorManager.getTierColor(tier).orElse(0xAAAAAA)))
+                .append((switch (flag) {
                     case 0b01 -> new TranslatableComponent("tconjei.tooltip.ranged");
                     case 0b10 -> new TranslatableComponent("tconjei.tooltip.harvest");
                     case 0b11 -> new TranslatableComponent("tconjei.tooltip.harvest_ranged");
                     default -> (MutableComponent) TextComponent.EMPTY;
-                };
+                })
+                .withStyle(ChatFormatting.GRAY));
 
-                TConJEI.allMaterialsTooltip.put(
-                        stack.getItem(),
-                        component.append(extra.withStyle(ChatFormatting.GRAY))
-                );
+            for (ItemStack stack : wrapper.getInputs()) {
+                // exclude repair kits, doesn't effect 1.19.2
+                if (stack.getDescriptionId().equals("item.tconstruct.repair_kit")) {
+                    continue;
+                }
+                TConJEI.allMaterialsTooltip.put(stack.getItem(), component);
             }
         }
     }
