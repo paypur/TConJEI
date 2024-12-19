@@ -8,9 +8,11 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.RecipesUpdatedEvent;
+import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
@@ -23,9 +25,7 @@ public class ClientForgeEventHandler {
     // runs on reload too
     @SubscribeEvent
     public static void onLogin(RecipesUpdatedEvent event) {
-        if (!TConJEI.allMaterialsTooltip.isEmpty()) {
-            return;
-        }
+        allMaterialsTooltip.clear();
 
         for (MaterialStatsWrapper wrapper : Utils.getMaterialWrappers()) {
             int h = wrapper.hasStats(HARVEST_STAT_IDS) ? 1 : 0;
@@ -51,11 +51,18 @@ public class ClientForgeEventHandler {
 
             for (ItemStack stack : wrapper.getInputs()) {
                 // exclude repair kits, doesn't effect 1.19.2
-                if (stack.getDescriptionId().equals("item.tconstruct.repair_kit")) {
-                    continue;
+                if (!stack.getDescriptionId().equals("item.tconstruct.repair_kit")) {
+                    TConJEI.allMaterialsTooltip.put(stack.getItem(), component);
                 }
-                TConJEI.allMaterialsTooltip.put(stack.getItem(), component);
             }
+        }
+    }
+
+    @SubscribeEvent
+    public static void onToolTip(ItemTooltipEvent event) {
+        Item key = event.getItemStack().getItem();
+        if (TConJEI.allMaterialsTooltip.containsKey(key)) {
+            event.getToolTip().add(TConJEI.allMaterialsTooltip.get(key));
         }
     }
 
