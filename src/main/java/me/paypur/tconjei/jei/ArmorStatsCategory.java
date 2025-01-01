@@ -89,12 +89,12 @@ public class ArmorStatsCategory extends AbstractMaterialStatsCategory {
 
         if (platingStats.isPresent()) {
             PlatingMaterialStats plating = platingStats.get();
-            drawComponentShadow(stack, Component.translatable("stat.tconstruct.plating").withStyle(ChatFormatting.UNDERLINE), 0, lineNumber++, color);
+            drawComponent(stack, Component.translatable("stat.tconstruct.plating").withStyle(ChatFormatting.UNDERLINE), 0, lineNumber++, color, true);
 
             if (plating.getType() == PlatingMaterialStats.SHIELD) {
-                drawStatComponentShadow(stack, plating.getLocalizedInfo().get(0), lineNumber++); // durability
-                drawStatComponentShadow(stack, plating.getLocalizedInfo().get(1), lineNumber++); // toughness
-                drawStatComponentShadow(stack, plating.getLocalizedInfo().get(2), lineNumber++); // knockback resistance
+                drawStatComponent(stack, plating.getLocalizedInfo().get(0), lineNumber++); // durability
+                drawStatComponent(stack, plating.getLocalizedInfo().get(1), lineNumber++); // toughness
+                drawStatComponent(stack, plating.getLocalizedInfo().get(2), lineNumber++); // knockback resistance
             } else {
                 String durabilityText = plating.getLocalizedInfo().get(0).plainCopy().getString();
                 String armorText = plating.getLocalizedInfo().get(1).plainCopy().getString();
@@ -102,49 +102,49 @@ public class ArmorStatsCategory extends AbstractMaterialStatsCategory {
                 int durabilityTextWidth = FONT.width(durabilityText);
                 int armorTextWidth = FONT.width(armorText);
 
-                int maxTextWidth = FONT.width(Collections.max(armorStats, Comparator.comparingInt(s -> FONT.width(s.text))).text);
-                int maxArmorWidth = FONT.width(Collections.max(armorStats, Comparator.comparingInt(s -> FONT.width(s.armor))).armor);
-                int maxDurabilityWidth = FONT.width(Collections.max(armorStats, Comparator.comparingInt(s -> FONT.width(s.durability))).durability);
+                int maxTextWidth = armorStats.stream().map(s -> FONT.width(s.text)).max(Integer::compare).get();
+                int maxArmorWidth = armorStats.stream().map(s -> FONT.width(s.armor)).max(Integer::compare).get();
+                int maxDurabilityWidth = armorStats.stream().map(s -> FONT.width(s.durability)).max(Integer::compare).get();
 
                 String line = "─";
                 int lineWidth = FONT.width(line);
 
-                int durabilityLine = (maxTextWidth + maxArmorWidth + maxDurabilityWidth - durabilityTextWidth) / lineWidth - 1;
-                int armorLine = (maxTextWidth + maxArmorWidth - armorTextWidth) / lineWidth - 1;
+                int durabilityLine = Math.max((maxTextWidth + maxArmorWidth + maxDurabilityWidth - durabilityTextWidth) / lineWidth - 1, 0);
+                int armorLine = Math.max((maxTextWidth + maxArmorWidth - armorTextWidth) / lineWidth - 1, 0);
 
-                drawString(stack, durabilityText, 0, lineNumber, TEXT_COLOR);
+                drawString(stack, durabilityText, 0, lineNumber, TEXT_COLOR, false);
                 // durability line
-                drawStringShadow(stack, line.repeat(durabilityLine) + "┐", durabilityTextWidth, lineNumber++, DURABILITY_COLOR);
-                drawStringShadow(stack, "│", durabilityTextWidth + lineWidth * durabilityLine, lineNumber, DURABILITY_COLOR);
+                drawString(stack, line.repeat(durabilityLine) + "┐", durabilityTextWidth, lineNumber++, DURABILITY_COLOR, true);
+                drawString(stack, "│", durabilityTextWidth + lineWidth * durabilityLine, lineNumber, DURABILITY_COLOR, true);
 
-                drawString(stack, armorText, 0, lineNumber, TEXT_COLOR);
+                drawString(stack, armorText, 0, lineNumber, TEXT_COLOR, false);
                 // armor line
-                drawStringShadow(stack, line.repeat(armorLine) + "┐", armorTextWidth, lineNumber++, ARMOR_COLOR);
+                drawString(stack, line.repeat(armorLine) + "┐", armorTextWidth, lineNumber++, ARMOR_COLOR, true);
 
                 for (ArmorStat armorStat : armorStats) {
-                    drawString(stack, armorStat.text, 0, lineNumber, TEXT_COLOR);
-                    drawStringShadow(stack, armorStat.armor, maxTextWidth + maxArmorWidth - FONT.width(armorStat.armor), lineNumber, ARMOR_COLOR); // armor, drawn first because its on the left
-                    drawStringShadow(stack, armorStat.durability, maxTextWidth + maxArmorWidth + maxDurabilityWidth - FONT.width(armorStat.durability), lineNumber++, DURABILITY_COLOR); // durability
+                    drawString(stack, armorStat.text, 0, lineNumber, TEXT_COLOR, false);
+                    drawString(stack, armorStat.armor, maxTextWidth + maxArmorWidth - FONT.width(armorStat.armor), lineNumber, ARMOR_COLOR, true); // armor, drawn first because its on the left
+                    drawString(stack, armorStat.durability, maxTextWidth + maxArmorWidth + maxDurabilityWidth - FONT.width(armorStat.durability), lineNumber++, DURABILITY_COLOR, true); // durability
                 }
 
                 // these should be the same for the whole set
-                drawStatComponentShadow(stack, plating.getLocalizedInfo().get(2), lineNumber++); // toughness
-                drawStatComponentShadow(stack, plating.getLocalizedInfo().get(3), lineNumber++); // knockback resistance
+                drawStatComponent(stack, plating.getLocalizedInfo().get(2), lineNumber++); // toughness
+                drawStatComponent(stack, plating.getLocalizedInfo().get(3), lineNumber++); // knockback resistance
             }
             lineNumber += LINE_SPACING;
         }
 
         if (coreOptional.isPresent()) {
             StatlessMaterialStats core = coreOptional.get();
-            drawComponentShadow(stack, core.getLocalizedName().withStyle(ChatFormatting.UNDERLINE), 0, lineNumber++, color);
-            drawComponent(stack, core.getLocalizedInfo().get(0), 0, lineNumber++, TEXT_COLOR);
+            drawComponent(stack, core.getLocalizedName().withStyle(ChatFormatting.UNDERLINE), 0, lineNumber++, color, true);
+            drawComponent(stack, core.getLocalizedInfo().get(0), 0, lineNumber++, TEXT_COLOR, false);
             lineNumber += LINE_SPACING;
         }
 
         if (mailleOptional.isPresent()) {
             StatlessMaterialStats maille = mailleOptional.get();
-            drawComponentShadow(stack, maille.getLocalizedName().withStyle(ChatFormatting.UNDERLINE), 0, lineNumber++, color);
-            drawComponent(stack, maille.getLocalizedInfo().get(0), 0, lineNumber, TEXT_COLOR);
+            drawComponent(stack, maille.getLocalizedName().withStyle(ChatFormatting.UNDERLINE), 0, lineNumber++, color, true);
+            drawComponent(stack, maille.getLocalizedInfo().get(0), 0, lineNumber, TEXT_COLOR, false);
         }
     }
 
@@ -190,9 +190,9 @@ public class ArmorStatsCategory extends AbstractMaterialStatsCategory {
             PlatingMaterialStats plating = platingStats.get();
             if (plating.getType() == PlatingMaterialStats.SHIELD) {
                 Stream<List<Component>> stream = Stream.of(
-                        getStatTooltip(plating, 0, mouseX, mouseY, lineNumber++),  // durability
+                        getStatTooltip(plating, 0, mouseX, mouseY, lineNumber++), // durability
                         getStatTooltip(plating, 1, mouseX, mouseY, lineNumber++), // toughness
-                        getStatTooltip(plating, 2, mouseX, mouseY, lineNumber)   // knockback resistance
+                        getStatTooltip(plating, 2, mouseX, mouseY, lineNumber)    // knockback resistance
                 );
                 Optional<List<Component>> component = stream
                         .filter(list -> !list.isEmpty())

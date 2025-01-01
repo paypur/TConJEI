@@ -54,29 +54,29 @@ public class RangedStatsCategory extends AbstractMaterialStatsCategory {
         // LIMB
         if (limbOptional.isPresent()) {
             LimbMaterialStats limb = limbOptional.get();
-            drawComponentShadow(stack, limb.getLocalizedName().withStyle(ChatFormatting.UNDERLINE), 0, lineNumber++, color);
-            drawStatComponentShadow(stack, limb.getLocalizedInfo().get(0), lineNumber++);
-            drawStatComponentShadow(stack, limb.getLocalizedInfo().get(1), lineNumber++);
-            drawStatComponentShadow(stack, limb.getLocalizedInfo().get(2), lineNumber++);
-            drawStatComponentShadow(stack, limb.getLocalizedInfo().get(3), lineNumber++);
+            drawComponent(stack, limb.getLocalizedName().withStyle(ChatFormatting.UNDERLINE), 0, lineNumber++, color, true);
+            drawStatComponent(stack, limb.getLocalizedInfo().get(0), lineNumber++);
+            drawStatComponent(stack, limb.getLocalizedInfo().get(1), lineNumber++);
+            drawStatComponent(stack, limb.getLocalizedInfo().get(2), lineNumber++);
+            drawStatComponent(stack, limb.getLocalizedInfo().get(3), lineNumber++);
             lineNumber += LINE_SPACING;
         }
 
         // GRIP
         if (gripOptional.isPresent()) {
             GripMaterialStats grip = gripOptional.get();
-            drawComponentShadow(stack, grip.getLocalizedName().withStyle(ChatFormatting.UNDERLINE), 0, lineNumber++, color);
-            drawStatComponentShadow(stack, grip.getLocalizedInfo().get(0), lineNumber++);
-            drawStatComponentShadow(stack, grip.getLocalizedInfo().get(1), lineNumber++);
-            drawStatComponentShadow(stack, grip.getLocalizedInfo().get(2), lineNumber++);
+            drawComponent(stack, grip.getLocalizedName().withStyle(ChatFormatting.UNDERLINE), 0, lineNumber++, color, true);
+            drawStatComponent(stack, grip.getLocalizedInfo().get(0), lineNumber++);
+            drawStatComponent(stack, grip.getLocalizedInfo().get(1), lineNumber++);
+            drawStatComponent(stack, grip.getLocalizedInfo().get(2), lineNumber++);
             lineNumber += LINE_SPACING;
         }
 
         // STRING
         if (stringOptional.isPresent()) {
             StatlessMaterialStats string = stringOptional.get();
-            drawComponentShadow(stack, string.getLocalizedName().withStyle(ChatFormatting.UNDERLINE), 0, lineNumber++, color);
-            drawComponent(stack, string.getLocalizedInfo().get(0), 0, lineNumber, TEXT_COLOR);
+            drawComponent(stack, string.getLocalizedName().withStyle(ChatFormatting.UNDERLINE), 0, lineNumber++, color, true);
+            drawComponent(stack, string.getLocalizedInfo().get(0), 0, lineNumber, TEXT_COLOR, false);
         }
     }
 

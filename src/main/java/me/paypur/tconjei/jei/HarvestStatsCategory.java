@@ -54,30 +54,30 @@ public class HarvestStatsCategory extends AbstractMaterialStatsCategory {
         // HEAD
         if (headOptional.isPresent()) {
             HeadMaterialStats head = headOptional.get();
-            drawComponentShadow(stack, head.getLocalizedName().withStyle(ChatFormatting.UNDERLINE), 0, lineNumber++, color);
-            drawStatComponentShadow(stack, head.getLocalizedInfo().get(0), lineNumber++); // durability
-            drawStatComponentShadow(stack, head.getLocalizedInfo().get(1), lineNumber++); // mining tier
-            drawStatComponentShadow(stack, head.getLocalizedInfo().get(2), lineNumber++); // mining speed
-            drawStatComponentShadow(stack, head.getLocalizedInfo().get(3), lineNumber++); // melee damage
+            drawComponent(stack, head.getLocalizedName().withStyle(ChatFormatting.UNDERLINE), 0, lineNumber++, color, true);
+            drawStatComponent(stack, head.getLocalizedInfo().get(0), lineNumber++); // durability
+            drawStatComponent(stack, head.getLocalizedInfo().get(1), lineNumber++); // mining tier
+            drawStatComponent(stack, head.getLocalizedInfo().get(2), lineNumber++); // mining speed
+            drawStatComponent(stack, head.getLocalizedInfo().get(3), lineNumber++); // melee damage
             lineNumber += LINE_SPACING;
         }
 
         // BINDING
         if (bindingOptional.isPresent()) {
             StatlessMaterialStats binding = bindingOptional.get();
-            drawComponentShadow(stack, binding.getLocalizedName().withStyle(ChatFormatting.UNDERLINE), 0, lineNumber++, color);
-            drawComponent(stack, binding.getLocalizedInfo().get(0), 0, lineNumber++, TEXT_COLOR);
+            drawComponent(stack, binding.getLocalizedName().withStyle(ChatFormatting.UNDERLINE), 0, lineNumber++, color, true);
+            drawComponent(stack, binding.getLocalizedInfo().get(0), 0, lineNumber++, TEXT_COLOR, false);
             lineNumber += LINE_SPACING;
         }
 
         // HANDLE
         if (handleOptional.isPresent()) {
             HandleMaterialStats handle = handleOptional.get();
-            drawComponentShadow(stack, handle.getLocalizedName().withStyle(ChatFormatting.UNDERLINE), 0, lineNumber++, color);
-            drawStatComponentShadow(stack, handle.getLocalizedInfo().get(0), lineNumber++); // durability
-            drawStatComponentShadow(stack, handle.getLocalizedInfo().get(1), lineNumber++); // melee damage
-            drawStatComponentShadow(stack, handle.getLocalizedInfo().get(2), lineNumber++); // melee speed
-            drawStatComponentShadow(stack, handle.getLocalizedInfo().get(3), lineNumber); // mining speed
+            drawComponent(stack, handle.getLocalizedName().withStyle(ChatFormatting.UNDERLINE), 0, lineNumber++, color, true);
+            drawStatComponent(stack, handle.getLocalizedInfo().get(0), lineNumber++); // durability
+            drawStatComponent(stack, handle.getLocalizedInfo().get(1), lineNumber++); // melee damage
+            drawStatComponent(stack, handle.getLocalizedInfo().get(2), lineNumber++); // melee speed
+            drawStatComponent(stack, handle.getLocalizedInfo().get(3), lineNumber);  // mining speed
         }
     }
 

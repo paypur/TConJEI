@@ -84,43 +84,42 @@ public abstract class AbstractMaterialStatsCategory implements IRecipeCategory<M
         return List.of();
     }
 
-    protected void drawString(PoseStack stack, String string, int x, float lineNumber, int color) {
-        FONT.draw(stack, string, x, lineNumber * LINE_HEIGHT, color);
+    protected final void drawString(PoseStack stack, String string, int x, float lineNumber, int color, boolean shadow) {
+        final float y = lineNumber * LINE_HEIGHT;
+        if (shadow) {
+            FONT.draw(stack, string, (float) x + 1, y + 1, getShade(color, 6));
+        }
+        FONT.draw(stack, string, (float) x, y, color);
     }
 
-    protected void drawComponent(PoseStack stack, Component component, int x, float lineNumber, int color) {
-        FONT.draw(stack, component, x, lineNumber * LINE_HEIGHT, color);
+    protected final void drawComponent(PoseStack stack, Component component, int x, float lineNumber, int color, boolean shadow) {
+        final float y = lineNumber * LINE_HEIGHT;
+        if (shadow) {
+            FONT.draw(stack, component, (float) x + 1, y + 1, getShade(color, 6));
+        }
+        FONT.draw(stack, component, (float) x, y, color);
     }
 
-    protected void drawStringShadow(PoseStack stack, String string, int x, float lineNumber, int color) {
-        drawString(stack, string, x + 1, lineNumber + 0.1f, getShade(color, 6));
-        drawString(stack, string, x, lineNumber, color);
-    }
-
-    protected void drawStatComponentShadow(PoseStack stack, Component component, float lineNumber) {
+    /* has shadow by default */
+    protected final void drawStatComponent(PoseStack stack, Component component, float lineNumber) {
         Component sibling = component.getSiblings().get(0);
-        drawComponentShadow(stack, sibling.plainCopy(), FONT.width(component.plainCopy()), lineNumber, sibling.getStyle().getColor().getValue());
-        drawComponent(stack, component.plainCopy(), 0, lineNumber, TEXT_COLOR);
+        drawComponent(stack, sibling.plainCopy(), FONT.width(component.plainCopy()), lineNumber, sibling.getStyle().getColor().getValue(), true);
+        drawComponent(stack, component.plainCopy(), 0, lineNumber, TEXT_COLOR, false);
     }
 
-    protected void drawComponentShadow(PoseStack stack, Component component, int x, float lineNumber, int color) {
-        drawComponent(stack, component, x + 1, lineNumber  + 0.1f, getShade(color, 6));
-        drawComponent(stack, component, x, lineNumber, color);
+    protected final void drawComponentShadowCentered(PoseStack stack, Component component, float lineNumber, int color) {
+        drawComponent(stack, component, (WIDTH - FONT.width(component)) / 2, lineNumber, color, true);
     }
 
-    protected void drawComponentShadowCentered(PoseStack stack, Component component, float lineNumber, int color) {
-        drawComponentShadow(stack, component, (WIDTH - FONT.width(component)) / 2, lineNumber, color);
-    }
-
-    protected void drawTraits(PoseStack stack, List<ModifierEntry> traits, float lineNumber) {
+    protected final void drawTraits(PoseStack stack, List<ModifierEntry> traits, float lineNumber) {
         for (ModifierEntry trait : traits) {
             final Component component = trait.getDisplayName().copy().withStyle(style -> style.withColor((TextColor) null));
             final int color = ResourceColorManager.getColor(Util.makeTranslationKey("modifier", trait.getId()));
-            drawComponentShadow(stack, component, WIDTH - FONT.width(component), lineNumber++, color);
+            drawComponent(stack, component, WIDTH - FONT.width(component), lineNumber++, color, true);
         }
     }
 
-    protected List<Component> getStatTooltip(IMaterialStats stats, int i, double mouseX, double mouseY, float lineNumber) {
+    protected final List<Component> getStatTooltip(IMaterialStats stats, int i, double mouseX, double mouseY, float lineNumber) {
         final int width = FONT.width(stats.getLocalizedInfo().get(i).plainCopy());
         if (Utils.inBox(mouseX, mouseY, 0, lineNumber * LINE_HEIGHT - 1, width, LINE_HEIGHT)) {
             return List.of(stats.getLocalizedDescriptions().get(i));
@@ -128,7 +127,7 @@ public abstract class AbstractMaterialStatsCategory implements IRecipeCategory<M
         return List.of();
     }
 
-    protected List<Component> getTraitTooltips(List<ModifierEntry> traits, double mouseX, double mouseY, float lineNumber) {
+    protected final List<Component> getTraitTooltips(List<ModifierEntry> traits, double mouseX, double mouseY, float lineNumber) {
         for (ModifierEntry trait : traits) {
             final String key = Util.makeTranslationKey("modifier", trait.getId());
             final int width = FONT.width(trait.getDisplayName());
@@ -145,6 +144,7 @@ public abstract class AbstractMaterialStatsCategory implements IRecipeCategory<M
     public Component getTitle() {
         return title;
     }
+
     @NotNull
     @Override
     public RecipeType<MaterialStatsWrapper> getRecipeType() {
