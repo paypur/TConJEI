@@ -7,6 +7,8 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.IForgeRegistry;
 import slimeknights.mantle.recipe.helper.RecipeHelper;
 import slimeknights.mantle.util.RegistryHelper;
 import slimeknights.tconstruct.library.materials.IMaterialRegistry;
@@ -66,7 +68,7 @@ public record MaterialStatsWrapper(IMaterial material) {
     // taken from AbstractMaterialContent
     public List<ItemStack> getInputsParts(TagKey<Item> tag) {
         Set<Item> seen = new HashSet<>();
-        return RegistryHelper.getTagValueStream(Registry.ITEM, tag)
+        return RegistryHelper.getTagValueStream(tag)
                 .filter(item -> item instanceof IModifiable)
                 .flatMap(
                     item -> ToolPartsHook.parts(((IModifiable) item).getToolDefinition()).stream()

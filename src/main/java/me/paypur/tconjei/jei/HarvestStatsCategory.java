@@ -1,10 +1,11 @@
 package me.paypur.tconjei.jei;
 
-import com.mojang.blaze3d.vertex.PoseStack;
+import mezz.jei.api.gui.builder.ITooltipBuilder;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.recipe.RecipeType;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import slimeknights.tconstruct.common.TinkerTags;
@@ -31,8 +32,8 @@ public class HarvestStatsCategory extends AbstractMaterialStatsCategory {
     }
 
     @Override
-    public void draw(MaterialStatsWrapper wrapper, IRecipeSlotsView recipeSlotsView, PoseStack stack, double mouseX, double mouseY) {
-        super.draw(wrapper, recipeSlotsView, stack, mouseX, mouseY);
+    public void draw(MaterialStatsWrapper wrapper, IRecipeSlotsView recipeSlotsView, GuiGraphics gui, double mouseX, double mouseY) {
+        super.draw(wrapper, recipeSlotsView, gui, mouseX, mouseY);
 
         final int color = MaterialTooltipCache.getColor(wrapper.getMaterialId()).getValue();
         float lineNumber = 2f;
@@ -48,46 +49,46 @@ public class HarvestStatsCategory extends AbstractMaterialStatsCategory {
                 .findFirst();
 
         if (statOptional.isPresent()) {
-            drawTraits(stack, wrapper.getTraits(statOptional.get().getIdentifier()), lineNumber);
+            drawTraits(gui, wrapper.getTraits(statOptional.get().getIdentifier()), lineNumber);
         }
 
         // HEAD
         if (headOptional.isPresent()) {
             HeadMaterialStats head = headOptional.get();
-            drawComponentShadow(stack, head.getLocalizedName().withStyle(ChatFormatting.UNDERLINE), 0, lineNumber++, color);
-            drawStatComponentShadow(stack, head.getLocalizedInfo().get(0), lineNumber++); // durability
-            drawStatComponentShadow(stack, head.getLocalizedInfo().get(1), lineNumber++); // mining tier
-            drawStatComponentShadow(stack, head.getLocalizedInfo().get(2), lineNumber++); // mining speed
-            drawStatComponentShadow(stack, head.getLocalizedInfo().get(3), lineNumber++); // melee damage
+            drawComponent(gui, head.getLocalizedName().withStyle(ChatFormatting.UNDERLINE), 0, lineNumber++, color, true);
+            drawStatComponent(gui, head.getLocalizedInfo().get(0), lineNumber++); // durability
+            drawStatComponent(gui, head.getLocalizedInfo().get(1), lineNumber++); // mining tier
+            drawStatComponent(gui, head.getLocalizedInfo().get(2), lineNumber++); // mining speed
+            drawStatComponent(gui, head.getLocalizedInfo().get(3), lineNumber++); // melee damage
             lineNumber += LINE_SPACING;
         }
 
         // BINDING
         if (bindingOptional.isPresent()) {
             StatlessMaterialStats binding = bindingOptional.get();
-            drawComponentShadow(stack, binding.getLocalizedName().withStyle(ChatFormatting.UNDERLINE), 0, lineNumber++, color);
-            drawComponent(stack, binding.getLocalizedInfo().get(0), 0, lineNumber++, TEXT_COLOR);
+            drawComponent(gui, binding.getLocalizedName().withStyle(ChatFormatting.UNDERLINE), 0, lineNumber++, color, true);
+            drawComponent(gui, binding.getLocalizedInfo().get(0), 0, lineNumber++, TEXT_COLOR, false);
             lineNumber += LINE_SPACING;
         }
 
         // HANDLE
         if (handleOptional.isPresent()) {
             HandleMaterialStats handle = handleOptional.get();
-            drawComponentShadow(stack, handle.getLocalizedName().withStyle(ChatFormatting.UNDERLINE), 0, lineNumber++, color);
-            drawStatComponentShadow(stack, handle.getLocalizedInfo().get(0), lineNumber++); // durability
-            drawStatComponentShadow(stack, handle.getLocalizedInfo().get(1), lineNumber++); // melee damage
-            drawStatComponentShadow(stack, handle.getLocalizedInfo().get(2), lineNumber++); // melee speed
-            drawStatComponentShadow(stack, handle.getLocalizedInfo().get(3), lineNumber); // mining speed
+            drawComponent(gui, handle.getLocalizedName().withStyle(ChatFormatting.UNDERLINE), 0, lineNumber++, color, true);
+            drawStatComponent(gui, handle.getLocalizedInfo().get(0), lineNumber++); // durability
+            drawStatComponent(gui, handle.getLocalizedInfo().get(1), lineNumber++); // melee damage
+            drawStatComponent(gui, handle.getLocalizedInfo().get(2), lineNumber++); // melee speed
+            drawStatComponent(gui, handle.getLocalizedInfo().get(3), lineNumber);   // mining speed
         }
     }
 
-    @Nonnull
     @Override
-    public List<Component> getTooltipStrings(MaterialStatsWrapper wrapper, IRecipeSlotsView recipeSlotsView, double mouseX, double mouseY) {
+    public void getTooltip(ITooltipBuilder tooltip, MaterialStatsWrapper wrapper, IRecipeSlotsView recipeSlotsView, double mouseX, double mouseY) {
         // MATERIAL
-        List<Component> material = super.getTooltipStrings(wrapper, recipeSlotsView, mouseX, mouseY);
-        if (!material.isEmpty()) {
-            return material;
+        List<Component> materialTooltips = getMaterialTooltip(wrapper, mouseX, mouseY);
+        if (!materialTooltips.isEmpty()) {
+            tooltip.addAll(materialTooltips);
+            return;
         }
 
         float lineNumber = 2f;
@@ -103,9 +104,10 @@ public class HarvestStatsCategory extends AbstractMaterialStatsCategory {
                 .findFirst();
 
         if (statOptional.isPresent()) {
-            List<Component> tooltips = getTraitTooltips(wrapper.getTraits(statOptional.get().getIdentifier()), mouseX, mouseY, lineNumber);
-            if (!tooltips.isEmpty()) {
-                return tooltips;
+            List<Component> traitTooltips = getTraitTooltips(wrapper.getTraits(statOptional.get().getIdentifier()), mouseX, mouseY, lineNumber);
+            if (!traitTooltips.isEmpty()) {
+                tooltip.addAll(traitTooltips);
+                return;
             }
         }
 
@@ -121,7 +123,8 @@ public class HarvestStatsCategory extends AbstractMaterialStatsCategory {
                     .filter(list -> !list.isEmpty())
                     .findFirst();
             if (component.isPresent()) {
-                return component.get();
+                tooltip.addAll(component.get());
+                return;
             }
             lineNumber += LINE_SPACING;
         }
@@ -143,10 +146,9 @@ public class HarvestStatsCategory extends AbstractMaterialStatsCategory {
                     .filter(list -> !list.isEmpty())
                     .findFirst();
             if (component.isPresent()) {
-                return component.get();
+                tooltip.addAll(component.get());
+                return;
             }
         }
-
-        return List.of();
     }
 }

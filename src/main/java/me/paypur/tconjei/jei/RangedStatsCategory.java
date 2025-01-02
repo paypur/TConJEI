@@ -1,10 +1,11 @@
 package me.paypur.tconjei.jei;
 
-import com.mojang.blaze3d.vertex.PoseStack;
+import mezz.jei.api.gui.builder.ITooltipBuilder;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.recipe.RecipeType;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import slimeknights.tconstruct.common.TinkerTags;
@@ -31,8 +32,8 @@ public class RangedStatsCategory extends AbstractMaterialStatsCategory {
     }
 
     @Override
-    public void draw(MaterialStatsWrapper wrapper, IRecipeSlotsView recipeSlotsView, PoseStack stack, double mouseX, double mouseY) {
-        super.draw(wrapper, recipeSlotsView, stack, mouseX, mouseY);
+    public void draw(MaterialStatsWrapper wrapper, IRecipeSlotsView recipeSlotsView, GuiGraphics gui, double mouseX, double mouseY) {
+        super.draw(wrapper, recipeSlotsView, gui, mouseX, mouseY);
 
         final int color = MaterialTooltipCache.getColor(wrapper.getMaterialId()).getValue();
         float lineNumber = 2f;
@@ -48,45 +49,45 @@ public class RangedStatsCategory extends AbstractMaterialStatsCategory {
                 .findFirst();
 
         if (statOptional.isPresent()) {
-            drawTraits(stack, wrapper.getTraits(statOptional.get().getIdentifier()), lineNumber);
+            drawTraits(gui, wrapper.getTraits(statOptional.get().getIdentifier()), lineNumber);
         }
 
         // LIMB
         if (limbOptional.isPresent()) {
             LimbMaterialStats limb = limbOptional.get();
-            drawComponentShadow(stack, limb.getLocalizedName().withStyle(ChatFormatting.UNDERLINE), 0, lineNumber++, color);
-            drawStatComponentShadow(stack, limb.getLocalizedInfo().get(0), lineNumber++);
-            drawStatComponentShadow(stack, limb.getLocalizedInfo().get(1), lineNumber++);
-            drawStatComponentShadow(stack, limb.getLocalizedInfo().get(2), lineNumber++);
-            drawStatComponentShadow(stack, limb.getLocalizedInfo().get(3), lineNumber++);
+            drawComponent(gui, limb.getLocalizedName().withStyle(ChatFormatting.UNDERLINE), 0, lineNumber++, color, true);
+            drawStatComponent(gui, limb.getLocalizedInfo().get(0), lineNumber++);
+            drawStatComponent(gui, limb.getLocalizedInfo().get(1), lineNumber++);
+            drawStatComponent(gui, limb.getLocalizedInfo().get(2), lineNumber++);
+            drawStatComponent(gui, limb.getLocalizedInfo().get(3), lineNumber++);
             lineNumber += LINE_SPACING;
         }
 
         // GRIP
         if (gripOptional.isPresent()) {
             GripMaterialStats grip = gripOptional.get();
-            drawComponentShadow(stack, grip.getLocalizedName().withStyle(ChatFormatting.UNDERLINE), 0, lineNumber++, color);
-            drawStatComponentShadow(stack, grip.getLocalizedInfo().get(0), lineNumber++);
-            drawStatComponentShadow(stack, grip.getLocalizedInfo().get(1), lineNumber++);
-            drawStatComponentShadow(stack, grip.getLocalizedInfo().get(2), lineNumber++);
+            drawComponent(gui, grip.getLocalizedName().withStyle(ChatFormatting.UNDERLINE), 0, lineNumber++, color, true);
+            drawStatComponent(gui, grip.getLocalizedInfo().get(0), lineNumber++);
+            drawStatComponent(gui, grip.getLocalizedInfo().get(1), lineNumber++);
+            drawStatComponent(gui, grip.getLocalizedInfo().get(2), lineNumber++);
             lineNumber += LINE_SPACING;
         }
 
         // STRING
         if (stringOptional.isPresent()) {
             StatlessMaterialStats string = stringOptional.get();
-            drawComponentShadow(stack, string.getLocalizedName().withStyle(ChatFormatting.UNDERLINE), 0, lineNumber++, color);
-            drawComponent(stack, string.getLocalizedInfo().get(0), 0, lineNumber, TEXT_COLOR);
+            drawComponent(gui, string.getLocalizedName().withStyle(ChatFormatting.UNDERLINE), 0, lineNumber++, color, true);
+            drawComponent(gui, string.getLocalizedInfo().get(0), 0, lineNumber, TEXT_COLOR, false);
         }
     }
 
-    @Nonnull
     @Override
-    public List<Component> getTooltipStrings(MaterialStatsWrapper wrapper, IRecipeSlotsView recipeSlotsView, double mouseX, double mouseY) {
+    public void getTooltip(ITooltipBuilder tooltip, MaterialStatsWrapper wrapper, IRecipeSlotsView recipeSlotsView, double mouseX, double mouseY) {
         // MATERIAL
-        List<Component> material = super.getTooltipStrings(wrapper, recipeSlotsView, mouseX, mouseY);
-        if (!material.isEmpty()) {
-            return material;
+        List<Component> materialTooltips = getMaterialTooltip(wrapper, mouseX, mouseY);
+        if (!materialTooltips.isEmpty()) {
+            tooltip.addAll(materialTooltips);
+            return;
         }
 
         float lineNumber = 2f;
@@ -102,9 +103,10 @@ public class RangedStatsCategory extends AbstractMaterialStatsCategory {
                 .findFirst();
 
         if (statOptional.isPresent()) {
-            List<Component> tooltips = getTraitTooltips(wrapper.getTraits(statOptional.get().getIdentifier()), mouseX, mouseY, lineNumber);
-            if (!tooltips.isEmpty()) {
-                return tooltips;
+            List<Component> traitTooltips = getTraitTooltips(wrapper.getTraits(statOptional.get().getIdentifier()), mouseX, mouseY, lineNumber);
+            if (!traitTooltips.isEmpty()) {
+                tooltip.addAll(traitTooltips);
+                return;
             }
         }
 
@@ -120,7 +122,8 @@ public class RangedStatsCategory extends AbstractMaterialStatsCategory {
                     .filter(list -> !list.isEmpty())
                     .findFirst();
             if (component.isPresent()) {
-                return component.get();
+                tooltip.addAll(component.get());
+                return;
             }
             lineNumber += LINE_SPACING;
         }
@@ -136,11 +139,10 @@ public class RangedStatsCategory extends AbstractMaterialStatsCategory {
                     .filter(list -> !list.isEmpty())
                     .findFirst();
             if (component.isPresent()) {
-                return component.get();
+                tooltip.addAll(component.get());
+                return;
             }
         }
-
-        return List.of();
     }
 
 }

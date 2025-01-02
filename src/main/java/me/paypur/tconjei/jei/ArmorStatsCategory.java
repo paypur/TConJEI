@@ -1,10 +1,11 @@
 package me.paypur.tconjei.jei;
 
-import com.mojang.blaze3d.vertex.PoseStack;
+import mezz.jei.api.gui.builder.ITooltipBuilder;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.recipe.RecipeType;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import slimeknights.tconstruct.common.TinkerTags;
@@ -31,8 +32,8 @@ public class ArmorStatsCategory extends AbstractMaterialStatsCategory {
     }
 
     @Override
-    public void draw(MaterialStatsWrapper wrapper, IRecipeSlotsView recipeSlotsView, PoseStack stack, double mouseX, double mouseY) {
-        super.draw(wrapper, recipeSlotsView, stack, mouseX, mouseY);
+    public void draw(MaterialStatsWrapper wrapper, IRecipeSlotsView recipeSlotsView, GuiGraphics gui, double mouseX, double mouseY) {
+        super.draw(wrapper, recipeSlotsView, gui, mouseX, mouseY);
 
         final int color = MaterialTooltipCache.getColor(wrapper.getMaterialId()).getValue();
         float lineNumber = 2f;
@@ -52,7 +53,7 @@ public class ArmorStatsCategory extends AbstractMaterialStatsCategory {
                 .findFirst();
 
         if (statOptional.isPresent()) {
-            drawTraits(stack, wrapper.getTraits(statOptional.get().getIdentifier()), lineNumber);
+            drawTraits(gui, wrapper.getTraits(statOptional.get().getIdentifier()), lineNumber);
         }
 
         List<ArmorStat> armorStats = new ArrayList<>();
@@ -89,7 +90,7 @@ public class ArmorStatsCategory extends AbstractMaterialStatsCategory {
 
         if (platingStats.isPresent()) {
             PlatingMaterialStats plating = platingStats.get();
-            drawComponentShadow(stack, Component.translatable("stat.tconstruct.plating").withStyle(ChatFormatting.UNDERLINE), 0, lineNumber++, color);
+            drawComponent(gui, Component.translatable("stat.tconstruct.plating").withStyle(ChatFormatting.UNDERLINE), 0, lineNumber++, color, true);
 
             String durabilityText = plating.getLocalizedInfo().get(0).plainCopy().getString();
             String armorText = plating.getLocalizedInfo().get(1).plainCopy().getString();
@@ -107,47 +108,48 @@ public class ArmorStatsCategory extends AbstractMaterialStatsCategory {
             int durabilityLine = (maxTextWidth + maxArmorWidth + maxDurabilityWidth - durabilityTextWidth) / lineWidth - 1;
             int armorLine = (maxTextWidth + maxArmorWidth - armorTextWidth) / lineWidth - 1;
 
-            drawString(stack, durabilityText, 0, lineNumber, TEXT_COLOR);
+            drawString(gui, durabilityText, 0, lineNumber, TEXT_COLOR, false);
             // durability line
-            drawStringShadow(stack, line.repeat(durabilityLine) + "┐", durabilityTextWidth, lineNumber++, DURABILITY_COLOR);
-            drawStringShadow(stack, "│", durabilityTextWidth + lineWidth * durabilityLine, lineNumber, DURABILITY_COLOR);
+            drawString(gui, line.repeat(durabilityLine) + "┐", durabilityTextWidth, lineNumber++, DURABILITY_COLOR, true);
+            drawString(gui, "│", durabilityTextWidth + lineWidth * durabilityLine, lineNumber, DURABILITY_COLOR, true);
 
-            drawString(stack, armorText, 0, lineNumber, TEXT_COLOR);
+            drawString(gui, armorText, 0, lineNumber, TEXT_COLOR, false);
             // armor line
-            drawStringShadow(stack, line.repeat(armorLine) + "┐", armorTextWidth, lineNumber++, ARMOR_COLOR);
+            drawString(gui, line.repeat(armorLine) + "┐", armorTextWidth, lineNumber++, ARMOR_COLOR, true);
 
             for (ArmorStat armorStat : armorStats) {
-                drawString(stack, armorStat.text, 0, lineNumber, TEXT_COLOR);
-                drawStringShadow(stack, armorStat.armor, maxTextWidth + maxArmorWidth - FONT.width(armorStat.armor), lineNumber, ARMOR_COLOR); // armor, drawn first because its on the left
-                drawStringShadow(stack, armorStat.durability, maxTextWidth + maxArmorWidth + maxDurabilityWidth - FONT.width(armorStat.durability), lineNumber++, DURABILITY_COLOR); // durability
+                drawString(gui, armorStat.text, 0, lineNumber, TEXT_COLOR, false);
+                drawString(gui, armorStat.armor, maxTextWidth + maxArmorWidth - FONT.width(armorStat.armor), lineNumber, ARMOR_COLOR, true); // armor, drawn first because its on the left
+                drawString(gui, armorStat.durability, maxTextWidth + maxArmorWidth + maxDurabilityWidth - FONT.width(armorStat.durability), lineNumber++, DURABILITY_COLOR, true); // durability
             }
 
             // these should be the same for the whole set
-            drawStatComponentShadow(stack, plating.getLocalizedInfo().get(2), lineNumber++); // toughness
-            drawStatComponentShadow(stack, plating.getLocalizedInfo().get(3), lineNumber++); // knockback resistance
+            drawStatComponent(gui, plating.getLocalizedInfo().get(2), lineNumber++); // toughness
+            drawStatComponent(gui, plating.getLocalizedInfo().get(3), lineNumber++); // knockback resistance
             lineNumber += LINE_SPACING;
         }
 
         if (coreOptional.isPresent()) {
             StatlessMaterialStats core = coreOptional.get();
-            drawComponentShadow(stack, core.getLocalizedName().withStyle(ChatFormatting.UNDERLINE), 0, lineNumber++, color);
-            drawComponent(stack, core.getLocalizedInfo().get(0), 0, lineNumber++, TEXT_COLOR);
+            drawComponent(gui, core.getLocalizedName().withStyle(ChatFormatting.UNDERLINE), 0, lineNumber++, color, true);
+            drawComponent(gui, core.getLocalizedInfo().get(0), 0, lineNumber++, TEXT_COLOR, false);
             lineNumber += LINE_SPACING;
         }
 
         if (mailleOptional.isPresent()) {
             StatlessMaterialStats maille = mailleOptional.get();
-            drawComponentShadow(stack, maille.getLocalizedName().withStyle(ChatFormatting.UNDERLINE), 0, lineNumber++, color);
-            drawComponent(stack, maille.getLocalizedInfo().get(0), 0, lineNumber, TEXT_COLOR);
+            drawComponent(gui, maille.getLocalizedName().withStyle(ChatFormatting.UNDERLINE), 0, lineNumber++, color, true);
+            drawComponent(gui, maille.getLocalizedInfo().get(0), 0, lineNumber, TEXT_COLOR, false);
         }
     }
 
     @Override
-    public List<Component> getTooltipStrings(MaterialStatsWrapper wrapper, IRecipeSlotsView recipeSlotsView, double mouseX, double mouseY) {
+    public void getTooltip(ITooltipBuilder tooltip, MaterialStatsWrapper wrapper, IRecipeSlotsView recipeSlotsView, double mouseX, double mouseY) {
         // MATERIAL
-        List<Component> material = super.getTooltipStrings(wrapper, recipeSlotsView, mouseX, mouseY);
-        if (!material.isEmpty()) {
-            return material;
+        List<Component> materialTooltips = getMaterialTooltip(wrapper, mouseX, mouseY);
+        if (!materialTooltips.isEmpty()) {
+            tooltip.addAll(materialTooltips);
+            return;
         }
 
         float lineNumber = 2f;
@@ -167,9 +169,10 @@ public class ArmorStatsCategory extends AbstractMaterialStatsCategory {
                 .findFirst();
 
         if (statOptional.isPresent()) {
-            List<Component> tooltips = getTraitTooltips(wrapper.getTraits(statOptional.get().getIdentifier()), mouseX, mouseY, lineNumber);
-            if (!tooltips.isEmpty()) {
-                return tooltips;
+            List<Component> traitTooltips = getTraitTooltips(wrapper.getTraits(statOptional.get().getIdentifier()), mouseX, mouseY, lineNumber);
+            if (!traitTooltips.isEmpty()) {
+                tooltip.addAll(traitTooltips);
+                return;
             }
         }
 
@@ -184,22 +187,21 @@ public class ArmorStatsCategory extends AbstractMaterialStatsCategory {
             PlatingMaterialStats plating = platingStats.get();
             Stream<List<Component>> stream = Stream.of(
                     getStatTooltip(plating, 0, mouseX, mouseY, lineNumber++), // durability
-                    getStatTooltip(plating, 1, mouseX, mouseY, lineNumber) // armor
+                    getStatTooltip(plating, 1, mouseX, mouseY, lineNumber)    // armor
             );
             lineNumber += 6;
             stream = Stream.concat(stream, Stream.of(
                     getStatTooltip(plating, 2, mouseX, mouseY, lineNumber++), // toughness
-                    getStatTooltip(plating, 3, mouseX, mouseY, lineNumber)) // knockback resistance
+                    getStatTooltip(plating, 3, mouseX, mouseY, lineNumber))   // knockback resistance
             );
             Optional<List<Component>> component = stream
                     .filter(list -> !list.isEmpty())
                     .findFirst();
             if (component.isPresent()) {
-                return component.get();
+                tooltip.addAll(component.get());
+                return;
             }
         }
-
-        return List.of();
     }
 
     private record ArmorStat(String text, String durability, String armor) {

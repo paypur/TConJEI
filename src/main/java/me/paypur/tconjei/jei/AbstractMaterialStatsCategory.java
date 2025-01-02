@@ -1,9 +1,9 @@
 package me.paypur.tconjei.jei;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import me.paypur.tconjei.ColorManager;
 import me.paypur.tconjei.Utils;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
+import mezz.jei.api.gui.builder.ITooltipBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.helpers.IGuiHelper;
@@ -13,6 +13,7 @@ import mezz.jei.api.recipe.category.IRecipeCategory;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextColor;
 import net.minecraft.tags.TagKey;
@@ -66,15 +67,15 @@ public abstract class AbstractMaterialStatsCategory implements IRecipeCategory<M
     }
 
     @Override
-    public void draw(MaterialStatsWrapper wrapper, IRecipeSlotsView recipeSlotsView, PoseStack stack, double mouseX, double mouseY) {
+    public void draw(MaterialStatsWrapper wrapper, IRecipeSlotsView recipeSlotsView, GuiGraphics gui, double mouseX, double mouseY) {
         final int tier = wrapper.material().getTier();
         final int color = MaterialTooltipCache.getColor(wrapper.getMaterialId()).getValue();
-        drawComponentShadowCentered(stack, Component.translatable(Util.makeTranslationKey("material", wrapper.getMaterialId())).withStyle(ChatFormatting.UNDERLINE), 0, color);
-        drawComponentShadowCentered(stack, Component.translatable("tconjei.tooltip.tier", tier), 1, ColorManager.getTierColor(tier).orElse(color));
+        drawComponentShadowCentered(gui, Component.translatable(Util.makeTranslationKey("material", wrapper.getMaterialId())).withStyle(ChatFormatting.UNDERLINE), 0, color);
+        drawComponentShadowCentered(gui, Component.translatable("tconjei.tooltip.tier", tier), 1, ColorManager.getTierColor(tier).orElse(color));
     }
 
-    @Override
-    public List<Component> getTooltipStrings(MaterialStatsWrapper wrapper, IRecipeSlotsView recipeSlotsView, double mouseX, double mouseY) {
+
+    public final List<Component> getMaterialTooltip(MaterialStatsWrapper wrapper, double mouseX, double mouseY) {
         final String key = Util.makeTranslationKey("material", wrapper.getMaterialId());
         final int width = FONT.width(ForgeI18n.getPattern(key));
         // TODO: doesnt line up with actual text, slightly to the left
@@ -84,43 +85,41 @@ public abstract class AbstractMaterialStatsCategory implements IRecipeCategory<M
         return List.of();
     }
 
-    protected void drawString(PoseStack stack, String string, int x, float lineNumber, int color) {
-        FONT.draw(stack, string, x, lineNumber * LINE_HEIGHT, color);
+    protected final void drawString(GuiGraphics gui, String string, int x, float lineNumber, int color, boolean shadow) {
+        final int y = (int) (lineNumber * LINE_HEIGHT);
+        if (shadow) {
+            gui.drawString(FONT, string, x + 1, y + 1, getShade(color, 6), false);
+        }
+        gui.drawString(FONT, string, x, y, color, false);
     }
 
-    protected void drawComponent(PoseStack stack, Component component, int x, float lineNumber, int color) {
-        FONT.draw(stack, component, x, lineNumber * LINE_HEIGHT, color);
+    protected final void drawComponent(GuiGraphics gui, Component component, int x, float lineNumber, int color, boolean shadow) {
+        final int y = (int) (lineNumber * LINE_HEIGHT);
+        if (shadow) {
+            gui.drawString(FONT, component, x + 1, y + 1, getShade(color, 6), false);
+        }
+        gui.drawString(FONT, component, x, y, color, false);
     }
 
-    protected void drawStringShadow(PoseStack stack, String string, int x, float lineNumber, int color) {
-        drawString(stack, string, x + 1, lineNumber + 0.1f, getShade(color, 6));
-        drawString(stack, string, x, lineNumber, color);
-    }
-
-    protected void drawStatComponentShadow(PoseStack stack, Component component, float lineNumber) {
+    protected final void drawStatComponent(GuiGraphics gui, Component component, float lineNumber) {
         Component sibling = component.getSiblings().get(0);
-        drawComponentShadow(stack, sibling.plainCopy(), FONT.width(component.plainCopy()), lineNumber, sibling.getStyle().getColor().getValue());
-        drawComponent(stack, component.plainCopy(), 0, lineNumber, TEXT_COLOR);
+        drawComponent(gui, sibling.plainCopy(), FONT.width(component.plainCopy()), lineNumber, sibling.getStyle().getColor().getValue(), true);
+        drawComponent(gui, component.plainCopy(), 0, lineNumber, TEXT_COLOR, false);
     }
 
-    protected void drawComponentShadow(PoseStack stack, Component component, int x, float lineNumber, int color) {
-        drawComponent(stack, component, x + 1, lineNumber  + 0.1f, getShade(color, 6));
-        drawComponent(stack, component, x, lineNumber, color);
+    protected final void drawComponentShadowCentered(GuiGraphics gui, Component component, float lineNumber, int color) {
+        drawComponent(gui, component, (WIDTH - FONT.width(component)) / 2, lineNumber, color, true);
     }
 
-    protected void drawComponentShadowCentered(PoseStack stack, Component component, float lineNumber, int color) {
-        drawComponentShadow(stack, component, (WIDTH - FONT.width(component)) / 2, lineNumber, color);
-    }
-
-    protected void drawTraits(PoseStack stack, List<ModifierEntry> traits, float lineNumber) {
+    protected final void drawTraits(GuiGraphics gui, List<ModifierEntry> traits, float lineNumber) {
         for (ModifierEntry trait : traits) {
             final Component component = trait.getDisplayName().copy().withStyle(style -> style.withColor((TextColor) null));
             final int color = ResourceColorManager.getColor(Util.makeTranslationKey("modifier", trait.getId()));
-            drawComponentShadow(stack, component, WIDTH - FONT.width(component), lineNumber++, color);
+            drawComponent(gui, component, WIDTH - FONT.width(component), lineNumber++, color, true);
         }
     }
 
-    protected List<Component> getStatTooltip(IMaterialStats stats, int i, double mouseX, double mouseY, float lineNumber) {
+    protected final List<Component> getStatTooltip(IMaterialStats stats, int i, double mouseX, double mouseY, float lineNumber) {
         final int width = FONT.width(stats.getLocalizedInfo().get(i).plainCopy());
         if (Utils.inBox(mouseX, mouseY, 0, lineNumber * LINE_HEIGHT - 1, width, LINE_HEIGHT)) {
             return List.of(stats.getLocalizedDescriptions().get(i));
@@ -128,7 +127,7 @@ public abstract class AbstractMaterialStatsCategory implements IRecipeCategory<M
         return List.of();
     }
 
-    protected List<Component> getTraitTooltips(List<ModifierEntry> traits, double mouseX, double mouseY, float lineNumber) {
+    protected final List<Component> getTraitTooltips(List<ModifierEntry> traits, double mouseX, double mouseY, float lineNumber) {
         for (ModifierEntry trait : traits) {
             final String key = Util.makeTranslationKey("modifier", trait.getId());
             final int width = FONT.width(trait.getDisplayName());
