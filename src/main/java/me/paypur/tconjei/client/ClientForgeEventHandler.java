@@ -15,6 +15,7 @@ import net.minecraftforge.client.event.RecipesUpdatedEvent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import slimeknights.tconstruct.tools.item.RepairKitItem;
 
 import static me.paypur.tconjei.TConJEI.*;
 
@@ -50,8 +51,7 @@ public class ClientForgeEventHandler {
                 .withStyle(ChatFormatting.GRAY));
 
             for (ItemStack stack : wrapper.getInputs()) {
-                // exclude repair kits, doesn't effect 1.19.2
-                if (!stack.getDescriptionId().equals("item.tconstruct.repair_kit")) {
+                if (!(stack.getItem() instanceof RepairKitItem)) {
                     TConJEI.allMaterialsTooltip.put(stack.getItem(), component);
                 }
             }
