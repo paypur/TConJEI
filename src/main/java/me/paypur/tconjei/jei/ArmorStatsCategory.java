@@ -92,40 +92,46 @@ public class ArmorStatsCategory extends AbstractMaterialStatsCategory {
             PlatingMaterialStats plating = platingStats.get();
             drawComponent(gui, Component.translatable("stat.tconstruct.plating").withStyle(ChatFormatting.UNDERLINE), 0, lineNumber++, color, true);
 
-            String durabilityText = plating.getLocalizedInfo().get(0).plainCopy().getString();
-            String armorText = plating.getLocalizedInfo().get(1).plainCopy().getString();
+            if (plating.getType() == PlatingMaterialStats.SHIELD) {
+                drawStatComponent(gui, plating.getLocalizedInfo().get(0), lineNumber++); // durability
+                drawStatComponent(gui, plating.getLocalizedInfo().get(1), lineNumber++); // toughness
+                drawStatComponent(gui, plating.getLocalizedInfo().get(2), lineNumber++); // knockback resistance
+            } else {
+                String durabilityText = plating.getLocalizedInfo().get(0).plainCopy().getString();
+                String armorText = plating.getLocalizedInfo().get(1).plainCopy().getString();
 
-            int durabilityTextWidth = FONT.width(durabilityText);
-            int armorTextWidth = FONT.width(armorText);
+                int durabilityTextWidth = FONT.width(durabilityText);
+                int armorTextWidth = FONT.width(armorText);
 
-            int maxTextWidth = FONT.width(Collections.max(armorStats, Comparator.comparingInt(s -> FONT.width(s.text))).text);
-            int maxArmorWidth = FONT.width(Collections.max(armorStats, Comparator.comparingInt(s -> FONT.width(s.armor))).armor);
-            int maxDurabilityWidth = FONT.width(Collections.max(armorStats, Comparator.comparingInt(s -> FONT.width(s.durability))).durability);
+                int maxTextWidth = FONT.width(Collections.max(armorStats, Comparator.comparingInt(s -> FONT.width(s.text))).text);
+                int maxArmorWidth = FONT.width(Collections.max(armorStats, Comparator.comparingInt(s -> FONT.width(s.armor))).armor);
+                int maxDurabilityWidth = FONT.width(Collections.max(armorStats, Comparator.comparingInt(s -> FONT.width(s.durability))).durability);
 
-            String line = "─";
-            int lineWidth = FONT.width(line);
+                String line = "─";
+                int lineWidth = FONT.width(line);
 
-            int durabilityLine = (maxTextWidth + maxArmorWidth + maxDurabilityWidth - durabilityTextWidth) / lineWidth - 1;
-            int armorLine = (maxTextWidth + maxArmorWidth - armorTextWidth) / lineWidth - 1;
+                int durabilityLine = Math.max((maxTextWidth + maxArmorWidth + maxDurabilityWidth - durabilityTextWidth) / lineWidth - 1, 0);
+                int armorLine = Math.max((maxTextWidth + maxArmorWidth - armorTextWidth) / lineWidth - 1, 0);
 
-            drawString(gui, durabilityText, 0, lineNumber, TEXT_COLOR, false);
-            // durability line
-            drawString(gui, line.repeat(durabilityLine) + "┐", durabilityTextWidth, lineNumber++, DURABILITY_COLOR, true);
-            drawString(gui, "│", durabilityTextWidth + lineWidth * durabilityLine, lineNumber, DURABILITY_COLOR, true);
+                drawString(gui, durabilityText, 0, lineNumber, TEXT_COLOR, false);
+                // durability line
+                drawString(gui, line.repeat(durabilityLine) + "┐", durabilityTextWidth, lineNumber++, DURABILITY_COLOR, true);
+                drawString(gui, "│", durabilityTextWidth + lineWidth * durabilityLine, lineNumber, DURABILITY_COLOR, true);
 
-            drawString(gui, armorText, 0, lineNumber, TEXT_COLOR, false);
-            // armor line
-            drawString(gui, line.repeat(armorLine) + "┐", armorTextWidth, lineNumber++, ARMOR_COLOR, true);
+                drawString(gui, armorText, 0, lineNumber, TEXT_COLOR, false);
+                // armor line
+                drawString(gui, line.repeat(armorLine) + "┐", armorTextWidth, lineNumber++, ARMOR_COLOR, true);
 
-            for (ArmorStat armorStat : armorStats) {
-                drawString(gui, armorStat.text, 0, lineNumber, TEXT_COLOR, false);
-                drawString(gui, armorStat.armor, maxTextWidth + maxArmorWidth - FONT.width(armorStat.armor), lineNumber, ARMOR_COLOR, true); // armor, drawn first because its on the left
-                drawString(gui, armorStat.durability, maxTextWidth + maxArmorWidth + maxDurabilityWidth - FONT.width(armorStat.durability), lineNumber++, DURABILITY_COLOR, true); // durability
+                for (ArmorStat armorStat : armorStats) {
+                    drawString(gui, armorStat.text, 0, lineNumber, TEXT_COLOR, false);
+                    drawString(gui, armorStat.armor, maxTextWidth + maxArmorWidth - FONT.width(armorStat.armor), lineNumber, ARMOR_COLOR, true); // armor, drawn first because its on the left
+                    drawString(gui, armorStat.durability, maxTextWidth + maxArmorWidth + maxDurabilityWidth - FONT.width(armorStat.durability), lineNumber++, DURABILITY_COLOR, true); // durability
+                }
+
+                // these should be the same for the whole set
+                drawStatComponent(gui, plating.getLocalizedInfo().get(2), lineNumber++); // toughness
+                drawStatComponent(gui, plating.getLocalizedInfo().get(3), lineNumber++); // knockback resistance
             }
-
-            // these should be the same for the whole set
-            drawStatComponent(gui, plating.getLocalizedInfo().get(2), lineNumber++); // toughness
-            drawStatComponent(gui, plating.getLocalizedInfo().get(3), lineNumber++); // knockback resistance
             lineNumber += LINE_SPACING;
         }
 
@@ -185,21 +191,34 @@ public class ArmorStatsCategory extends AbstractMaterialStatsCategory {
         if (platingStats.isPresent()) {
             lineNumber++;
             PlatingMaterialStats plating = platingStats.get();
-            Stream<List<Component>> stream = Stream.of(
-                    getStatTooltip(plating, 0, mouseX, mouseY, lineNumber++), // durability
-                    getStatTooltip(plating, 1, mouseX, mouseY, lineNumber)    // armor
-            );
-            lineNumber += 6;
-            stream = Stream.concat(stream, Stream.of(
-                    getStatTooltip(plating, 2, mouseX, mouseY, lineNumber++), // toughness
-                    getStatTooltip(plating, 3, mouseX, mouseY, lineNumber))   // knockback resistance
-            );
-            Optional<List<Component>> component = stream
-                    .filter(list -> !list.isEmpty())
-                    .findFirst();
-            if (component.isPresent()) {
-                tooltip.addAll(component.get());
-                return;
+            if (plating.getType() == PlatingMaterialStats.SHIELD) {
+                Stream<List<Component>> stream = Stream.of(
+                        getStatTooltip(plating, 0, mouseX, mouseY, lineNumber++),  // durability
+                        getStatTooltip(plating, 1, mouseX, mouseY, lineNumber++), // toughness
+                        getStatTooltip(plating, 2, mouseX, mouseY, lineNumber)   // knockback resistance
+                );
+                Optional<List<Component>> component = stream
+                        .filter(list -> !list.isEmpty())
+                        .findFirst();
+                if (component.isPresent()) {
+                    tooltip.addAll(component.get());
+                }
+            } else {
+                Stream<List<Component>> stream = Stream.of(
+                        getStatTooltip(plating, 0, mouseX, mouseY, lineNumber++), // durability
+                        getStatTooltip(plating, 1, mouseX, mouseY, lineNumber)    // armor
+                );
+                lineNumber += 6;
+                stream = Stream.concat(stream, Stream.of(
+                        getStatTooltip(plating, 2, mouseX, mouseY, lineNumber++), // toughness
+                        getStatTooltip(plating, 3, mouseX, mouseY, lineNumber))   // knockback resistance
+                );
+                Optional<List<Component>> component = stream
+                        .filter(list -> !list.isEmpty())
+                        .findFirst();
+                if (component.isPresent()) {
+                    tooltip.addAll(component.get());
+                }
             }
         }
     }
