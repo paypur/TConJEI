@@ -1,8 +1,11 @@
 package me.paypur.tconjei;
 
+import me.paypur.tconjei.client.ClientConfig;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;
+import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.config.ModConfig;
 import slimeknights.tconstruct.library.materials.stats.MaterialStatsId;
 import slimeknights.tconstruct.tools.stats.*;
 
@@ -14,7 +17,6 @@ import static me.paypur.tconjei.TConJEI.MOD_ID;
 // The value here should match an entry in the META-INF/mods.toml file
 @Mod(MOD_ID)
 public class TConJEI {
-
     public static final String MOD_ID = "tconjei";
     public static final List<MaterialStatsId> HARVEST_STAT_IDS = List.of(
             HeadMaterialStats.ID,
@@ -37,4 +39,7 @@ public class TConJEI {
     );
     public static HashMap<Item, Component> allMaterialsTooltip = new HashMap<>();
 
+    public TConJEI() {
+        ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, ClientConfig.SPEC, MOD_ID + "-client.toml");
+    }
 }
