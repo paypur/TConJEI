@@ -28,31 +28,33 @@ public class ClientForgeEventHandler {
     public static void onLogin(RecipesUpdatedEvent event) {
         allMaterialsTooltip.clear();
 
-        for (MaterialStatsWrapper wrapper : Utils.getMaterialWrappers()) {
-            int h = wrapper.hasStats(HARVEST_STAT_IDS) ? 1 : 0;
-            int r = wrapper.hasStats(RANGED_STAT_IDS) ? 1 : 0;
+        if (ClientConfig.ENABLE_TOOLTIP.get()) {
+            for (MaterialStatsWrapper wrapper : Utils.getMaterialWrappers()) {
+                int h = wrapper.hasStats(HARVEST_STAT_IDS) ? 1 : 0;
+                int r = wrapper.hasStats(RANGED_STAT_IDS) ? 1 : 0;
 
-            int flag = h << 1 | r;
+                int flag = h << 1 | r;
 
-            if (flag == 0) {
-                continue;
-            }
+                if (flag == 0) {
+                    continue;
+                }
 
-            int tier = wrapper.material().getTier();
+                int tier = wrapper.material().getTier();
 
-            MutableComponent component = new TranslatableComponent("tconjei.tooltip.tier", tier)
-                .withStyle(style -> style.withColor(ColorManager.getTierColor(tier).orElse(0xAAAAAA)))
-                .append((switch (flag) {
-                    case 0b01 -> new TranslatableComponent("tconjei.tooltip.ranged");
-                    case 0b10 -> new TranslatableComponent("tconjei.tooltip.harvest");
-                    case 0b11 -> new TranslatableComponent("tconjei.tooltip.harvest_ranged");
-                    default -> (MutableComponent) TextComponent.EMPTY;
-                })
-                .withStyle(ChatFormatting.GRAY));
+                MutableComponent component = new TranslatableComponent("tconjei.tooltip.tier", tier)
+                        .withStyle(style -> style.withColor(ColorManager.getTierColor(tier).orElse(0xAAAAAA)))
+                        .append((switch (flag) {
+                            case 0b01 -> new TranslatableComponent("tconjei.tooltip.ranged");
+                            case 0b10 -> new TranslatableComponent("tconjei.tooltip.harvest");
+                            case 0b11 -> new TranslatableComponent("tconjei.tooltip.harvest_ranged");
+                            default -> (MutableComponent) TextComponent.EMPTY;
+                        })
+                                .withStyle(ChatFormatting.GRAY));
 
-            for (ItemStack stack : wrapper.getInputs()) {
-                if (!(stack.getItem() instanceof RepairKitItem)) {
-                    TConJEI.allMaterialsTooltip.put(stack.getItem(), component);
+                for (ItemStack stack : wrapper.getInputs()) {
+                    if (!(stack.getItem() instanceof RepairKitItem)) {
+                        TConJEI.allMaterialsTooltip.put(stack.getItem(), component);
+                    }
                 }
             }
         }
@@ -60,9 +62,11 @@ public class ClientForgeEventHandler {
 
     @SubscribeEvent
     public static void onToolTip(ItemTooltipEvent event) {
-        Item key = event.getItemStack().getItem();
-        if (TConJEI.allMaterialsTooltip.containsKey(key)) {
-            event.getToolTip().add(TConJEI.allMaterialsTooltip.get(key));
+        if (ClientConfig.ENABLE_TOOLTIP.get()) {
+            Item key = event.getItemStack().getItem();
+            if (TConJEI.allMaterialsTooltip.containsKey(key)) {
+                event.getToolTip().add(TConJEI.allMaterialsTooltip.get(key));
+            }
         }
     }
 
