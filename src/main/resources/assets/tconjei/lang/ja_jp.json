@@ -3,7 +3,7 @@
   "tconjei.tool_stats.ranged": "遠距離ステータス",
   "tconjei.tool_stats.armor": "防具ステータス",
 
-  "tconjei.tooltip.tier": "Tier%s",
+  "tconjei.tooltip.tier": "Tier %s",
   "tconjei.tooltip.harvest": " 近接/収穫用素材",
   "tconjei.tooltip.harvest_ranged": " 近接/収穫/遠距離用素材",
   "tconjei.tooltip.harvest_armor": " 近接/収穫/防具用素材",
