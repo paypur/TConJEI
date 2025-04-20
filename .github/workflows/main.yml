@@ -26,8 +26,18 @@ jobs:
       - name: 'Upload to CurseForge'
         uses: itsmeow/curseforge-upload@v3
         with:
+          token: '${{ secrets.CF_API_TOKEN }}'
+          project_id: '974154'
           file_path: 'build/libs/tconjei-${{ env.minecraft_version }}-${{ env.mod_version }}.jar'
           game_endpoint: 'minecraft'
           game_versions: 'Minecraft ${{ env.minecraft_version }},Java 17,Forge'
-          project_id: '974154'
-          token: '${{ secrets.CF_API_TOKEN }}'
+      - name: 'Upload to Modrinth'
+        uses: cloudnode-pro/modrinth-publish@v2
+        with:
+          token: '${{ secrets.MODRINTH_TOKEN }}'
+          project: 'DhBtjMiv'
+          files: 'build/libs/tconjei-${{ env.minecraft_version }}-${{ env.mod_version }}.jar'
+          name: 'TConJEI ${{ env.minecraft_version }}-${{ env.mod_version }}'
+          version: '${{ env.mod_version }}'
+          loaders: 'forge'
+          game-versions: '${{ env.minecraft_version }}'
