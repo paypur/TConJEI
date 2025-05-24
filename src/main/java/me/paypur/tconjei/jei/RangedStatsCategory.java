@@ -1,7 +1,8 @@
 package me.paypur.tconjei.jei;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
+import me.paypur.tconjei.ColorProvider;
+import com.mojang.blaze3d.vertex.PoseStack;
 import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.recipe.RecipeType;
 import net.minecraft.ChatFormatting;
@@ -18,7 +19,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import static me.paypur.tconjei.ColorManager.*;
 import static me.paypur.tconjei.TConJEI.MOD_ID;
 
 public class RangedStatsCategory extends AbstractMaterialStatsCategory {
@@ -78,7 +78,7 @@ public class RangedStatsCategory extends AbstractMaterialStatsCategory {
         if (stringOptional.isPresent()) {
             BowstringMaterialStats string = stringOptional.get();
             drawComponent(stack, string.getLocalizedName().withStyle(ChatFormatting.UNDERLINE), 0, lineNumber++, color, true);
-            drawComponent(stack, string.getLocalizedInfo().get(0), 0, lineNumber, TEXT_COLOR, false);
+            drawComponent(stack, string.getLocalizedInfo().get(0), 0, lineNumber, ColorProvider.TEXT, false);
         }
     }
 

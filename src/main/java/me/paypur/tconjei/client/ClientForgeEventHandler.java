@@ -1,6 +1,6 @@
 package me.paypur.tconjei.client;
 
-import me.paypur.tconjei.ColorManager;
+import me.paypur.tconjei.ColorProvider;
 import me.paypur.tconjei.TConJEI;
 import me.paypur.tconjei.Utils;
 import me.paypur.tconjei.jei.MaterialStatsWrapper;
@@ -42,7 +42,7 @@ public class ClientForgeEventHandler {
                 int tier = wrapper.material().getTier();
 
                 MutableComponent component = new TranslatableComponent("tconjei.tooltip.tier", tier)
-                        .withStyle(style -> style.withColor(ColorManager.getTierColor(tier).orElse(0xAAAAAA)))
+                        .withStyle(style -> style.withColor(ColorProvider.getTierColor(tier).orElse(0xAAAAAA)))
                         .append((switch (flag) {
                             case 0b01 -> new TranslatableComponent("tconjei.tooltip.ranged");
                             case 0b10 -> new TranslatableComponent("tconjei.tooltip.harvest");
