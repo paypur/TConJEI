@@ -1,5 +1,6 @@
 package me.paypur.tconjei.jei;
 
+import me.paypur.tconjei.ColorProvider;
 import mezz.jei.api.gui.builder.ITooltipBuilder;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.helpers.IGuiHelper;
@@ -13,12 +14,10 @@ import slimeknights.tconstruct.library.client.materials.MaterialTooltipCache;
 import slimeknights.tconstruct.library.materials.stats.IMaterialStats;
 import slimeknights.tconstruct.tools.stats.*;
 
-import javax.annotation.Nonnull;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import static me.paypur.tconjei.ColorManager.*;
 import static me.paypur.tconjei.TConJEI.MOD_ID;
 
 public class RangedStatsCategory extends AbstractMaterialStatsCategory {
@@ -77,7 +76,7 @@ public class RangedStatsCategory extends AbstractMaterialStatsCategory {
         if (stringOptional.isPresent()) {
             StatlessMaterialStats string = stringOptional.get();
             drawComponent(gui, string.getLocalizedName().withStyle(ChatFormatting.UNDERLINE), 0, lineNumber++, color, true);
-            drawComponent(gui, string.getLocalizedInfo().get(0), 0, lineNumber, TEXT_COLOR, false);
+            drawComponent(gui, string.getLocalizedInfo().get(0), 0, lineNumber, ColorProvider.TEXT, false);
         }
     }
 

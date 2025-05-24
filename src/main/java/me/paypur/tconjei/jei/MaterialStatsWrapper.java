@@ -1,14 +1,11 @@
 package me.paypur.tconjei.jei;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.core.Registry;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.IForgeRegistry;
 import slimeknights.mantle.recipe.helper.RecipeHelper;
 import slimeknights.mantle.util.RegistryHelper;
 import slimeknights.tconstruct.library.materials.IMaterialRegistry;

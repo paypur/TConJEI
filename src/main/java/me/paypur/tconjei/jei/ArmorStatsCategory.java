@@ -1,5 +1,6 @@
 package me.paypur.tconjei.jei;
 
+import me.paypur.tconjei.ColorProvider;
 import mezz.jei.api.gui.builder.ITooltipBuilder;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.helpers.IGuiHelper;
@@ -18,7 +19,6 @@ import java.util.*;
 import java.util.List;
 import java.util.stream.Stream;
 
-import static me.paypur.tconjei.ColorManager.*;
 import static me.paypur.tconjei.TConJEI.MOD_ID;
 
 public class ArmorStatsCategory extends AbstractMaterialStatsCategory {
@@ -113,19 +113,19 @@ public class ArmorStatsCategory extends AbstractMaterialStatsCategory {
                 int durabilityLine = Math.max((maxTextWidth + maxArmorWidth + maxDurabilityWidth - durabilityTextWidth) / lineWidth - 1, 0);
                 int armorLine = Math.max((maxTextWidth + maxArmorWidth - armorTextWidth) / lineWidth - 1, 0);
 
-                drawString(gui, durabilityText, 0, lineNumber, TEXT_COLOR, false);
+                drawString(gui, durabilityText, 0, lineNumber, ColorProvider.TEXT, false);
                 // durability line
-                drawString(gui, line.repeat(durabilityLine) + "┐", durabilityTextWidth, lineNumber++, DURABILITY_COLOR, true);
-                drawString(gui, "│", durabilityTextWidth + lineWidth * durabilityLine, lineNumber, DURABILITY_COLOR, true);
+                drawString(gui, line.repeat(durabilityLine) + "┐", durabilityTextWidth, lineNumber++, ColorProvider.DURABILITY, true);
+                drawString(gui, "│", durabilityTextWidth + lineWidth * durabilityLine, lineNumber, ColorProvider.DURABILITY, true);
 
-                drawString(gui, armorText, 0, lineNumber, TEXT_COLOR, false);
+                drawString(gui, armorText, 0, lineNumber, ColorProvider.TEXT, false);
                 // armor line
-                drawString(gui, line.repeat(armorLine) + "┐", armorTextWidth, lineNumber++, ARMOR_COLOR, true);
+                drawString(gui, line.repeat(armorLine) + "┐", armorTextWidth, lineNumber++, ColorProvider.ARMOR, true);
 
                 for (ArmorStat armorStat : armorStats) {
-                    drawString(gui, armorStat.text, 0, lineNumber, TEXT_COLOR, false);
-                    drawString(gui, armorStat.armor, maxTextWidth + maxArmorWidth - FONT.width(armorStat.armor), lineNumber, ARMOR_COLOR, true); // armor, drawn first because its on the left
-                    drawString(gui, armorStat.durability, maxTextWidth + maxArmorWidth + maxDurabilityWidth - FONT.width(armorStat.durability), lineNumber++, DURABILITY_COLOR, true); // durability
+                    drawString(gui, armorStat.text, 0, lineNumber, ColorProvider.TEXT, false);
+                    drawString(gui, armorStat.armor, maxTextWidth + maxArmorWidth - FONT.width(armorStat.armor), lineNumber, ColorProvider.ARMOR, true); // armor, drawn first because its on the left
+                    drawString(gui, armorStat.durability, maxTextWidth + maxArmorWidth + maxDurabilityWidth - FONT.width(armorStat.durability), lineNumber++, ColorProvider.DURABILITY, true); // durability
                 }
 
                 // these should be the same for the whole set
@@ -138,14 +138,14 @@ public class ArmorStatsCategory extends AbstractMaterialStatsCategory {
         if (coreOptional.isPresent()) {
             StatlessMaterialStats core = coreOptional.get();
             drawComponent(gui, core.getLocalizedName().withStyle(ChatFormatting.UNDERLINE), 0, lineNumber++, color, true);
-            drawComponent(gui, core.getLocalizedInfo().get(0), 0, lineNumber++, TEXT_COLOR, false);
+            drawComponent(gui, core.getLocalizedInfo().get(0), 0, lineNumber++, ColorProvider.TEXT, false);
             lineNumber += LINE_SPACING;
         }
 
         if (mailleOptional.isPresent()) {
             StatlessMaterialStats maille = mailleOptional.get();
             drawComponent(gui, maille.getLocalizedName().withStyle(ChatFormatting.UNDERLINE), 0, lineNumber++, color, true);
-            drawComponent(gui, maille.getLocalizedInfo().get(0), 0, lineNumber, TEXT_COLOR, false);
+            drawComponent(gui, maille.getLocalizedInfo().get(0), 0, lineNumber, ColorProvider.TEXT, false);
         }
     }
 

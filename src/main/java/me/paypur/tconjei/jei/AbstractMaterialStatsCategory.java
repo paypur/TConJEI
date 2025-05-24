@@ -1,9 +1,8 @@
 package me.paypur.tconjei.jei;
 
-import me.paypur.tconjei.ColorManager;
+import me.paypur.tconjei.ColorProvider;
 import me.paypur.tconjei.Utils;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
-import mezz.jei.api.gui.builder.ITooltipBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.helpers.IGuiHelper;
@@ -30,7 +29,6 @@ import slimeknights.tconstruct.library.utils.Util;
 
 import java.util.List;
 
-import static me.paypur.tconjei.ColorManager.*;
 import static mezz.jei.api.recipe.RecipeIngredientRole.INPUT;
 import static mezz.jei.api.recipe.RecipeIngredientRole.RENDER_ONLY;
 
@@ -71,14 +69,14 @@ public abstract class AbstractMaterialStatsCategory implements IRecipeCategory<M
         final int tier = wrapper.material().getTier();
         final int color = MaterialTooltipCache.getColor(wrapper.getMaterialId()).getValue();
         drawComponentShadowCentered(gui, Component.translatable(Util.makeTranslationKey("material", wrapper.getMaterialId())).withStyle(ChatFormatting.UNDERLINE), 0, color);
-        drawComponentShadowCentered(gui, Component.translatable("tconjei.tooltip.tier", tier), 1, ColorManager.getTierColor(tier).orElse(color));
+        drawComponentShadowCentered(gui, Component.translatable("tconjei.tooltip.tier", tier), 1, ColorProvider.getTierColor(tier).orElse(color));
     }
 
 
     public final List<Component> getMaterialTooltip(MaterialStatsWrapper wrapper, double mouseX, double mouseY) {
         final String key = Util.makeTranslationKey("material", wrapper.getMaterialId());
         final int width = FONT.width(ForgeI18n.getPattern(key));
-        // TODO: doesnt line up with actual text, slightly to the left
+        // TODO: doesnt line up with actual ColorProvider.TEXT, slightly to the left
         if (Utils.inBox(mouseX, mouseY, (WIDTH - width) / 2f, -1, width, LINE_HEIGHT)) {
             return List.of(Component.translatable(key + ".flavor").withStyle(ChatFormatting.ITALIC));
         }
@@ -87,24 +85,18 @@ public abstract class AbstractMaterialStatsCategory implements IRecipeCategory<M
 
     protected final void drawString(GuiGraphics gui, String string, int x, float lineNumber, int color, boolean shadow) {
         final int y = (int) (lineNumber * LINE_HEIGHT);
-        if (shadow) {
-            gui.drawString(FONT, string, x + 1, y + 1, getShade(color, 6), false);
-        }
-        gui.drawString(FONT, string, x, y, color, false);
+        gui.drawString(FONT, string, x, y, color, shadow);
     }
 
     protected final void drawComponent(GuiGraphics gui, Component component, int x, float lineNumber, int color, boolean shadow) {
         final int y = (int) (lineNumber * LINE_HEIGHT);
-        if (shadow) {
-            gui.drawString(FONT, component, x + 1, y + 1, getShade(color, 6), false);
-        }
-        gui.drawString(FONT, component, x, y, color, false);
+        gui.drawString(FONT, component, x, y, color, shadow);
     }
 
     protected final void drawStatComponent(GuiGraphics gui, Component component, float lineNumber) {
         Component sibling = component.getSiblings().get(0);
         drawComponent(gui, sibling.plainCopy(), FONT.width(component.plainCopy()), lineNumber, sibling.getStyle().getColor().getValue(), true);
-        drawComponent(gui, component.plainCopy(), 0, lineNumber, TEXT_COLOR, false);
+        drawComponent(gui, component.plainCopy(), 0, lineNumber, ColorProvider.TEXT, false);
     }
 
     protected final void drawComponentShadowCentered(GuiGraphics gui, Component component, float lineNumber, int color) {

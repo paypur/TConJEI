@@ -13,12 +13,11 @@ import slimeknights.tconstruct.library.client.materials.MaterialTooltipCache;
 import slimeknights.tconstruct.library.materials.stats.IMaterialStats;
 import slimeknights.tconstruct.tools.stats.*;
 
-import javax.annotation.Nonnull;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import static me.paypur.tconjei.ColorManager.*;
+import static me.paypur.tconjei.ColorProvider.*;
 import static me.paypur.tconjei.TConJEI.MOD_ID;
 
 public class HarvestStatsCategory extends AbstractMaterialStatsCategory {
@@ -67,7 +66,7 @@ public class HarvestStatsCategory extends AbstractMaterialStatsCategory {
         if (bindingOptional.isPresent()) {
             StatlessMaterialStats binding = bindingOptional.get();
             drawComponent(gui, binding.getLocalizedName().withStyle(ChatFormatting.UNDERLINE), 0, lineNumber++, color, true);
-            drawComponent(gui, binding.getLocalizedInfo().get(0), 0, lineNumber++, TEXT_COLOR, false);
+            drawComponent(gui, binding.getLocalizedInfo().get(0), 0, lineNumber++, TEXT, false);
             lineNumber += LINE_SPACING;
         }
 
