@@ -1,6 +1,7 @@
 package me.paypur.tconjei.jei;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import me.paypur.tconjei.ColorProvider;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.recipe.RecipeType;
@@ -17,7 +18,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import static me.paypur.tconjei.ColorManager.*;
 import static me.paypur.tconjei.TConJEI.MOD_ID;
 
 public class HarvestStatsCategory extends AbstractMaterialStatsCategory {
@@ -66,7 +66,7 @@ public class HarvestStatsCategory extends AbstractMaterialStatsCategory {
         if (bindingOptional.isPresent()) {
             StatlessMaterialStats binding = bindingOptional.get();
             drawComponent(stack, binding.getLocalizedName().withStyle(ChatFormatting.UNDERLINE), 0, lineNumber++, color, true);
-            drawComponent(stack, binding.getLocalizedInfo().get(0), 0, lineNumber++, TEXT_COLOR, false);
+            drawComponent(stack, binding.getLocalizedInfo().get(0), 0, lineNumber++, ColorProvider.TEXT, false);
             lineNumber += LINE_SPACING;
         }
 

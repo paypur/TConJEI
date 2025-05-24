@@ -1,7 +1,7 @@
 package me.paypur.tconjei.jei;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import me.paypur.tconjei.ColorManager;
+import me.paypur.tconjei.ColorProvider;
 import me.paypur.tconjei.Utils;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
@@ -29,7 +29,6 @@ import slimeknights.tconstruct.library.utils.Util;
 
 import java.util.List;
 
-import static me.paypur.tconjei.ColorManager.*;
 import static mezz.jei.api.recipe.RecipeIngredientRole.INPUT;
 import static mezz.jei.api.recipe.RecipeIngredientRole.RENDER_ONLY;
 
@@ -70,7 +69,7 @@ public abstract class AbstractMaterialStatsCategory implements IRecipeCategory<M
         final int tier = wrapper.material().getTier();
         final int color = MaterialTooltipCache.getColor(wrapper.getMaterialId()).getValue();
         drawComponentShadowCentered(stack, Component.translatable(Util.makeTranslationKey("material", wrapper.getMaterialId())).withStyle(ChatFormatting.UNDERLINE), 0, color);
-        drawComponentShadowCentered(stack, Component.translatable("tconjei.tooltip.tier", tier), 1, ColorManager.getTierColor(tier).orElse(color));
+        drawComponentShadowCentered(stack, Component.translatable("tconjei.tooltip.tier", tier), 1, ColorProvider.getTierColor(tier).orElse(color));
     }
 
     @Override
@@ -85,26 +84,28 @@ public abstract class AbstractMaterialStatsCategory implements IRecipeCategory<M
     }
 
     protected final void drawString(PoseStack stack, String string, int x, float lineNumber, int color, boolean shadow) {
-        final float y = lineNumber * LINE_HEIGHT;
+        final int y = (int) (lineNumber * LINE_HEIGHT);
         if (shadow) {
-            FONT.draw(stack, string, (float) x + 1, y + 1, getShade(color, 6));
+            FONT.drawShadow(stack, string, x, y, color);
+        } else {
+            FONT.draw(stack, string, x, y, color);
         }
-        FONT.draw(stack, string, (float) x, y, color);
     }
 
     protected final void drawComponent(PoseStack stack, Component component, int x, float lineNumber, int color, boolean shadow) {
-        final float y = lineNumber * LINE_HEIGHT;
+        final int y = (int) (lineNumber * LINE_HEIGHT);
         if (shadow) {
-            FONT.draw(stack, component, (float) x + 1, y + 1, getShade(color, 6));
+            FONT.drawShadow(stack, component, x, y, color);
+        } else {
+            FONT.draw(stack, component, x, y, color);
         }
-        FONT.draw(stack, component, (float) x, y, color);
     }
 
     /* has shadow by default */
     protected final void drawStatComponent(PoseStack stack, Component component, float lineNumber) {
         Component sibling = component.getSiblings().get(0);
         drawComponent(stack, sibling.plainCopy(), FONT.width(component.plainCopy()), lineNumber, sibling.getStyle().getColor().getValue(), true);
-        drawComponent(stack, component.plainCopy(), 0, lineNumber, TEXT_COLOR, false);
+        drawComponent(stack, component.plainCopy(), 0, lineNumber, ColorProvider.TEXT, false);
     }
 
     protected final void drawComponentShadowCentered(PoseStack stack, Component component, float lineNumber, int color) {
