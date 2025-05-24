@@ -42,5 +42,5 @@ jobs:
           files: 'build/libs/tconjei-${{ env.minecraft_version }}-${{ env.mod_version }}.jar'
           name: 'TConJEI ${{ env.minecraft_version }}-${{ env.mod_version }}'
           version: '${{ env.mod_version }}'
-          loaders: 'forge'
+          loaders: '["forge", "neoforge"]'
           game-versions: '${{ env.minecraft_version }}'
