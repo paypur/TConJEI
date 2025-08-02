@@ -21,13 +21,21 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.ForgeI18n;
 import net.minecraftforge.fluids.FluidStack;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import slimeknights.mantle.client.ResourceColorManager;
+import slimeknights.mantle.util.RegistryHelper;
 import slimeknights.tconstruct.library.client.materials.MaterialTooltipCache;
+import slimeknights.tconstruct.library.materials.definition.MaterialId;
 import slimeknights.tconstruct.library.materials.stats.IMaterialStats;
 import slimeknights.tconstruct.library.modifiers.ModifierEntry;
+import slimeknights.tconstruct.library.tools.definition.module.material.ToolPartsHook;
+import slimeknights.tconstruct.library.tools.item.IModifiable;
 import slimeknights.tconstruct.library.utils.Util;
 
+import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static mezz.jei.api.recipe.RecipeIngredientRole.INPUT;
 import static mezz.jei.api.recipe.RecipeIngredientRole.RENDER_ONLY;
@@ -39,9 +47,10 @@ public abstract class AbstractMaterialStatsCategory implements IRecipeCategory<M
     protected static final float LINE_SPACING = 0.5f;
     protected static final int WIDTH = 178;
     protected static final int HEIGHT = 200;
-    protected Component title;
     protected RecipeType<MaterialStatsWrapper> recipeType;
+    protected Component title;
     protected IDrawable background, icon;
+    @Nullable
     protected TagKey<Item> tag;
 
     public AbstractMaterialStatsCategory(IGuiHelper guiHelper) {
@@ -57,7 +66,7 @@ public abstract class AbstractMaterialStatsCategory implements IRecipeCategory<M
             builder.addInvisibleIngredients(INPUT).addFluidStack(fluidStack.getFluid(), bucket);
         }
         final List<ItemStack> inputs = wrapper.getInputs();
-        final List<ItemStack> inputsParts = wrapper.getInputsParts(tag);
+        final List<ItemStack> inputsParts = getInputsParts(wrapper.getMaterialId());
         builder.addSlot(RENDER_ONLY, 0, 0).addItemStacks(inputs);
         builder.addSlot(RENDER_ONLY, WIDTH - 16, 0).addItemStacks(inputsParts);
         builder.addInvisibleIngredients(INPUT).addItemStacks(inputs);
@@ -72,6 +81,19 @@ public abstract class AbstractMaterialStatsCategory implements IRecipeCategory<M
         drawComponentShadowCentered(gui, Component.translatable("tconjei.tooltip.tier", tier), 1, ColorProvider.getTierColor(tier).orElse(color));
     }
 
+    protected List<ItemStack> getInputsParts(MaterialId materialId) {
+        if (tag == null) return List.of();
+        Set<Item> seen = new HashSet<>();
+        return RegistryHelper.getTagValueStream(tag)
+                .filter(item -> item instanceof IModifiable)
+                .flatMap(item -> ToolPartsHook.parts(((IModifiable) item).getToolDefinition()).stream()
+                        .filter(part -> part.canUseMaterial(materialId))
+                        .map(part -> part.withMaterial(materialId))
+                )
+                .filter(part -> seen.add(part.getItem()))
+                .sorted(Comparator.comparing(a -> a.getItem().getDescriptionId()))
+                .toList();
+    }
 
     public final List<Component> getMaterialTooltip(MaterialStatsWrapper wrapper, double mouseX, double mouseY) {
         final String key = Util.makeTranslationKey("material", wrapper.getMaterialId());
@@ -134,12 +156,13 @@ public abstract class AbstractMaterialStatsCategory implements IRecipeCategory<M
     @NotNull
     @Override
     public Component getTitle() {
-        return title;
+        return this.title;
     }
+
     @NotNull
     @Override
     public RecipeType<MaterialStatsWrapper> getRecipeType() {
-        return recipeType;
+        return this.recipeType;
     }
 
     @NotNull

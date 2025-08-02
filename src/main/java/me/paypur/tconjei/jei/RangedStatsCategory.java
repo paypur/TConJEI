@@ -4,7 +4,6 @@ import me.paypur.tconjei.ColorProvider;
 import mezz.jei.api.gui.builder.ITooltipBuilder;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.helpers.IGuiHelper;
-import mezz.jei.api.recipe.RecipeType;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
@@ -26,7 +25,7 @@ public class RangedStatsCategory extends AbstractMaterialStatsCategory {
         super(guiHelper);
         this.icon = guiHelper.createDrawable(new ResourceLocation(MOD_ID, "textures/gui/jei.png"), 16, 0, 16, 16);
         this.title = Component.translatable("tconjei.tool_stats.ranged");
-        this.recipeType = RecipeType.create(MOD_ID, "ranged_stats", MaterialStatsWrapper.class);
+        this.recipeType = TConJEIPlugin.RANGED_STATS;
         this.tag = TinkerTags.Items.RANGED;
     }
 

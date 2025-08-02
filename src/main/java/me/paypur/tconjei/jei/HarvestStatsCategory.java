@@ -3,7 +3,6 @@ package me.paypur.tconjei.jei;
 import mezz.jei.api.gui.builder.ITooltipBuilder;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.helpers.IGuiHelper;
-import mezz.jei.api.recipe.RecipeType;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
@@ -26,7 +25,7 @@ public class HarvestStatsCategory extends AbstractMaterialStatsCategory {
         super(guiHelper);
         this.icon = guiHelper.createDrawable(new ResourceLocation(MOD_ID, "textures/gui/jei.png"), 0, 0, 16, 16);
         this.title = Component.translatable("tconjei.tool_stats.harvest");
-        this.recipeType = RecipeType.create(MOD_ID, "harvest_stats", MaterialStatsWrapper.class);
+        this.recipeType = TConJEIPlugin.HARVEST_STATS;
         this.tag = TinkerTags.Items.HARVEST;
     }
 

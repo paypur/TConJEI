@@ -4,7 +4,6 @@ import me.paypur.tconjei.ColorProvider;
 import mezz.jei.api.gui.builder.ITooltipBuilder;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.helpers.IGuiHelper;
-import mezz.jei.api.recipe.RecipeType;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
@@ -27,7 +26,7 @@ public class ArmorStatsCategory extends AbstractMaterialStatsCategory {
         super(guiHelper);
         this.icon = guiHelper.createDrawable(new ResourceLocation(MOD_ID, "textures/gui/jei.png"), 32, 0, 16, 16);
         this.title = Component.translatable("tconjei.tool_stats.armor");
-        this.recipeType = RecipeType.create(MOD_ID, "armor_stats", MaterialStatsWrapper.class);
+        this.recipeType = TConJEIPlugin.ARMOR_STATS;
         this.tag = TinkerTags.Items.ARMOR;
     }
 
@@ -113,6 +112,7 @@ public class ArmorStatsCategory extends AbstractMaterialStatsCategory {
                 int durabilityLine = Math.max((maxTextWidth + maxArmorWidth + maxDurabilityWidth - durabilityTextWidth) / lineWidth - 1, 0);
                 int armorLine = Math.max((maxTextWidth + maxArmorWidth - armorTextWidth) / lineWidth - 1, 0);
 
+                // TODO: just make this a table
                 drawString(gui, durabilityText, 0, lineNumber, ColorProvider.TEXT, false);
                 // durability line
                 drawString(gui, line.repeat(durabilityLine) + "┐", durabilityTextWidth, lineNumber++, ColorProvider.DURABILITY, true);

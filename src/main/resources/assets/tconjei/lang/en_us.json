@@ -2,6 +2,7 @@
     "tconjei.tool_stats.harvest":  "Harvest Stats",
     "tconjei.tool_stats.ranged":  "Ranged Stats",
     "tconjei.tool_stats.armor":  "Armor Stats",
+    "tconjei.tool_stats.skull":  "Slimeskull Stats",
 
     "tconjei.tooltip.tier": "Tier %s",
     "tconjei.tooltip.harvest": " harvest material",
