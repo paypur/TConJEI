@@ -3,12 +3,5 @@
     "tconjei.tool_stats.ranged": "Характ. дальнего оружия",
     "tconjei.tool_stats.armor": "Характ. брони",
 
-    "tconjei.tooltip.tier": "Уровень %s",
-    "tconjei.tooltip.harvest": "материал инструмента для добычи.",
-    "tconjei.tooltip.harvest_ranged": "материал инструмента для добычи и дальнего оружия.",
-    "tconjei.tooltip.harvest_armor": "материал инструмента для добычи и брони.",
-    "tconjei.tooltip.harvest_ranged_armor": "материал инструмента для добычи, дальнего оружия и брони.",
-    "tconjei.tooltip.ranged": "материал дальнего оружия.",
-    "tconjei.tooltip.ranged_armor": "материал дальнего оружия и брони.",
-    "tconjei.tooltip.armor": "материал брони."
+    "tconjei.tooltip.tier": "Уровень %s"
 }
