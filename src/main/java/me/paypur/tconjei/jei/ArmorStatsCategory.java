@@ -1,7 +1,6 @@
 package me.paypur.tconjei.jei;
 
 import me.paypur.tconjei.ColorProvider;
-import me.paypur.tconjei.Utils;
 import mezz.jei.api.gui.builder.ITooltipBuilder;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.helpers.IGuiHelper;
@@ -17,9 +16,8 @@ import slimeknights.tconstruct.library.utils.Util;
 import slimeknights.tconstruct.tools.stats.PlatingMaterialStats;
 import slimeknights.tconstruct.tools.stats.StatlessMaterialStats;
 
-import java.util.*;
 import java.util.List;
-import java.util.stream.Stream;
+import java.util.Optional;
 
 import static me.paypur.tconjei.TConJEI.MOD_ID;
 
@@ -35,17 +33,17 @@ public class ArmorStatsCategory extends AbstractMaterialStatsCategory {
     }
 
     @Override
-    public void draw(MaterialStatsWrapper recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics gui, double mouseX, double mouseY) {
-        final int tier = recipe.material().getTier();
-        final int color = MaterialTooltipCache.getColor(recipe.getMaterialId()).getValue();
+    public void draw(MaterialStatsWrapper wrapper, IRecipeSlotsView recipeSlotsView, GuiGraphics gui, double mouseX, double mouseY) {
+        final int tier = wrapper.material().getTier();
+        final int color = MaterialTooltipCache.getColor(wrapper.getMaterialId()).getValue();
         float lineNumber = 0f;
 
         // name and tier
-        drawComponentShadowCentered(gui, Component.translatable(Util.makeTranslationKey("material", recipe.getMaterialId())).withStyle(ChatFormatting.UNDERLINE), lineNumber++, color);
+        drawComponentShadowCentered(gui, Component.translatable(Util.makeTranslationKey("material", wrapper.getMaterialId())).withStyle(ChatFormatting.UNDERLINE), lineNumber++, color);
         drawComponentShadowCentered(gui, Component.translatable("tconjei.tooltip.tier", tier), lineNumber++, ColorProvider.getTierColor(tier).orElse(color));
 
         List<IMaterialStats> statsList = statsIds.stream()
-                .map(recipe::getStats)
+                .map(wrapper::getStats)
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .toList();
@@ -55,9 +53,14 @@ public class ArmorStatsCategory extends AbstractMaterialStatsCategory {
                 .map(stats -> (PlatingMaterialStats) stats)
                 .toList();
 
+        List<StatlessMaterialStats> statlessList = statsList.stream()
+                .filter(stats -> stats instanceof StatlessMaterialStats)
+                .map(stats -> (StatlessMaterialStats) stats)
+                .toList();
+
         if (!platingList.isEmpty()) {
             IMaterialStats stat = platingList.get(0);
-            List<ModifierEntry> traits = recipe.getTraits(stat.getIdentifier());
+            List<ModifierEntry> traits = wrapper.getTraits(stat.getIdentifier());
             drawTraits(gui, traits, lineNumber);
             drawComponent(gui, Component.translatable("stat.tconstruct.plating").withStyle(ChatFormatting.UNDERLINE), 0, lineNumber, color, true);
 
@@ -65,9 +68,9 @@ public class ArmorStatsCategory extends AbstractMaterialStatsCategory {
             lineNumber += Math.max(traits.size(), 1);
 
             if (stat.getType() == PlatingMaterialStats.SHIELD) {
-                drawStatComponent(gui, stat.getLocalizedInfo().get(0), lineNumber++); // durability
-                drawStatComponent(gui, stat.getLocalizedInfo().get(1), lineNumber++); // toughness
-                drawStatComponent(gui, stat.getLocalizedInfo().get(2), lineNumber++); // knockback resistance
+                for (Component line : stat.getLocalizedInfo()) {
+                    drawStatComponent(gui, line, lineNumber++);
+                }
             } else {
                 String durabilityText = stat.getLocalizedInfo().get(0).plainCopy().getString();
                 String armorText = stat.getLocalizedInfo().get(1).plainCopy().getString();
@@ -100,43 +103,30 @@ public class ArmorStatsCategory extends AbstractMaterialStatsCategory {
             lineNumber += LINE_SPACING;
         }
 
-        for (IMaterialStats stats : statsList) {
-            if (stats instanceof StatlessMaterialStats statless) {
-                drawComponent(gui, statless.getLocalizedName().withStyle(ChatFormatting.UNDERLINE), 0, lineNumber++, color, true);
-                for (Component line : statless.getLocalizedInfo()) {
-                    drawStatComponent(gui, line, lineNumber++);
-                }
-                lineNumber += LINE_SPACING;
+        for (StatlessMaterialStats statless : statlessList) {
+            drawComponent(gui, statless.getLocalizedName().withStyle(ChatFormatting.UNDERLINE), 0, lineNumber++, color, true);
+            for (Component line : statless.getLocalizedInfo()) {
+                drawStatComponent(gui, line, lineNumber++);
             }
+            lineNumber += LINE_SPACING;
         }
     }
 
     @Override
-    public void getTooltip(ITooltipBuilder tooltip, MaterialStatsWrapper recipe, IRecipeSlotsView recipeSlotsView, double mouseX, double mouseY) {
+    public void getTooltip(ITooltipBuilder tooltips, MaterialStatsWrapper wrapper, IRecipeSlotsView recipeSlotsView, double mouseX, double mouseY) {
         // MATERIAL
-        List<Component> materialTooltips = getMaterialTooltip(recipe, mouseX, mouseY);
-        if (!materialTooltips.isEmpty()) {
-            tooltip.addAll(materialTooltips);
-            return;
-        }
+        if (addMaterialTooltip(tooltips, wrapper, mouseX, mouseY)) return;
 
         float lineNumber = 2f;
 
         List<IMaterialStats> statsList = statsIds.stream()
-                .map(recipe::getStats)
+                .map(wrapper::getStats)
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .toList();
 
-        if (!statsList.isEmpty()) {
-            List<Component> traitTooltips = getTraitTooltips(recipe.getTraits(statsList.get(0).getIdentifier()), mouseX, mouseY, lineNumber);
-            if (!traitTooltips.isEmpty()) {
-                tooltip.addAll(traitTooltips);
-                return;
-            }
-        }
-
         List<IMaterialStats> platingList = statsList.stream().filter(stats -> stats instanceof PlatingMaterialStats).toList();
+
 
         // PLATING
         if (!platingList.isEmpty()) {
@@ -144,41 +134,31 @@ public class ArmorStatsCategory extends AbstractMaterialStatsCategory {
             IMaterialStats stat = platingList.get(0);
             if (stat.getType() == PlatingMaterialStats.SHIELD) {
                 for (int i = 0; i < stat.getLocalizedDescriptions().size(); i++) {
-                    final int width = FONT.width(stat.getLocalizedInfo().get(i).plainCopy());
-                    if (Utils.inBox(mouseX, mouseY, 0, lineNumber * LINE_HEIGHT - 1, width, LINE_HEIGHT)) {
-                        tooltip.add(stat.getLocalizedDescriptions().get(i));
-                        return;
-                    }
+                    if (addStatTooltip(tooltips, stat, i, mouseX, mouseY, lineNumber++)) return;
                 }
             } else {
+                // armor traits can be pretty long and would overlap with other text
+                List<ModifierEntry> traits = wrapper.getTraits(stat.getIdentifier());
+                lineNumber += Math.max(traits.size(), 1);
+
+                if (addTraitTooltip(tooltips, traits, mouseX, mouseY, lineNumber)) return;
+
                 final int maxTextWidth = statsList.stream()
                         .map(s -> FONT.width(s.getLocalizedName().plainCopy().getString().split(" ")[0] + ": "))
                         .max(Integer::compareTo)
                         .get();
 
                 String durabilityText = stat.getLocalizedInfo().get(0).plainCopy().getString();
-                String armorText = stat.getLocalizedInfo().get(1).plainCopy().getString();
                 // strip : and " "
                 durabilityText = durabilityText.substring(0, durabilityText.length() - 2);
-                armorText = armorText.substring(0, armorText.length() - 2);
 
-                if (Utils.inBox(mouseX, mouseY, maxTextWidth, lineNumber * LINE_HEIGHT, FONT.width(durabilityText))) {
-                    tooltip.add(stat.getLocalizedDescriptions().get(0));
+                if (addStatTooltip(tooltips, stat, 0, maxTextWidth, mouseX, mouseY, lineNumber)) return;
+                if (addStatTooltip(tooltips, stat, 1, maxTextWidth + FONT.width(durabilityText), mouseX, mouseY, lineNumber++))
                     return;
-                }
 
-                if (Utils.inBox(mouseX, mouseY,maxTextWidth + FONT.width(durabilityText), lineNumber * LINE_HEIGHT, FONT.width(armorText))) {
-                    tooltip.add(stat.getLocalizedDescriptions().get(1));
-                    return;
-                }
-
-                lineNumber += platingList.size() + 1;
+                lineNumber += platingList.size();
                 for (int i = 2; i < stat.getLocalizedDescriptions().size(); i++) {
-                    final int width = FONT.width(stat.getLocalizedInfo().get(i).plainCopy());
-                    if (Utils.inBox(mouseX, mouseY, 0, lineNumber++ * LINE_HEIGHT, width, LINE_HEIGHT)) {
-                        tooltip.add(stat.getLocalizedDescriptions().get(i));
-                        return;
-                    }
+                    if (addStatTooltip(tooltips, stat, i, mouseX, mouseY, lineNumber++)) return;
                 }
             }
         }

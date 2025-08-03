@@ -20,6 +20,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.ForgeI18n;
 import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import slimeknights.mantle.util.RegistryHelper;
@@ -72,17 +73,17 @@ public abstract class AbstractMaterialStatsCategory implements IRecipeCategory<M
     }
 
     @Override
-    public void draw(MaterialStatsWrapper recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics gui, double mouseX, double mouseY) {
-        final int tier = recipe.material().getTier();
-        final int color = MaterialTooltipCache.getColor(recipe.getMaterialId()).getValue();
+    public void draw(MaterialStatsWrapper wrapper, IRecipeSlotsView recipeSlotsView, GuiGraphics gui, double mouseX, double mouseY) {
+        final int tier = wrapper.material().getTier();
+        final int color = MaterialTooltipCache.getColor(wrapper.getMaterialId()).getValue();
         float lineNumber = 0f;
 
         // Name and Tier
-        drawComponentShadowCentered(gui, Component.translatable(Util.makeTranslationKey("material", recipe.getMaterialId())).withStyle(ChatFormatting.UNDERLINE), lineNumber++, color);
+        drawComponentShadowCentered(gui, Component.translatable(Util.makeTranslationKey("material", wrapper.getMaterialId())).withStyle(ChatFormatting.UNDERLINE), lineNumber++, color);
         drawComponentShadowCentered(gui, Component.translatable("tconjei.tooltip.tier", tier), lineNumber++, ColorProvider.getTierColor(tier).orElse(color));
 
         List<IMaterialStats> statsList = statsIds.stream()
-                .map(recipe::getStats)
+                .map(wrapper::getStats)
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .toList();
@@ -90,7 +91,7 @@ public abstract class AbstractMaterialStatsCategory implements IRecipeCategory<M
         // Traits
         Optional<IMaterialStats> statOptional = statsList.stream().findFirst();
         if (statOptional.isPresent()) {
-            drawTraits(gui, recipe.getTraits(statOptional.get().getIdentifier()), lineNumber);
+            drawTraits(gui, wrapper.getTraits(statOptional.get().getIdentifier()), lineNumber);
         }
 
         // Stats
@@ -104,34 +105,21 @@ public abstract class AbstractMaterialStatsCategory implements IRecipeCategory<M
     }
 
     @Override
-    public void getTooltip(ITooltipBuilder tooltip, MaterialStatsWrapper recipe, IRecipeSlotsView recipeSlotsView, double mouseX, double mouseY) {
+    public void getTooltip(ITooltipBuilder tooltips, MaterialStatsWrapper wrapper, IRecipeSlotsView recipeSlotsView, double mouseX, double mouseY) {
         // MATERIAL
-        List<Component> materialTooltips = getMaterialTooltip(recipe, mouseX, mouseY);
-        if (!materialTooltips.isEmpty()) {
-            tooltip.addAll(materialTooltips);
-            return;
-        }
+        if (addMaterialTooltip(tooltips, wrapper, mouseX, mouseY)) return;
 
         float lineNumber = 2f;
 
         for (MaterialStatsId statsId : statsIds) {
-            Optional<IMaterialStats> statsOptional = recipe.getStats(statsId);
+            Optional<IMaterialStats> statsOptional = wrapper.getStats(statsId);
             if (statsOptional.isEmpty()) continue;
             IMaterialStats stats = statsOptional.get();
 
-            List<Component> traitTooltips = getTraitTooltips(recipe.getTraits(stats.getIdentifier()), mouseX, mouseY, lineNumber++);
-            if (!traitTooltips.isEmpty()) {
-                tooltip.addAll(traitTooltips);
-                return;
-            }
+            if (addTraitTooltip(tooltips, wrapper.getTraits(stats.getIdentifier()), mouseX, mouseY, lineNumber++)) return;
 
-            assert stats.getLocalizedInfo().size() == stats.getLocalizedDescriptions().size();
             for (int i = 0; i < stats.getLocalizedDescriptions().size(); i++) {
-                final int width = FONT.width(stats.getLocalizedInfo().get(i).plainCopy());
-                if (Utils.inBox(mouseX, mouseY, 0, lineNumber++ * LINE_HEIGHT - 1, width)) {
-                    tooltip.add(stats.getLocalizedDescriptions().get(i));
-                    return;
-                }
+                if (addStatTooltip(tooltips, stats, i, mouseX, mouseY, lineNumber++)) return;
             }
             lineNumber += LINE_SPACING;
         }
@@ -142,22 +130,15 @@ public abstract class AbstractMaterialStatsCategory implements IRecipeCategory<M
         Set<Item> seen = new HashSet<>();
         return RegistryHelper.getTagValueStream(tag)
                 .filter(item -> item instanceof IModifiable)
-                .flatMap(item -> ToolPartsHook.parts(((IModifiable) item).getToolDefinition()).stream()
+                .map(item -> ((IModifiable) item).getToolDefinition())
+                .map(ToolPartsHook::parts)
+                .flatMap(item -> item.stream()
                         .filter(part -> part.canUseMaterial(materialId))
                         .map(part -> part.withMaterial(materialId))
                 )
                 .filter(part -> seen.add(part.getItem()))
-                .sorted(Comparator.comparing(a -> a.getItem().getDescriptionId()))
+                .sorted(Comparator.comparing(a -> ForgeRegistries.ITEMS.getKey(a.getItem())))
                 .toList();
-    }
-
-    public final List<Component> getMaterialTooltip(MaterialStatsWrapper wrapper, double mouseX, double mouseY) {
-        final String key = Util.makeTranslationKey("material", wrapper.getMaterialId());
-        final int width = FONT.width(ForgeI18n.getPattern(key));
-        if (Utils.inBox(mouseX, mouseY, (WIDTH - width) / 2f, -1, width, LINE_HEIGHT)) {
-            return List.of(Component.translatable(key + ".flavor").withStyle(ChatFormatting.ITALIC));
-        }
-        return List.of();
     }
 
     protected final void drawString(GuiGraphics gui, String string, int x, float lineNumber, int color, boolean shadow) {
@@ -190,24 +171,41 @@ public abstract class AbstractMaterialStatsCategory implements IRecipeCategory<M
         }
     }
 
-    protected final List<Component> getStatTooltip(IMaterialStats stats, int i, double mouseX, double mouseY, float lineNumber) {
-        final int width = FONT.width(stats.getLocalizedInfo().get(i).plainCopy());
-        if (Utils.inBox(mouseX, mouseY, 0, lineNumber * LINE_HEIGHT - 1, width)) {
-            return List.of(stats.getLocalizedDescriptions().get(i));
+    public final boolean addMaterialTooltip(ITooltipBuilder tooltips, MaterialStatsWrapper wrapper, double mouseX, double mouseY) {
+        final String key = Util.makeTranslationKey("material", wrapper.getMaterialId());
+        final int width = FONT.width(ForgeI18n.getPattern(key));
+        if (Utils.inBox(mouseX, mouseY, (WIDTH - width) / 2f, 0, width)) {
+            tooltips.add(Component.translatable(key + ".flavor").withStyle(ChatFormatting.ITALIC));
+            return true;
         }
-        return List.of();
+        return false;
     }
 
-    protected final List<Component> getTraitTooltips(List<ModifierEntry> traits, double mouseX, double mouseY, float lineNumber) {
+    protected final boolean addStatTooltip(ITooltipBuilder tooltips, IMaterialStats stats, int i, double mouseX, double mouseY, float lineNumber) {
+        return addStatTooltip(tooltips, stats, i, 0, mouseX, mouseY, lineNumber);
+    }
+
+    protected final boolean addStatTooltip(ITooltipBuilder tooltips, IMaterialStats stats, int i, int x, double mouseX, double mouseY, float lineNumber) {
+        assert stats.getLocalizedInfo().size() == stats.getLocalizedDescriptions().size();
+        final int width = FONT.width(stats.getLocalizedInfo().get(i).plainCopy());
+        if (Utils.inBox(mouseX, mouseY, x, lineNumber * LINE_HEIGHT, width)) {
+            tooltips.add(stats.getLocalizedDescriptions().get(i));
+            return true;
+        }
+        return false;
+    }
+
+    protected final boolean addTraitTooltip(ITooltipBuilder tooltips, List<ModifierEntry> traits, double mouseX, double mouseY, float lineNumber) {
         for (ModifierEntry trait : traits) {
             final String key = Util.makeTranslationKey("modifier", trait.getId());
             final int width = FONT.width(trait.getDisplayName());
             if (Utils.inBox(mouseX, mouseY, WIDTH - width, lineNumber++ * LINE_HEIGHT - 1, width)) {
-                return List.of(Component.translatable(key + ".flavor").withStyle(ChatFormatting.ITALIC),
-                        Component.translatable(key + ".description"));
+                tooltips.add(Component.translatable(key + ".flavor").withStyle(ChatFormatting.ITALIC));
+                tooltips.add(Component.translatable(key + ".description"));
+                return true;
             }
         }
-        return List.of();
+        return false;
     }
 
     @NotNull
