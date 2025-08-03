@@ -189,8 +189,11 @@ public abstract class AbstractMaterialStatsCategory implements IRecipeCategory<M
         assert stats.getLocalizedInfo().size() == stats.getLocalizedDescriptions().size();
         final int width = FONT.width(stats.getLocalizedInfo().get(i).plainCopy());
         if (Utils.inBox(mouseX, mouseY, x, lineNumber * LINE_HEIGHT, width)) {
-            tooltips.add(stats.getLocalizedDescriptions().get(i));
-            return true;
+            Component desc = stats.getLocalizedDescriptions().get(i);
+            if (!desc.equals(Component.empty())) {
+                tooltips.add(desc);
+                return true;
+            }
         }
         return false;
     }

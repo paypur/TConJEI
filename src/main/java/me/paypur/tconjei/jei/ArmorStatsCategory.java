@@ -127,21 +127,19 @@ public class ArmorStatsCategory extends AbstractMaterialStatsCategory {
 
         List<IMaterialStats> platingList = statsList.stream().filter(stats -> stats instanceof PlatingMaterialStats).toList();
 
-
         // PLATING
         if (!platingList.isEmpty()) {
-            lineNumber++;
             IMaterialStats stat = platingList.get(0);
             if (stat.getType() == PlatingMaterialStats.SHIELD) {
                 for (int i = 0; i < stat.getLocalizedDescriptions().size(); i++) {
                     if (addStatTooltip(tooltips, stat, i, mouseX, mouseY, lineNumber++)) return;
                 }
             } else {
-                // armor traits can be pretty long and would overlap with other text
                 List<ModifierEntry> traits = wrapper.getTraits(stat.getIdentifier());
-                lineNumber += Math.max(traits.size(), 1);
-
                 if (addTraitTooltip(tooltips, traits, mouseX, mouseY, lineNumber)) return;
+
+                // armor traits can be pretty long and would overlap with other text
+                lineNumber += Math.max(traits.size(), 1);
 
                 final int maxTextWidth = statsList.stream()
                         .map(s -> FONT.width(s.getLocalizedName().plainCopy().getString().split(" ")[0] + ": "))
