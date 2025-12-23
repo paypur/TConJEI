@@ -200,11 +200,9 @@ public abstract class AbstractMaterialStatsCategory implements IRecipeCategory<M
 
     protected final boolean addTraitTooltip(ITooltipBuilder tooltips, List<ModifierEntry> traits, double mouseX, double mouseY, float lineNumber) {
         for (ModifierEntry trait : traits) {
-            final String key = Util.makeTranslationKey("modifier", trait.getId());
             final int width = FONT.width(trait.getDisplayName());
             if (Utils.inBox(mouseX, mouseY, WIDTH - width, lineNumber++ * LINE_HEIGHT - 1, width)) {
-                tooltips.add(Component.translatable(key + ".flavor").withStyle(ChatFormatting.ITALIC));
-                tooltips.add(Component.translatable(key + ".description"));
+                tooltips.addAll(trait.getModifier().getDescriptionList());
                 return true;
             }
         }
