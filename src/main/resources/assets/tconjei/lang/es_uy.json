@@ -1,0 +1,16 @@
+{
+    "tconjei.tool_stats.harvest":  "Estadística de Recolección",
+    "tconjei.tool_stats.ranged":  "Estadística de Rango",
+    "tconjei.tool_stats.armor":  "Estadística de Armadura",
+    "tconjei.tool_stats.skull":  "Estadísticas de Calavera",
+
+    "tconjei.tooltip.tier": "Material de Tier %s",
+    "tconjei.tooltip.material": "",
+    "tconjei.tooltip.separator": ", ",
+    "tconjei.tooltip.and": "y ",
+
+    "tconjei.tooltip.harvest": "para recolección",
+    "tconjei.tooltip.ranged": "para rango",
+    "tconjei.tooltip.armor": "para armadura",
+    "tconjei.tooltip.skull": "para calavera slime"
+}
