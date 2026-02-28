@@ -17,7 +17,6 @@ import slimeknights.tconstruct.tools.stats.PlatingMaterialStats;
 import slimeknights.tconstruct.tools.stats.StatlessMaterialStats;
 
 import java.util.List;
-import java.util.Optional;
 
 import static me.paypur.tconjei.TConJEI.MOD_ID;
 
@@ -42,11 +41,7 @@ public class ArmorStatsCategory extends AbstractMaterialStatsCategory {
         drawComponentShadowCentered(gui, Component.translatable(Util.makeTranslationKey("material", wrapper.getMaterialId())).withStyle(ChatFormatting.UNDERLINE), lineNumber++, color);
         drawComponentShadowCentered(gui, Component.translatable("tconjei.tooltip.tier", tier), lineNumber++, ColorProvider.getTierColor(tier).orElse(color));
 
-        List<IMaterialStats> statsList = statsIds.stream()
-                .map(wrapper::getStats)
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .toList();
+        List<IMaterialStats> statsList = getStatsPresent(wrapper);
 
         List<PlatingMaterialStats> platingList = statsList.stream()
                 .filter(stats -> stats instanceof PlatingMaterialStats)
@@ -58,10 +53,11 @@ public class ArmorStatsCategory extends AbstractMaterialStatsCategory {
                 .map(stats -> (StatlessMaterialStats) stats)
                 .toList();
 
+        IMaterialStats stat = statsList.get(0);
+        List<ModifierEntry> traits = wrapper.getTraits(stat.getIdentifier());
+        drawTraits(gui, traits, lineNumber);
+
         if (!platingList.isEmpty()) {
-            IMaterialStats stat = platingList.get(0);
-            List<ModifierEntry> traits = wrapper.getTraits(stat.getIdentifier());
-            drawTraits(gui, traits, lineNumber);
             drawComponent(gui, Component.translatable("stat.tconstruct.plating").withStyle(ChatFormatting.UNDERLINE), 0, lineNumber, color, true);
 
             // armor traits can be pretty long and would overlap with other text
@@ -119,25 +115,20 @@ public class ArmorStatsCategory extends AbstractMaterialStatsCategory {
 
         float lineNumber = 2f;
 
-        List<IMaterialStats> statsList = statsIds.stream()
-                .map(wrapper::getStats)
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .toList();
-
+        List<IMaterialStats> statsList = getStatsPresent(wrapper);
         List<IMaterialStats> platingList = statsList.stream().filter(stats -> stats instanceof PlatingMaterialStats).toList();
+
+        IMaterialStats stat = statsList.get(0);  // TODO: the first stat might have fewer traits than other stats
+        List<ModifierEntry> traits = wrapper.getTraits(stat.getIdentifier());
+        if (addTraitTooltip(tooltips, traits, mouseX, mouseY, lineNumber)) return;
 
         // PLATING
         if (!platingList.isEmpty()) {
-            IMaterialStats stat = platingList.get(0);
             if (stat.getType() == PlatingMaterialStats.SHIELD) {
                 for (int i = 0; i < stat.getLocalizedDescriptions().size(); i++) {
                     if (addStatTooltip(tooltips, stat, i, mouseX, mouseY, lineNumber++)) return;
                 }
             } else {
-                List<ModifierEntry> traits = wrapper.getTraits(stat.getIdentifier());
-                if (addTraitTooltip(tooltips, traits, mouseX, mouseY, lineNumber)) return;
-
                 // armor traits can be pretty long and would overlap with other text
                 lineNumber += Math.max(traits.size(), 1);
 

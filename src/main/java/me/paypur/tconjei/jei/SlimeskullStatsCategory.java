@@ -30,7 +30,7 @@ public class SlimeskullStatsCategory extends AbstractMaterialStatsCategory {
 
     // taken from ContentMaterialSkull
     @Override
-    public List<ItemStack> getInputsParts(MaterialId materialId) {
+    protected List<ItemStack> getInputsParts(MaterialId materialId) {
         Level world = Minecraft.getInstance().level;
         if (world != null) {
             Optional<IDisplayableCastingRecipe> optional = world.getRecipeManager().getAllRecipesFor(TinkerRecipeTypes.CASTING_BASIN.get()).stream()

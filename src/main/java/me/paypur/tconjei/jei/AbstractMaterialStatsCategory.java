@@ -171,7 +171,7 @@ public abstract class AbstractMaterialStatsCategory implements IRecipeCategory<M
         }
     }
 
-    public final boolean addMaterialTooltip(ITooltipBuilder tooltips, MaterialStatsWrapper wrapper, double mouseX, double mouseY) {
+    protected final boolean addMaterialTooltip(ITooltipBuilder tooltips, MaterialStatsWrapper wrapper, double mouseX, double mouseY) {
         final String key = Util.makeTranslationKey("material", wrapper.getMaterialId());
         final int width = FONT.width(ForgeI18n.getPattern(key));
         if (Utils.inBox(mouseX, mouseY, (WIDTH - width) / 2f, 0, width)) {
@@ -207,6 +207,14 @@ public abstract class AbstractMaterialStatsCategory implements IRecipeCategory<M
             }
         }
         return false;
+    }
+
+    protected final List<IMaterialStats> getStatsPresent(MaterialStatsWrapper wrapper) {
+        return statsIds.stream()
+                .map(wrapper::getStats)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .toList();
     }
 
     @NotNull
