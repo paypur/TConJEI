@@ -14,7 +14,7 @@ public class ColorProvider {
 
     public static Optional<TextColor> getTierTextColor(int i) {
         MaterialId id = switch (i) {
-            case 1 -> MaterialId.tryParse("tconstruct:rock");
+            case 0, 1 -> MaterialId.tryParse("tconstruct:rock");
             case 2 -> MaterialId.tryParse("tconstruct:slimewood");
             case 3 -> MaterialId.tryParse("tconstruct:cobalt");
             case 4 -> MaterialId.tryParse("tconstruct:manyullyn");
