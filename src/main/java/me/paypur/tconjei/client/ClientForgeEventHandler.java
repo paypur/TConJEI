@@ -1,6 +1,6 @@
 package me.paypur.tconjei.client;
 
-import me.paypur.tconjei.ColorManager;
+import me.paypur.tconjei.ColorProvider;
 import me.paypur.tconjei.TConJEI;
 import me.paypur.tconjei.Utils;
 import me.paypur.tconjei.jei.MaterialStatsWrapper;
@@ -15,6 +15,10 @@ import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import slimeknights.tconstruct.tools.item.RepairKitItem;
+import slimeknights.tconstruct.tools.stats.SkullStats;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static me.paypur.tconjei.TConJEI.*;
 
@@ -27,38 +31,44 @@ public class ClientForgeEventHandler {
     public static void onLogin(RecipesUpdatedEvent event) {
         allMaterialsTooltip.clear();
 
-        if (ClientConfig.ENABLE_TOOLTIP.get()) {
-            for (MaterialStatsWrapper wrapper : Utils.getMaterialWrappers()) {
-                int h = wrapper.hasStats(HARVEST_STAT_IDS) ? 1 : 0;
-                int r = wrapper.hasStats(RANGED_STAT_IDS) ? 1 : 0;
-                int a = wrapper.hasStats(ARMOR_STAT_IDS) ? 1 : 0;
+        if (!ClientConfig.ENABLE_TOOLTIP.get()) return;
 
-                int flag = h << 2 | r << 1 | a;
+        for (MaterialStatsWrapper wrapper : Utils.getMaterialWrappers()) {
+            List<Component> components = new ArrayList<>();
 
-                if (flag == 0) {
-                    continue;
+            if (wrapper.hasStats(HARVEST_STAT_IDS)) components.add(Component.translatable("tconjei.tooltip.harvest"));
+            if (wrapper.hasStats(RANGED_STAT_IDS)) components.add(Component.translatable("tconjei.tooltip.ranged"));
+            if (wrapper.hasStats(ARMOR_STAT_IDS)) components.add(Component.translatable("tconjei.tooltip.armor"));
+            if (wrapper.hasStats(List.of(SkullStats.ID))) components.add(Component.translatable("tconjei.tooltip.skull"));
+
+            if (components.isEmpty()) continue;
+
+            MutableComponent child = Component.literal(" ") ;
+
+            if (components.size() == 1) {
+                child.append(components.get(0));
+            } else {
+                int i = 0;
+                for (; i < components.size() - 1; i++) {
+                    child.append(components.get(i))
+                         .append(Component.translatable("tconjei.tooltip.separator"));
                 }
+                child.append(Component.translatable("tconjei.tooltip.and"))
+                     .append(components.get(i));
+            }
 
-                int tier = wrapper.material().getTier();
+            child.append(" ")
+                 .append(Component.translatable("tconjei.tooltip.material"))
+                 .withStyle(ChatFormatting.GRAY);
 
-                MutableComponent component = Component.translatable("tconjei.tooltip.tier", tier)
-                        .withStyle(style -> style.withColor(ColorManager.getTierColor(tier).orElse(0xAAAAAA)))
-                        .append((switch (flag) {
-                            case 0b001 -> Component.translatable("tconjei.tooltip.armor");
-                            case 0b010 -> Component.translatable("tconjei.tooltip.ranged");
-                            case 0b011 -> Component.translatable("tconjei.tooltip.ranged_armor");
-                            case 0b100 -> Component.translatable("tconjei.tooltip.harvest");
-                            case 0b101 -> Component.translatable("tconjei.tooltip.harvest_armor");
-                            case 0b110 -> Component.translatable("tconjei.tooltip.harvest_ranged");
-                            case 0b111 -> Component.translatable("tconjei.tooltip.harvest_ranged_armor");
-                            default -> Component.empty();
-                        })
-                        .withStyle(ChatFormatting.GRAY));
+            int tier = wrapper.material().getTier();
+            MutableComponent component = Component.translatable("tconjei.tooltip.tier", tier)
+                    .withStyle(style -> style.withColor(ColorProvider.getTierColor(tier).orElse(0xAAAAAA)))
+                    .append(child);
 
-                for (ItemStack stack : wrapper.getInputs()) {
-                    if (!(stack.getItem() instanceof RepairKitItem)) {
-                        TConJEI.allMaterialsTooltip.put(stack.getItem(), component);
-                    }
+            for (ItemStack stack : wrapper.getInputs()) {
+                if (!(stack.getItem() instanceof RepairKitItem)) {
+                    TConJEI.allMaterialsTooltip.put(stack.getItem(), component);
                 }
             }
         }
@@ -66,11 +76,10 @@ public class ClientForgeEventHandler {
 
     @SubscribeEvent
     public static void onToolTip(ItemTooltipEvent event) {
-        if (ClientConfig.ENABLE_TOOLTIP.get()) {
-            Item key = event.getItemStack().getItem();
-            if (TConJEI.allMaterialsTooltip.containsKey(key)) {
-                event.getToolTip().add(TConJEI.allMaterialsTooltip.get(key));
-            }
+        if (!ClientConfig.ENABLE_TOOLTIP.get()) return;
+        Item key = event.getItemStack().getItem();
+        if (TConJEI.allMaterialsTooltip.containsKey(key)) {
+            event.getToolTip().add(TConJEI.allMaterialsTooltip.get(key));
         }
     }
 

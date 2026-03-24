@@ -1,7 +1,7 @@
 package me.paypur.tconjei.client;
 
 import com.mojang.logging.LogUtils;
-import me.paypur.tconjei.ColorManager;
+import me.paypur.tconjei.ColorProvider;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
@@ -61,7 +61,7 @@ public class ClientModEventHandler {
         try {
             InputStream stream = Minecraft.getInstance().getResourceManager().getResource(new ResourceLocation(MOD_ID, "textures/gui/palette.png")).get().open();
             BufferedImage image = ImageIO.read(stream);
-            ColorManager.TEXT_COLOR = image.getRGB(0, 0);
+            ColorProvider.TEXT = image.getRGB(0, 0);
             stream.close();
         } catch (ArrayIndexOutOfBoundsException | IOException e) {
             LogUtils.getLogger().error("Error loading palette", e);

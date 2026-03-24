@@ -12,7 +12,9 @@ import mezz.jei.api.registration.IRecipeRegistration;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
+import slimeknights.tconstruct.smeltery.TinkerSmeltery;
 import slimeknights.tconstruct.tables.TinkerTables;
+import slimeknights.tconstruct.tools.stats.SkullStats;
 
 import java.util.List;
 
@@ -23,9 +25,10 @@ import static me.paypur.tconjei.TConJEI.MOD_ID;
 public class TConJEIPlugin implements IModPlugin {
 
     ResourceLocation UID = new ResourceLocation(MOD_ID, "jei_plugin");
-    private static final RecipeType<MaterialStatsWrapper> HARVEST_STATS = RecipeType.create(MOD_ID, "harvest_stats", MaterialStatsWrapper.class);
-    private static final RecipeType<MaterialStatsWrapper> RANGED_STATS = RecipeType.create(MOD_ID, "ranged_stats", MaterialStatsWrapper.class);
-    private static final RecipeType<MaterialStatsWrapper> ARMOR_STATS = RecipeType.create(MOD_ID, "armor_stats", MaterialStatsWrapper.class);
+    public static final RecipeType<MaterialStatsWrapper> HARVEST_STATS = RecipeType.create(MOD_ID, "harvest_stats", MaterialStatsWrapper.class);
+    public static final RecipeType<MaterialStatsWrapper> RANGED_STATS = RecipeType.create(MOD_ID, "ranged_stats", MaterialStatsWrapper.class);
+    public static final RecipeType<MaterialStatsWrapper> ARMOR_STATS = RecipeType.create(MOD_ID, "armor_stats", MaterialStatsWrapper.class);
+    public static final RecipeType<MaterialStatsWrapper> SKULL_STATS = RecipeType.create(MOD_ID, "skull_stats", MaterialStatsWrapper.class);
 
     @NotNull
     @Override
@@ -45,6 +48,9 @@ public class TConJEIPlugin implements IModPlugin {
         registration.addRecipes(ARMOR_STATS, statsWrappers.stream()
                 .filter(w -> w.hasStats(TConJEI.ARMOR_STAT_IDS))
                 .toList());
+        registration.addRecipes(SKULL_STATS, statsWrappers.stream()
+                .filter(w -> w.hasStats(List.of(SkullStats.ID)))
+                .toList());
     }
 
     @Override
@@ -53,6 +59,7 @@ public class TConJEIPlugin implements IModPlugin {
         registration.addRecipeCategories(new HarvestStatsCategory(guiHelper));
         registration.addRecipeCategories(new RangedStatsCategory(guiHelper));
         registration.addRecipeCategories(new ArmorStatsCategory(guiHelper));
+        registration.addRecipeCategories(new SlimeskullStatsCategory(guiHelper));
     }
 
     @Override
@@ -60,6 +67,8 @@ public class TConJEIPlugin implements IModPlugin {
         registration.addRecipeCatalyst(new ItemStack(TinkerTables.tinkerStation.asItem()), HARVEST_STATS, RANGED_STATS, ARMOR_STATS);
         registration.addRecipeCatalyst(new ItemStack(TinkerTables.tinkersAnvil.asItem()), HARVEST_STATS, RANGED_STATS, ARMOR_STATS);
         registration.addRecipeCatalyst(new ItemStack(TinkerTables.scorchedAnvil.asItem()), HARVEST_STATS, RANGED_STATS, ARMOR_STATS);
+        registration.addRecipeCatalyst(new ItemStack(TinkerSmeltery.searedBasin.asItem()), SKULL_STATS);
+        registration.addRecipeCatalyst(new ItemStack(TinkerSmeltery.scorchedBasin.asItem()), SKULL_STATS);
     }
 
 }

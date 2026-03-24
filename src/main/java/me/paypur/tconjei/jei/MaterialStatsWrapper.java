@@ -1,16 +1,10 @@
 package me.paypur.tconjei.jei;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.core.Registry;
-import net.minecraft.tags.TagKey;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.IForgeRegistry;
 import slimeknights.mantle.recipe.helper.RecipeHelper;
-import slimeknights.mantle.util.RegistryHelper;
 import slimeknights.tconstruct.library.materials.IMaterialRegistry;
 import slimeknights.tconstruct.library.materials.MaterialRegistry;
 import slimeknights.tconstruct.library.materials.definition.IMaterial;
@@ -22,8 +16,6 @@ import slimeknights.tconstruct.library.modifiers.ModifierEntry;
 import slimeknights.tconstruct.library.recipe.TinkerRecipeTypes;
 import slimeknights.tconstruct.library.recipe.casting.material.MaterialCastingLookup;
 import slimeknights.tconstruct.library.recipe.material.MaterialRecipe;
-import slimeknights.tconstruct.library.tools.definition.module.material.ToolPartsHook;
-import slimeknights.tconstruct.library.tools.item.IModifiable;
 import slimeknights.tconstruct.tools.TinkerToolParts;
 
 import java.util.*;
@@ -63,21 +55,6 @@ public record MaterialStatsWrapper(IMaterial material) {
                 .flatMap(recipe -> recipe.getFluids().stream())
                 .findFirst()
                 .orElse(FluidStack.EMPTY);
-    }
-
-    // taken from AbstractMaterialContent
-    public List<ItemStack> getInputsParts(TagKey<Item> tag) {
-        Set<Item> seen = new HashSet<>();
-        return RegistryHelper.getTagValueStream(tag)
-                .filter(item -> item instanceof IModifiable)
-                .flatMap(
-                    item -> ToolPartsHook.parts(((IModifiable) item).getToolDefinition()).stream()
-                        .filter(part -> part.canUseMaterial(material.getIdentifier()))
-                        .map(part -> part.withMaterial(material.getIdentifier()))
-                )
-                .filter(part -> seen.add(part.getItem()))
-                .sorted(Comparator.comparing(a -> a.getItem().getDescriptionId()))
-                .toList();
     }
 
     public <T extends IMaterialStats> Optional<T> getStats(MaterialStatsId materialStatsId) {
