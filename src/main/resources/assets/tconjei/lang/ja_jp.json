@@ -4,11 +4,12 @@
   "tconjei.tool_stats.armor": "防具ステータス",
 
   "tconjei.tooltip.tier": "Tier %s",
-  "tconjei.tooltip.harvest": " 近接/収穫用素材",
-  "tconjei.tooltip.harvest_ranged": " 近接/収穫/遠距離用素材",
-  "tconjei.tooltip.harvest_armor": " 近接/収穫/防具用素材",
-  "tconjei.tooltip.harvest_ranged_armor": " 近接/収穫/遠距離/防具用素材",
-  "tconjei.tooltip.ranged": " 遠距離用素材",
-  "tconjei.tooltip.ranged_armor": " 遠距離/防具用素材",
-  "tconjei.tooltip.armor": " 防具用素材"
+  "tconjei.tooltip.material": "用素材",
+  "tconjei.tooltip.separator": "/",
+  "tconjei.tooltip.and": "",
+
+  "tconjei.tooltip.harvest": "収穫",
+  "tconjei.tooltip.ranged": "遠距離",
+  "tconjei.tooltip.armor": "防具",
+  "tconjei.tooltip.skull": "スライムスカル"
 }
