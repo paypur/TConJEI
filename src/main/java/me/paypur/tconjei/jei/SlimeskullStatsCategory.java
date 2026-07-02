@@ -1,31 +1,28 @@
 package me.paypur.tconjei.jei;
 
+import mezz.jei.api.gui.drawable.IDrawable;
 import mezz.jei.api.helpers.IGuiHelper;
+import mezz.jei.api.recipe.RecipeType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import slimeknights.tconstruct.library.materials.definition.MaterialId;
+import slimeknights.tconstruct.library.materials.stats.MaterialStatsId;
 import slimeknights.tconstruct.library.recipe.TinkerRecipeTypes;
 import slimeknights.tconstruct.library.recipe.casting.IDisplayableCastingRecipe;
 import slimeknights.tconstruct.library.tools.nbt.MaterialIdNBT;
 import slimeknights.tconstruct.tools.TinkerTools;
-import slimeknights.tconstruct.tools.stats.SkullStats;
 
 import java.util.List;
 import java.util.Optional;
 
 
-public class SlimeskullStatsCategory extends AbstractMaterialStatsCategory {
+public class SlimeskullStatsCategory extends MaterialStatsCategory {
 
-    public SlimeskullStatsCategory(IGuiHelper guiHelper) {
-        super(guiHelper);
-        this.icon = guiHelper.createDrawableItemLike(Items.SKELETON_SKULL);
-        this.title = Component.translatable("tconjei.tool_stats.skull");
-        this.statsIds = List.of(SkullStats.ID);
-        this.recipeType = TConJEIPlugin.SKULL_STATS;
+    public SlimeskullStatsCategory(IGuiHelper guiHelper, RecipeType<MaterialStatsWrapper> recipeType, List<MaterialStatsId> statsIds, Component title, IDrawable icon) {
+        super(guiHelper, recipeType, statsIds, title, icon, null);
     }
 
     // taken from ContentMaterialSkull

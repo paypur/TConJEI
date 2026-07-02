@@ -38,7 +38,7 @@ import java.util.*;
 import static mezz.jei.api.recipe.RecipeIngredientRole.INPUT;
 import static mezz.jei.api.recipe.RecipeIngredientRole.RENDER_ONLY;
 
-public abstract class AbstractMaterialStatsCategory implements IRecipeCategory<MaterialStatsWrapper> {
+public class MaterialStatsCategory implements IRecipeCategory<MaterialStatsWrapper> {
 
     protected static final Font FONT = Minecraft.getInstance().font;
     public static final int LINE_HEIGHT = 10;
@@ -52,8 +52,13 @@ public abstract class AbstractMaterialStatsCategory implements IRecipeCategory<M
     @Nullable
     protected TagKey<Item> tag;
 
-    public AbstractMaterialStatsCategory(IGuiHelper guiHelper) {
+    public MaterialStatsCategory(IGuiHelper guiHelper, RecipeType<MaterialStatsWrapper> recipeType, List<MaterialStatsId> statsIds, Component title, IDrawable icon, TagKey<Item> tag) {
+        this.recipeType = recipeType;
+        this.statsIds = statsIds;
+        this.title = title;
         this.background = guiHelper.createBlankDrawable(WIDTH, HEIGHT);
+        this.icon = icon;
+        this.tag = tag;
     }
 
     @Override

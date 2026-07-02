@@ -1,6 +1,6 @@
 package me.paypur.tconjei;
 
-import me.paypur.tconjei.jei.AbstractMaterialStatsCategory;
+import me.paypur.tconjei.jei.MaterialStatsCategory;
 import me.paypur.tconjei.jei.MaterialStatsWrapper;
 import slimeknights.tconstruct.library.materials.MaterialRegistry;
 
@@ -20,7 +20,7 @@ public class Utils {
     }
 
     public static boolean inBox(double mX, double mY, float x, float y, float w) {
-        return inBox(mX, mY, x, y, w, AbstractMaterialStatsCategory.LINE_HEIGHT);
+        return inBox(mX, mY, x, y, w, MaterialStatsCategory.LINE_HEIGHT);
     }
 
 }

@@ -2,15 +2,18 @@ package me.paypur.tconjei.jei;
 
 import me.paypur.tconjei.ColorProvider;
 import mezz.jei.api.gui.builder.ITooltipBuilder;
+import mezz.jei.api.gui.drawable.IDrawable;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.helpers.IGuiHelper;
+import mezz.jei.api.recipe.RecipeType;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
-import slimeknights.tconstruct.common.TinkerTags;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.item.Item;
 import slimeknights.tconstruct.library.client.materials.MaterialTooltipCache;
 import slimeknights.tconstruct.library.materials.stats.IMaterialStats;
+import slimeknights.tconstruct.library.materials.stats.MaterialStatsId;
 import slimeknights.tconstruct.library.modifiers.ModifierEntry;
 import slimeknights.tconstruct.library.utils.Util;
 import slimeknights.tconstruct.tools.stats.PlatingMaterialStats;
@@ -18,17 +21,9 @@ import slimeknights.tconstruct.tools.stats.StatlessMaterialStats;
 
 import java.util.List;
 
-import static me.paypur.tconjei.TConJEI.MOD_ID;
-
-public class ArmorStatsCategory extends AbstractMaterialStatsCategory {
-
-    public ArmorStatsCategory(IGuiHelper guiHelper) {
-        super(guiHelper);
-        this.icon = guiHelper.createDrawable(new ResourceLocation(MOD_ID, "textures/gui/jei.png"), 32, 0, 16, 16);
-        this.title = Component.translatable("tconjei.tool_stats.armor");
-        this.recipeType = TConJEIPlugin.ARMOR_STATS;
-        this.statsIds = List.of(PlatingMaterialStats.HELMET.getId(), PlatingMaterialStats.CHESTPLATE.getId(), PlatingMaterialStats.LEGGINGS.getId(), PlatingMaterialStats.BOOTS.getId(), PlatingMaterialStats.SHIELD.getId(), StatlessMaterialStats.SHIELD_CORE.getIdentifier(), StatlessMaterialStats.MAILLE.getIdentifier());
-        this.tag = TinkerTags.Items.ARMOR;
+public class ArmorStatsCategory extends MaterialStatsCategory {
+    public ArmorStatsCategory(IGuiHelper guiHelper, RecipeType<MaterialStatsWrapper> recipeType, List<MaterialStatsId> statsIds, Component title, IDrawable icon, TagKey<Item> tag) {
+        super(guiHelper, recipeType, statsIds, title, icon, tag);
     }
 
     @Override

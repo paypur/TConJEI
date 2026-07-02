@@ -9,12 +9,15 @@ import mezz.jei.api.recipe.RecipeType;
 import mezz.jei.api.registration.IRecipeCatalystRegistration;
 import mezz.jei.api.registration.IRecipeCategoryRegistration;
 import mezz.jei.api.registration.IRecipeRegistration;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import org.jetbrains.annotations.NotNull;
+import slimeknights.tconstruct.common.TinkerTags;
 import slimeknights.tconstruct.smeltery.TinkerSmeltery;
 import slimeknights.tconstruct.tables.TinkerTables;
-import slimeknights.tconstruct.tools.stats.SkullStats;
+import slimeknights.tconstruct.tools.stats.*;
 
 import java.util.List;
 
@@ -56,10 +59,38 @@ public class TConJEIPlugin implements IModPlugin {
     @Override
     public void registerCategories(IRecipeCategoryRegistration registration) {
         final IGuiHelper guiHelper = registration.getJeiHelpers().getGuiHelper();
-        registration.addRecipeCategories(new HarvestStatsCategory(guiHelper));
-        registration.addRecipeCategories(new RangedStatsCategory(guiHelper));
-        registration.addRecipeCategories(new ArmorStatsCategory(guiHelper));
-        registration.addRecipeCategories(new SlimeskullStatsCategory(guiHelper));
+
+        registration.addRecipeCategories(new MaterialStatsCategory(
+            guiHelper,
+            TConJEIPlugin.HARVEST_STATS,
+            TConJEI.HARVEST_STAT_IDS,
+            Component.translatable("tconjei.tool_stats.harvest"),
+            guiHelper.createDrawable(new ResourceLocation(MOD_ID, "textures/gui/jei.png"), 0, 0, 16, 16),
+            TinkerTags.Items.HARVEST
+        ));
+        registration.addRecipeCategories(new MaterialStatsCategory(
+            guiHelper,
+            TConJEIPlugin.RANGED_STATS,
+            TConJEI.RANGED_STAT_IDS,
+            Component.translatable("tconjei.tool_stats.ranged"),
+            guiHelper.createDrawable(new ResourceLocation(MOD_ID, "textures/gui/jei.png"), 16, 0, 16, 16),
+            TinkerTags.Items.RANGED
+        ));
+        registration.addRecipeCategories(new ArmorStatsCategory(
+            guiHelper,
+            TConJEIPlugin.ARMOR_STATS,
+            TConJEI.ARMOR_STAT_IDS,
+            Component.translatable("tconjei.tool_stats.armor"),
+            guiHelper.createDrawable(new ResourceLocation(MOD_ID, "textures/gui/jei.png"), 32, 0, 16, 16),
+            TinkerTags.Items.ARMOR
+        ));
+        registration.addRecipeCategories(new SlimeskullStatsCategory(
+            guiHelper,
+            TConJEIPlugin.SKULL_STATS,
+            List.of(SkullStats.ID),
+            Component.translatable("tconjei.tool_stats.skull"),
+            guiHelper.createDrawableItemLike(Items.SKELETON_SKULL)
+        ));
     }
 
     @Override
