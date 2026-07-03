@@ -43,7 +43,7 @@ public class MaterialStatsCategory implements IRecipeCategory<MaterialStatsWrapp
     protected static final Font FONT = Minecraft.getInstance().font;
     public static final int LINE_HEIGHT = 10;
     protected static final float LINE_SPACING = 0.5f;
-    protected static final int WIDTH = 180;
+    protected static final int WIDTH = 178;
     protected static final int HEIGHT = 200;
     protected RecipeType<MaterialStatsWrapper> recipeType;
     protected List<MaterialStatsId> statsIds;
