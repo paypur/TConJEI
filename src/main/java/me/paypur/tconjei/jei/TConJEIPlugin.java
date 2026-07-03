@@ -108,9 +108,9 @@ public class TConJEIPlugin implements IModPlugin {
 
     @Override
     public void registerRecipeCatalysts(IRecipeCatalystRegistration registration) {
-        registration.addRecipeCatalyst(new ItemStack(TinkerTables.tinkerStation.asItem()), HARVEST_STATS, RANGED_STATS, ARMOR_STATS);
-        registration.addRecipeCatalyst(new ItemStack(TinkerTables.tinkersAnvil.asItem()), HARVEST_STATS, RANGED_STATS, ARMOR_STATS);
-        registration.addRecipeCatalyst(new ItemStack(TinkerTables.scorchedAnvil.asItem()), HARVEST_STATS, RANGED_STATS, ARMOR_STATS);
+        registration.addRecipeCatalyst(new ItemStack(TinkerTables.tinkerStation.asItem()), HARVEST_STATS, RANGED_STATS, ARMOR_STATS, AMMO_STATS);
+        registration.addRecipeCatalyst(new ItemStack(TinkerTables.tinkersAnvil.asItem()), HARVEST_STATS, RANGED_STATS, ARMOR_STATS, AMMO_STATS);
+        registration.addRecipeCatalyst(new ItemStack(TinkerTables.scorchedAnvil.asItem()), HARVEST_STATS, RANGED_STATS, ARMOR_STATS, AMMO_STATS);
         registration.addRecipeCatalyst(new ItemStack(TinkerSmeltery.searedBasin.asItem()), SKULL_STATS);
         registration.addRecipeCatalyst(new ItemStack(TinkerSmeltery.scorchedBasin.asItem()), SKULL_STATS);
     }
