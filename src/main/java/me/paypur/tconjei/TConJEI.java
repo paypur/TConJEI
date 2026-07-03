@@ -37,6 +37,11 @@ public class TConJEI {
             StatlessMaterialStats.MAILLE.getIdentifier(),
             StatlessMaterialStats.SHIELD_CORE.getIdentifier()
     );
+    public static final List<MaterialStatsId> AMMO_STAT_IDS = List.of(
+            StatlessMaterialStats.ARROW_HEAD.getIdentifier(),
+            StatlessMaterialStats.ARROW_SHAFT.getIdentifier(),
+            StatlessMaterialStats.FLETCHING.getIdentifier()
+    );
     public static HashMap<Item, Component> allMaterialsTooltip = new HashMap<>();
 
     public TConJEI() {

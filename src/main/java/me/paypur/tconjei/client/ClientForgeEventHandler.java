@@ -37,8 +37,9 @@ public class ClientForgeEventHandler {
             List<Component> components = new ArrayList<>();
 
             if (wrapper.hasStats(HARVEST_STAT_IDS)) components.add(Component.translatable("tconjei.tooltip.harvest"));
-            if (wrapper.hasStats(RANGED_STAT_IDS)) components.add(Component.translatable("tconjei.tooltip.ranged"));
             if (wrapper.hasStats(ARMOR_STAT_IDS)) components.add(Component.translatable("tconjei.tooltip.armor"));
+            if (wrapper.hasStats(RANGED_STAT_IDS)) components.add(Component.translatable("tconjei.tooltip.ranged"));
+            if (wrapper.hasStats(AMMO_STAT_IDS)) components.add(Component.translatable("tconjei.tooltip.ammo"));
             if (wrapper.hasStats(List.of(SkullStats.ID))) components.add(Component.translatable("tconjei.tooltip.skull"));
 
             if (components.isEmpty()) continue;

@@ -17,6 +17,7 @@ import org.jetbrains.annotations.NotNull;
 import slimeknights.tconstruct.common.TinkerTags;
 import slimeknights.tconstruct.smeltery.TinkerSmeltery;
 import slimeknights.tconstruct.tables.TinkerTables;
+import slimeknights.tconstruct.tools.TinkerTools;
 import slimeknights.tconstruct.tools.stats.*;
 
 import java.util.List;
@@ -31,6 +32,7 @@ public class TConJEIPlugin implements IModPlugin {
     public static final RecipeType<MaterialStatsWrapper> HARVEST_STATS = RecipeType.create(MOD_ID, "harvest_stats", MaterialStatsWrapper.class);
     public static final RecipeType<MaterialStatsWrapper> RANGED_STATS = RecipeType.create(MOD_ID, "ranged_stats", MaterialStatsWrapper.class);
     public static final RecipeType<MaterialStatsWrapper> ARMOR_STATS = RecipeType.create(MOD_ID, "armor_stats", MaterialStatsWrapper.class);
+    public static final RecipeType<MaterialStatsWrapper> AMMO_STATS = RecipeType.create(MOD_ID, "ammo_stats", MaterialStatsWrapper.class);
     public static final RecipeType<MaterialStatsWrapper> SKULL_STATS = RecipeType.create(MOD_ID, "skull_stats", MaterialStatsWrapper.class);
 
     @NotNull
@@ -53,6 +55,9 @@ public class TConJEIPlugin implements IModPlugin {
                 .toList());
         registration.addRecipes(SKULL_STATS, statsWrappers.stream()
                 .filter(w -> w.hasStats(List.of(SkullStats.ID)))
+                .toList());
+        registration.addRecipes(AMMO_STATS, statsWrappers.stream()
+                .filter(w -> w.hasStats(TConJEI.AMMO_STAT_IDS))
                 .toList());
     }
 
@@ -83,6 +88,14 @@ public class TConJEIPlugin implements IModPlugin {
             Component.translatable("tconjei.tool_stats.armor"),
             guiHelper.createDrawable(new ResourceLocation(MOD_ID, "textures/gui/jei.png"), 32, 0, 16, 16),
             TinkerTags.Items.ARMOR
+        ));
+        registration.addRecipeCategories(new MaterialStatsCategory(
+            guiHelper,
+            TConJEIPlugin.AMMO_STATS,
+            TConJEI.AMMO_STAT_IDS,
+            Component.translatable("tconjei.tool_stats.ammo"),
+            guiHelper.createDrawableItemStack(TinkerTools.arrow.get().getRenderTool()),
+            TinkerTags.Items.AMMO
         ));
         registration.addRecipeCategories(new SlimeskullStatsCategory(
             guiHelper,
